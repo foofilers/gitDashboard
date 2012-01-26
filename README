@@ -12,3 +12,23 @@ Requirements:
  dulwich
  ghdiff
  pygments
+ 
+Installation:
+ 1) install the python dependencies (see Requirements) with pip
+ 	i.e. pip install django
+ 2) copy settings.py.sample into settings.py
+ 3) edit settings.py and set the variables 
+ 	GIT_PATH : the directory that contain the git repositories
+ 	i.e. GIT_PATH="/var/lib/gitRepos" 
+ 	for the structure like:
+ 		-/var/lib/gitRepos/repo1.git
+ 		-/var/lib/gitRepos/repo2.git 
+ 	GIT_BASIC_URL: The url prefix for the git clone
+ 		i.e GIT_BASIC_URL="http://myinternalserver.lan/git/"
+ 		the result will be http://myinternalserver.lan/git/repo1.git"
+ 4) configure and create the django db (the default is sqlite3)
+ 	python manage.py syncdb
+ 5) run the server
+ 	python manage.py runserver 8080
+ 6) open browser and have a lot fun
+ 
