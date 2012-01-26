@@ -25,12 +25,20 @@
 		<th>Path</th>
 		<th>Description</th>
 		<th>Url</th>
+		<th>Tree</th>
 	</tr>
 	{% for rep in repos %}
 	<tr>
 		<td><a href="{%url gitview.views.commits%}?path={{rep.path}}">{{rep.path|relpath:gitPath}}</a></td>
 		<td>{{rep.get_description}}</td>
 		<td>{{gitBasicUrl}}{{rep.path|relpath:gitPath}}</td>
+		<td style="text-align:center;">
+			{% if rep.getHead %}
+				<a href="{% url gitview.views.tree%}?path={{rep.path}}&commit={{rep.getHead}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
+			{% else %}
+				<img src="/static/images/empty.png" title="Empty"/>
+			{% endif%}
+		</td>
 	</tr>
 	{% endfor %}
 </table>

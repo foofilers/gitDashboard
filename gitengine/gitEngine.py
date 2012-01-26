@@ -304,6 +304,12 @@ class GitRepo(Repo):
             finally:
                 newdescFile.close()
         return nrp
+    
+    def getHead(self):
+        try:
+            return self.head()
+        except KeyError:
+            return None
 
 class GitGraph:
     def __init__(self,repo,since=None,size=None,until=None,branch=None,commitUrl=None):
