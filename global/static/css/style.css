@@ -1,0 +1,163 @@
+body{
+	font-family: verdana;
+	font-size:12px;
+	background-color: #EEEEEE;
+}
+table{
+	font-size:12px;
+}
+a visited{
+	color:black;
+}
+a {
+	color:black;
+}
+.top{
+	background-color:white;
+	border:1px solid #CCCCCC;
+	height: 90px;
+	margin-bottom:10px;
+}
+.top img{
+	vertical-align: middle;
+}
+
+.center{
+	background-color:white;
+	border:1px solid #CCCCCC;
+	padding:5px;
+	margin:0px;
+}
+
+.bottom{
+	text-align:right;
+	border-left:1px solid #CCCCCC;
+	border-right:1px solid #CCCCCC;
+	border-bottom:1px solid #CCCCCC;
+	padding-right:5px;
+	font-size:10px;
+}
+
+.repoHeader{
+	background-color:white;
+	border:1px solid #CCCCCC;
+	margin-bottom:5px;
+	
+	padding:5px;
+}
+
+input,select,textarea{
+	font-family:monospace;
+	border:1px solid #CCCCCC;
+}
+
+.title{
+	font-size: 30px;
+	font-weight: bold;
+	float:left;
+	clear:left;
+}
+
+.menu{
+	float:right;
+	margin-right:50px;
+	margin-top:0px;
+}
+
+.menuTable{
+	font-size:20px;
+}
+
+.menuTable td{
+	padding-left: 15px;
+	padding-right: 15px;
+	margin:0px;
+}
+
+.menuTable td.highlight{
+	background-color: #CCFFFF;
+}
+
+.login{
+	border:1px solid #000000;
+	float:right;
+	margin-right:10px;
+}
+
+.content{
+	padding-top:10px;
+}
+
+.gridTable{
+	border:1px solid #000000;
+	border-collapse: collapse;
+	margin-bottom:10px;
+}
+
+.gridTable td{
+	padding:5px;
+	border:1px solid #CCCCCC;
+}
+
+.gridTable th{
+	background-image:url("/static/images/bg_table.png");
+	font-size:12px;
+	border:1px solid #CCCCCC;
+	height:25px;
+}
+
+.gridTable tr.highlight {
+  background-color: #e5f0f5;
+}
+.highlighttable{
+	width:100%;
+}
+.gd{
+	color:red;
+}
+.gi{
+	color:green;
+}
+.gu{
+	color:gray;
+}
+.commitTable{
+	border:1px solid #c5d5dd;
+	border-collapse: collapse;
+}
+.commitTable td{
+	padding:15px;
+	border:1px solid #c5d5dd;
+}	
+	
+.commitTable th{
+	padding:15px;
+	font-weight:normal;
+	text-align:left;
+	border:1px solid #c5d5dd;
+	background-color: #e5f0f5;
+}
+
+.tag{
+	margin-right:5px;
+	font-size:10px;
+	background-color: #e5f0f5;
+	border:1px solid #c5d5dd;
+}
+
+.branch{
+	margin-right:5px;
+	font-size:10px;
+	background-color: lightgreen;
+	border:1px solid #CCCCCC;
+}
+
+.fileContent{
+	overflow: auto;
+}
+
+.branchForm select{
+	background-color: white;
+}
+
+

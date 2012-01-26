@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% load pathutils %}
+
+{% block repoHeader %}
+<b>Git Main Directory :</b> {{ gitPath }}
+{% endblock %}
+
+{% block contentBlock %}
+<script type="text/javascript">
+	$(function(){
+		$('#repoTable tr').hover(
+			function(){
+				$(this).addClass("highlight");
+			},
+			function(){
+				$(this).removeClass("highlight");
+			}	
+		);
+	}
+	);
+</script>
+
+<table id="repoTable" width="100%" class="gridTable">
+	<tr>
+		<th>Path</th>
+		<th>Description</th>
+		<th>Url</th>
+	</tr>
+	{% for rep in repos %}
+	<tr>
+		<td><a href="{%url gitview.views.commits%}?path={{rep.path}}">{{rep.path|relpath:gitPath}}</a></td>
+		<td>{{rep.get_description}}</td>
+		<td>http://example.com/git/{{rep.path|relpath:gitPath}}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% load highlight %}
+
+{% block repoHeader %}
+<b>Repository path:</b>{{ repoPath }}/[commit:<a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{commitId}}">{{commitId}}</a>]
+{%endblock%}
+
+{% block contentBlock %}
+<script type="text/javascript">
+	$(document).ready(function(){
+	    $("#tree").treeview({
+	    	collapsed:true,
+	    	persist: "cookie",
+	    	cookieId: "fileTreeNavigation_{{commitId}}"
+	    });
+	    $('#layout').layout({ 
+	    	applyDefaultStyles: true ,
+	    	resizable:true,
+	    	closeable:true,
+	    	west__size:300
+	    	});
+	});
+	
+	function showContent(fileSha,fileName){
+		$.get("{%url gitview.views.fileContent%}",{
+			path:"{{repoPath}}",
+			sha:fileSha,
+			filePath:fileName
+		},function(html){
+			$('#fileContent').html(html);
+			
+		});
+	}
+</script>
+<div id="layout" style="height:100%;">
+	<div id="treeMenu" class="ui-layout-west" style="width:300px;">
+		<ul id="tree" class="filetree">
+			{{treeContent|safe}}
+		</ul>
+	</div>
+	<div class="fileContent ui-layout-center" id="fileContent" style="overflow: auto;">
+	</div>
+</div>
+{% endblock %}

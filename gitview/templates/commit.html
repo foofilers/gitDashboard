@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+{% load timeutils %}
+{% load highlight %}
+
+{% block repoHeader %}
+<b>Repository path:</b>{{ repoPath }}/[<a href="{%url gitview.views.commits%}?path={{repoPath}}">commits</a>]
+{%endblock %}
+
+{% block contentBlock %}
+<table  style="width:100%;" cellpadding="2px;" class="commitTable">
+	<tr>
+		<th colspan="2">
+			{{commit.message|linebreaks}}
+		</th>
+	</tr>
+	<tr>
+		<td>
+			<b>Id:</b>	{{commit.id}}<br/>
+			<b>Parents:</b>
+				{% for par in commit.parents %}
+					<a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{par}}">{{par}}</a>
+				{% endfor %}<br/>
+			<b>Author:</b> {{commit.author}}<br/>
+			<b>Commit Date:</b>	{{commit.commit_time|timestamp:'%Y-%m-%d %H:%M'}}<br/>
+			<b>Committer:</b> {{commit.committer}}<br/>
+			{% if commit.getTags %}
+				<b>Tag:</b> <span class="tag">{% for tag in commit.getTags %} {{tag}}</span> {%endfor%}
+			{% endif %}
+		</td>
+	</tr>
+	<tr>
+		<th colspan="2" style="padding:2px; text-align:center">
+			<img src="/static/images/file_tree.png" title="File Tree" style="vertical-align:middle;"/> <a href="{% url gitview.views.tree%}?path={{repoPath}}&commit={{commit.id}}"><b>File Tree</b></a>
+		</th>
+	</tr>
+</table>
+<br/>
+
+{%for change in changes%}
+<table class="gridTable" width="100%">
+	{% if change.oldFileName and change.newFileName %}
+		<tr>
+			<th nowrap="nowrap" style="width:150px;text-align:center;">
+				<script>
+					$(function(){
+						$('#{{change.newSha}}_showBtn').click(function(){
+							$('#{{change.newSha}}_diff').toggle('blind',300);
+						});
+						$('#{{change.newSha}}_ghshowBtn').click(function(){
+							$('#{{change.newSha}}_ghdiff').toggle('blind',300);
+						});
+					});
+				</script>
+				<input type="button" id="{{change.newSha}}_ghshowBtn" value="GHDiff"/>&nbsp;<input type="button" id="{{change.newSha}}_showBtn" value="Diff"/>
+			</th>
+			<th style="text-align:left;">&nbsp;
+				{% if change.oldFileName == change.newFileName %}
+					<a href="{%url gitview.views.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.oldFileName}}">
+						{{change.oldFileName}}</a>
+				{% else %}
+					{{change.oldFileName}} -> <a href="{%url gitview.views.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.newFileName}}">{{change.newFileName}}</a>
+				{% endif %}
+			</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<div id="{{change.newSha}}_diff" style="display:none;background-color:#EEEEEE;overflow: auto;">
+					{{change.getPrettyDiff|highlight:'a.diff'|safe}}
+				</div>
+				<div id="{{change.newSha}}_ghdiff" style="display:none;background-color:#EEEEEE;overflow: auto;">
+					{{change.getPrettyGHDiff|safe}}
+				</div>
+			</td>
+		</tr>
+	{% else %}
+		{% if change.newFileName == None %}
+			<tr><th style="text-align:left;">&nbsp;<span class="gd">deleted</span> {{change.oldFileName}}</th></tr>
+		{% else %}
+			<tr><th style="text-align:left;">&nbsp;<span class="gi">created</span> <a href="{%url gitview.views.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.newFileName}}">{{change.newFileName}}</a></th></tr>
+		{% endif %}
+	{% endif %}
+</table>
+{% endfor %}
+
+{% endblock %}

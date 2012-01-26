@@ -1,0 +1,43 @@
+<html>
+<head>
+	<title>Git DashBoard</title>
+	<link href="/static/css/style.css" rel="stylesheet" type="text/css" />
+	<link href="/static/css/jquery-ui-1.8.17.css" rel="stylesheet" type="text/css" />
+	<link href="/static/css/jquery-ui-timepicker-addon.css" rel="stylesheet" type="text/css" />
+	<link href="/static/css/jquery.tooltip.css" rel="stylesheet" type="text/css" />
+	<link href="/static/css/jquery.treeview.css" rel="stylesheet" type="text/css" />  
+	
+	<script type="text/javascript" src="/static/js/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="/static/js/jquery-ui-1.8.17.min.js"></script>
+	<script type="text/javascript" src="/static/js/jquery-ui-timepicker-addon.js"></script>
+	<script type="text/javascript" src="/static/js/jquery-ui-timepicker-it.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.tooltip.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.treeview.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.layout.js"></script>
+	
+</head>
+<body>
+	<div class="top">
+		<div class="title">
+			<a href="{%url gitview.views.index %}"><img id="logoImg" src="/static/images/logo.png" width="200px" border="0px"/>DashBoard</a></div>
+		<div class="menu">
+			<table class="menuTable" id="menuTable" cellspacing="0px;">
+				<tr>
+					<td><a href="{%url gitview.views.new %}">Create New Repository</a></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div class="repoHeader">
+		{% block repoHeader %}  {% endblock %}
+	</div>
+	
+	<div class="center">
+		{% block contentBlock %} content {% endblock %}
+	</div>
+	<div class="bottom">
+		realized by Igor Maculan (n3wtron@gmail.com)
+	</div>
+</body>
+</html>

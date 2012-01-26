@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% load highlight %}
+
+{% block repoHeader %}
+<b>Repository path:</b>{{ repoPath }} (<a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{commitId}}">commit</a>)
+{% endblock %}
+{% block contentBlock %}
+<script>
+	$(function(){
+		$.get("{%url gitview.views.fileContent%}",{
+			path:"{{repoPath}}",
+			sha:"{{fileSha}}",
+			filePath:"{{fileName}}"
+		},function(html){
+			$('#fileContent').html(html);
+		});
+	});
+</script>
+<div id="fileContent">
+	
+</div>
+{% endblock %}

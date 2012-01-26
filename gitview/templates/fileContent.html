@@ -1,0 +1,18 @@
+{% load highlight %}
+<style>
+	{{'code'|highlightstyle}}
+</style>
+<table class="gridTable" width="100%">
+	<tr>
+		<th style="font-weight:normal;text-align:left;padding-left:10px;">
+			{{fileName}} <a href="{%url gitview.views.rawContent%}?path={{repoPath}}&sha={{sha}}&filePath={{fileName}}">Raw</a>
+		</th>
+	</tr>
+	<tr>
+		<td>
+			<div class="code">
+				{{content|highlightTable:fileName|safe}}
+			</div>
+		</td>
+	</tr>
+</table>

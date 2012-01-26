@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block repoHeader %}
+<b>Git Main Directory :</b> {{ gitPath }}
+{% endblock %}
+
+{% block contentBlock %}
+<form method="POST">{% csrf_token %}
+	{{ newReposForm.no_field_errors }}
+	<table align="center">
+		<tr>
+			<td>Path:</td>
+			<td>{{ gitPath }}/{{newReposForm.path}}{{newReposForm.path.errors}}</td>
+		</tr>
+		<tr>
+			<td>Description:</td>
+			<td>{{newReposForm.description}}{{newReposForm.description.errors}}</td>
+		</tr>
+		<tr>
+			<td colspan="2" align="center">
+				<input type="submit" value="AddRepository"/>
+			</td>
+		</tr>
+	</table>
+</form>
+
+{% endblock %}
