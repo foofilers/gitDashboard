@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 
 def index(request):
     repos=GitRepo.getRepos(settings.GIT_PATH, True)
-    return render_to_response("index.html",{'gitPath':settings.GIT_PATH,'repos':repos})
+    return render_to_response("index.html",{'gitPath':settings.GIT_PATH,'gitBasicUrl':settings.GIT_BASIC_URL,'repos':repos})
 
 class BranchForm(forms.Form):
     def __init__(self,repo,*args,**kwargs):

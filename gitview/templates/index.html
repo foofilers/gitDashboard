@@ -30,7 +30,7 @@
 	<tr>
 		<td><a href="{%url gitview.views.commits%}?path={{rep.path}}">{{rep.path|relpath:gitPath}}</a></td>
 		<td>{{rep.get_description}}</td>
-		<td>http://example.com/git/{{rep.path|relpath:gitPath}}</td>
+		<td>{{gitBasicUrl}}{{rep.path|relpath:gitPath}}</td>
 	</tr>
 	{% endfor %}
 </table>

@@ -146,3 +146,4 @@ LOGGING = {
 }
 
 GIT_PATH='[PATH OF REPOSITORIES PARENT]'
+GIT_BASIC_URL="http://www.example.com/gitRepos"
