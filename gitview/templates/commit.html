@@ -24,7 +24,7 @@
 			<b>Commit Date:</b>	{{commit.commit_time|timestamp:'%Y-%m-%d %H:%M'}}<br/>
 			<b>Committer:</b> {{commit.committer}}<br/>
 			{% if commit.getTags %}
-				<b>Tag:</b> <span class="tag">{% for tag in commit.getTags %} {{tag}}</span> {%endfor%}
+				<b>Tag:</b> <span class="tag">{% for tag in commit.getTags %} {{tag.name}}</span> {%endfor%}
 			{% endif %}
 		</td>
 	</tr>

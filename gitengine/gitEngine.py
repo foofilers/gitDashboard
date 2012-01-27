@@ -170,8 +170,8 @@ class GitCommit(Commit):
     def getTags(self):
         repoTags=self.repo.getTags()
         tags=[]
-        for tag in repoTags.keys():
-            if repoTags[tag]==self.id:
+        for tag in repoTags:
+            if tag._object_sha==self.id:
                 tags.append(tag)
         return tags
     
@@ -222,11 +222,12 @@ class GitRepo(Repo):
         return self.description
     
     def getTags(self):
-        tags={}
+        tags=[]
         refs=self.get_refs()
         for ref in refs.keys():
-            if ref.find('refs/tags/')>-1:
-                tags[ref.replace('refs/tags/','')]=refs[ref]
+            t = self.get_object(refs[ref])
+            if t.get_type()==4:
+                tags.append(t)
         return tags
     
     def getBranches(self):

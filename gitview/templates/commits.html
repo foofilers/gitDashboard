@@ -110,7 +110,7 @@
 				<td>
 					{{cmt.message}}
 					{% if cmt.getTags %}
-						{% for tag in cmt.getTags %}<span class="tag">{{tag}}</span>{%endfor%}
+						{% for tag in cmt.getTags %}<span class="tag">{{tag.name}}</span>{%endfor%}
 					{% endif %}
 					{% if cmt.getBranches %}
 						{% for branch in cmt.getBranches %}<span class="branch">{{branch}}</span>{%endfor%}

@@ -12,6 +12,7 @@ Requirements:
  dulwich
  ghdiff
  pygments
+ pysqlite2
  
 Installation:
  1) install the python dependencies (see Requirements) with pip
