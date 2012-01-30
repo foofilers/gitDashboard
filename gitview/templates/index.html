@@ -3,6 +3,9 @@
 
 {% block repoHeader %}
 <b>Git Main Directory :</b> {{ gitPath }}
+{% if currPath != gitPath %}
+	&nbsp;<b>SubModule:</b>{{currPath|relpath:gitPath}}
+{% endif %}
 {% endblock %}
 
 {% block contentBlock %}
@@ -19,28 +22,44 @@
 	}
 	);
 </script>
+<div class="leftMenu">
+	<table id="moduleTable" width="100%" class="gridTable">
+		<tr>
+			<th>Sub Module</th>
+		</tr>
+		{% for mod in modules %}
+		<tr>
+			<td><img src="/static/images/file_tree.png"/>&nbsp;<a href="{%url gitview.views.index%}?path={{mod}}">{{mod}}</a></td>
+		</tr>
+		{% endfor %}	
+	</table>
+</div>
 
-<table id="repoTable" width="100%" class="gridTable">
-	<tr>
-		<th>Path</th>
-		<th>Description</th>
-		<th>Url</th>
-		<th>Tree</th>
-	</tr>
-	{% for rep in repos %}
-	<tr>
-		<td><a href="{%url gitview.views.commits%}?path={{rep.path}}">{{rep.path|relpath:gitPath}}</a></td>
-		<td>{{rep.get_description}}</td>
-		<td>{{gitBasicUrl}}{{rep.path|relpath:gitPath}}</td>
-		<td style="text-align:center;">
-			{% if rep.getHead %}
-				<a href="{% url gitview.views.tree%}?path={{rep.path}}&commit={{rep.getHead}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
-			{% else %}
-				<img src="/static/images/empty.png" title="Empty"/>
-			{% endif%}
-		</td>
-	</tr>
-	{% endfor %}
-</table>
-
+<div class="rightContent">
+	<span style="text-align:center"><h2>Repositories</h2></span>
+	<table id="repoTable" width="100%" class="gridTable">
+		<tr>
+			<th>Path</th>
+			<th>Description</th>
+			<th>Url</th>
+			<th>Tree</th>
+		</tr>
+		
+		
+		{% for rep in repos %}
+		<tr>
+			<td><img src="/static/images/favicon.png" style="width:24px; height:24px; vertical-align:middle;"  /><a href="{%url gitview.views.commits%}?path={{rep.path}}">{{rep.path|relpath:currPath}}</a></td>
+			<td>{{rep.get_description}}</td>
+			<td>{{gitBasicUrl}}{{rep.path|relpath:gitPath}}</td>
+			<td style="text-align:center;">
+				{% if rep.getHead %}
+					<a href="{% url gitview.views.tree%}?path={{rep.path}}&commit={{rep.getHead}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
+				{% else %}
+					<img src="/static/images/empty.png" title="Empty"/>
+				{% endif%}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
 {% endblock %}

@@ -4,15 +4,28 @@ from django.conf import settings
 from gitengine.gitEngine import GitRepo,GitGraph, GitDir
 import gitengine.gitEngine as gitEngine
 from django import forms
-from os import sep
+from os import sep,listdir
+from os.path import isdir
 import time
 import tempfile
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 
 def index(request):
-    repos=GitRepo.getRepos(settings.GIT_PATH, True)
-    return render_to_response("index.html",{'gitPath':settings.GIT_PATH,'gitBasicUrl':settings.GIT_BASIC_URL,'repos':repos})
+    try:
+        pathpar=request.GET['path']
+    except KeyError:
+        pathpar=""
+    currPath=settings.GIT_PATH+pathpar
+    modules=[]
+    contents = listdir(currPath)
+    for content in contents:
+        fullPath=currPath+sep+content
+        if isdir(fullPath):
+            if not isdir(fullPath+sep+".git") and not isdir(fullPath+sep+"refs"):
+                modules.append(content)
+    repos=GitRepo.getRepos(currPath, False)
+    return render_to_response("index.html",{'gitPath':settings.GIT_PATH,'currPath':currPath,'gitBasicUrl':settings.GIT_BASIC_URL,'modules':modules,'repos':repos})
 
 class BranchForm(forms.Form):
     def __init__(self,repo,*args,**kwargs):
