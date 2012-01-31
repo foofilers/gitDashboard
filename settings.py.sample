@@ -146,4 +146,6 @@ LOGGING = {
 }
 
 GIT_PATH='[PATH OF REPOSITORIES PARENT]'
+#List of regexp paths to exclude from repositories search  
+GIT_EXCLUDE_PATH=[]
 GIT_BASIC_URL="http://www.example.com/gitRepos"

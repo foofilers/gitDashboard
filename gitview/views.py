@@ -10,13 +10,13 @@ import time
 import tempfile
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
+import re
 
 def index(request):
     if settings.GIT_PATH[-1]=='/':
         gitPath=settings.GIT_PATH
     else:
         gitPath=settings.GIT_PATH+"/"
-    
     try:
         pathpar=request.GET['path']
     except KeyError:
@@ -27,10 +27,15 @@ def index(request):
     for content in contents:
         fullPath=currPath+sep+content
         if isdir(fullPath):
-            if not isdir(fullPath+sep+".git") and not isdir(fullPath+sep+"refs"):
-                subDirs.append(content)
+            if not isdir(fullPath+sep+".git") and not isdir(fullPath+sep+"refs") :
+                toAdd=True
+                for excl in settings.GIT_EXCLUDE_PATH:
+                    if re.match(excl, content):
+                        toAdd=False
+                if toAdd:
+                    subDirs.append(content)
     subDirs=sorted(subDirs)
-    repos=GitRepo.getRepos(currPath, False)
+    repos=GitRepo.getRepos(currPath, False,settings.GIT_EXCLUDE_PATH)
     return render_to_response("index.html",{'gitPath':gitPath,'currPath':currPath,'gitBasicUrl':settings.GIT_BASIC_URL,'subDirs':subDirs,'repos':repos})
 
 class BranchForm(forms.Form):

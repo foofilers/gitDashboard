@@ -11,6 +11,7 @@ from datetime import datetime
 import tempfile
 from difflib  import unified_diff
 import ghdiff
+import re
 
 class GitPathNotFound(Exception):
     def __init__(self, value):
@@ -266,7 +267,7 @@ class GitRepo(Repo):
         return commits
         
     @staticmethod
-    def getRepos(path,recursive=False):
+    def getRepos(path,recursive=False,excludePath=[]):
         """ Retrieve a list of git repositories from a partent path
             Args:
                 path: parent path of git repositories
@@ -280,7 +281,12 @@ class GitRepo(Repo):
             fullPath=path+sep+content
             if isdir(fullPath):
                 try:
-                    repos.append(GitRepo(fullPath))
+                    toAdd=True
+                    for excl in excludePath:
+                        if re.match(excl, content):
+                            toAdd=False
+                    if toAdd:
+                        repos.append(GitRepo(fullPath))
                 except NotGitRepository:
                     if recursive==True:
                         repos.extend(GitRepo.getRepos(fullPath,True))
