@@ -29,7 +29,7 @@ def index(request):
         if isdir(fullPath):
             if not isdir(fullPath+sep+".git") and not isdir(fullPath+sep+"refs"):
                 subDirs.append(content)
-    sorted(subDirs)
+    subDirs=sorted(subDirs)
     repos=GitRepo.getRepos(currPath, False)
     return render_to_response("index.html",{'gitPath':gitPath,'currPath':currPath,'gitBasicUrl':settings.GIT_BASIC_URL,'subDirs':subDirs,'repos':repos})
 
