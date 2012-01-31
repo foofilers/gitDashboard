@@ -2,8 +2,27 @@
 {% load pathutils %}
 
 {% block repoHeader %}
-<b>Git Main Directory :</b> {{ gitPath }}{% if currPath != gitPath %}{{currPath|relpath:gitPath}}
-{% endif %}
+
+<script>
+	$(function(){
+		$('#subDirSel').change(function(){
+			$('#subDirForm').submit();
+		});
+	});
+</script>
+
+<form id="subDirForm">
+<b>Git Main Directory :</b> {{ gitPath }}{% if currPath != gitPath %}{{currPath|relpath:gitPath}}{% endif %}
+<select id="subDirSel" name="path">
+	<option value="{{currPath|relpath:gitPath}}"></option>
+	{% if currPath != gitPath %}
+		<option value="{{currPath|parent:gitPath}}">../</option>
+	{% endif %}
+	{% for dr in subDirs %}
+		<option value="{{currPath|relpath:gitPath}}/{{dr}}">{{dr}}</option>
+	{%endfor%}
+</select>
+</form>
 {% endblock %}
 
 {% block contentBlock %}
@@ -20,35 +39,14 @@
 	}
 	);
 </script>
-<div class="leftMenu">
-	<table id="subDirTable" width="100%" class="gridTable">
-		<tr>
-			<th>Sub Dir</th>
-		</tr>
-		{% if currPath != gitPath %}
-		<tr><td>
-			<img src="/static/images/file_tree.png"/>&nbsp;<a href="{%url gitview.views.index%}?path={{currPath|parent:gitPath}}">Parent </a>
-		</td></tr>
-		{% endif %}
-		{% for dr in subDirs %}
-		<tr>
-			<td><img src="/static/images/file_tree.png"/>&nbsp;<a href="{%url gitview.views.index%}?path={{currPath|relpath:gitPath}}/{{dr}}">{{dr}}</a></td>
-		</tr>
-		{% endfor %}	
-	</table>
-</div>
-
-<div class="rightContent">
-	<span style="text-align:center"><h2>Repositories</h2></span>
+<div>
 	<table id="repoTable" width="100%" class="gridTable">
 		<tr>
 			<th>Path</th>
 			<th>Description</th>
 			<th>Url</th>
 			<th>Tree</th>
-		</tr>
-		
-		
+		</tr>	
 		{% for rep in repos %}
 		<tr>
 			<td><img src="/static/images/favicon.png" style="width:24px; height:24px; vertical-align:middle;"  /><a href="{%url gitview.views.commits%}?path={{rep.path}}">{{rep.path|relpath:currPath}}</a></td>
