@@ -22,15 +22,16 @@ def index(request):
     except KeyError:
         pathpar=""
     currPath=settings.GIT_PATH+pathpar
-    modules=[]
+    subDirs=[]
     contents = listdir(currPath)
     for content in contents:
         fullPath=currPath+sep+content
         if isdir(fullPath):
             if not isdir(fullPath+sep+".git") and not isdir(fullPath+sep+"refs"):
-                modules.append(content)
+                subDirs.append(content)
+    sorted(subDirs)
     repos=GitRepo.getRepos(currPath, False)
-    return render_to_response("index.html",{'gitPath':gitPath,'currPath':currPath,'gitBasicUrl':settings.GIT_BASIC_URL,'modules':modules,'repos':repos})
+    return render_to_response("index.html",{'gitPath':gitPath,'currPath':currPath,'gitBasicUrl':settings.GIT_BASIC_URL,'subDirs':subDirs,'repos':repos})
 
 class BranchForm(forms.Form):
     def __init__(self,repo,*args,**kwargs):

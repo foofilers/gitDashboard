@@ -21,18 +21,18 @@
 	);
 </script>
 <div class="leftMenu">
-	<table id="moduleTable" width="100%" class="gridTable">
+	<table id="subDirTable" width="100%" class="gridTable">
 		<tr>
-			<th>Sub Module</th>
+			<th>Sub Dir</th>
 		</tr>
 		{% if currPath != gitPath %}
 		<tr><td>
 			<img src="/static/images/file_tree.png"/>&nbsp;<a href="{%url gitview.views.index%}?path={{currPath|parent:gitPath}}">Parent </a>
 		</td></tr>
 		{% endif %}
-		{% for mod in modules %}
+		{% for dr in subDirs %}
 		<tr>
-			<td><img src="/static/images/file_tree.png"/>&nbsp;<a href="{%url gitview.views.index%}?path={{currPath|relpath:gitPath}}/{{mod}}">{{mod}}</a></td>
+			<td><img src="/static/images/file_tree.png"/>&nbsp;<a href="{%url gitview.views.index%}?path={{currPath|relpath:gitPath}}/{{dr}}">{{dr}}</a></td>
 		</tr>
 		{% endfor %}	
 	</table>
