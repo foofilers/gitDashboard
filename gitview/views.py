@@ -12,6 +12,11 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 
 def index(request):
+    if settings.GIT_PATH[-1]=='/':
+        gitPath=settings.GIT_PATH
+    else:
+        gitPath=settings.GIT_PATH+"/"
+    
     try:
         pathpar=request.GET['path']
     except KeyError:
@@ -25,7 +30,7 @@ def index(request):
             if not isdir(fullPath+sep+".git") and not isdir(fullPath+sep+"refs"):
                 modules.append(content)
     repos=GitRepo.getRepos(currPath, False)
-    return render_to_response("index.html",{'gitPath':settings.GIT_PATH,'currPath':currPath,'gitBasicUrl':settings.GIT_BASIC_URL,'modules':modules,'repos':repos})
+    return render_to_response("index.html",{'gitPath':gitPath,'currPath':currPath,'gitBasicUrl':settings.GIT_BASIC_URL,'modules':modules,'repos':repos})
 
 class BranchForm(forms.Form):
     def __init__(self,repo,*args,**kwargs):
@@ -62,7 +67,7 @@ class FilterForm(forms.Form):
     page=forms.IntegerField(widget=forms.HiddenInput(),initial=1)
 
 def commits(request):
-    reposPath=request.GET['path']
+    reposPath=request.GET['path'].replace("//","/")
     repo = GitRepo(reposPath)
     until=None
     since=None

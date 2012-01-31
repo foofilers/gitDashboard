@@ -4,8 +4,14 @@ register = template.Library()
 
 @register.filter(name='relpath')
 def relpath(fullPath,basePath):
-    newPath= fullPath.replace('//','/').replace(basePath,'')
-    return newPath
+    newPath= fullPath.replace('//','/').replace(basePath.replace('//','/'),'')
+    if len(newPath)>0:
+        if newPath[0]=='/':
+            return newPath[1:]
+        else:
+            return newPath
+    else:
+        return ""
     
 @register.filter(name='parent')
 def parent(fullPath,basePath):

@@ -2,9 +2,7 @@
 {% load pathutils %}
 
 {% block repoHeader %}
-<b>Git Main Directory :</b> {{ gitPath }}
-{% if currPath != gitPath %}
-	&nbsp;<b>SubModule:</b>{{currPath|relpath:gitPath}}
+<b>Git Main Directory :</b> {{ gitPath }}{% if currPath != gitPath %}{{currPath|relpath:gitPath}}
 {% endif %}
 {% endblock %}
 
