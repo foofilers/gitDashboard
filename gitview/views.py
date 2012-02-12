@@ -4,15 +4,39 @@ from django.conf import settings
 from gitengine.gitEngine import GitRepo,GitGraph, GitDir,GitChange
 import gitengine.gitEngine as gitEngine
 from django import forms
-from os import sep
+from os import sep,listdir
+from os.path import isdir
 import time
 import tempfile
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
+import re
 
 def index(request):
-    repos=GitRepo.getRepos(settings.GIT_PATH, True)
-    return render_to_response("index.html",{'gitPath':settings.GIT_PATH,'gitBasicUrl':settings.GIT_BASIC_URL,'repos':repos})
+    if settings.GIT_PATH[-1]=='/':
+        gitPath=settings.GIT_PATH
+    else:
+        gitPath=settings.GIT_PATH+"/"
+    try:
+        pathpar=request.GET['path']
+    except KeyError:
+        pathpar=""
+    currPath=settings.GIT_PATH+pathpar
+    subDirs=[]
+    contents = listdir(currPath)
+    for content in contents:
+        fullPath=currPath+sep+content
+        if isdir(fullPath):
+            if not isdir(fullPath+sep+".git") and not isdir(fullPath+sep+"refs") :
+                toAdd=True
+                for excl in settings.GIT_EXCLUDE_PATH:
+                    if re.match(excl, content):
+                        toAdd=False
+                if toAdd:
+                    subDirs.append(content)
+    subDirs=sorted(subDirs)
+    repos=GitRepo.getRepos(currPath, False,settings.GIT_EXCLUDE_PATH)
+    return render_to_response("index.html",{'gitPath':gitPath,'currPath':currPath,'gitBasicUrl':settings.GIT_BASIC_URL,'subDirs':subDirs,'repos':repos})
 
 class BranchForm(forms.Form):
     def __init__(self,repo,*args,**kwargs):
@@ -49,7 +73,7 @@ class FilterForm(forms.Form):
     page=forms.IntegerField(widget=forms.HiddenInput(),initial=1)
 
 def commits(request):
-    reposPath=request.GET['path']
+    reposPath=request.GET['path'].replace("//","/")
     repo = GitRepo(reposPath)
     until=None
     since=None

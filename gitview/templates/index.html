@@ -2,7 +2,27 @@
 {% load pathutils %}
 
 {% block repoHeader %}
-<b>Git Main Directory :</b> {{ gitPath }}
+
+<script>
+	$(function(){
+		$('#subDirSel').change(function(){
+			$('#subDirForm').submit();
+		});
+	});
+</script>
+
+<form id="subDirForm">
+<b>Git Main Directory :</b> {{ gitPath }}{% if currPath != gitPath %}{{currPath|relpath:gitPath}}{% endif %}
+<select id="subDirSel" name="path">
+	<option value="{{currPath|relpath:gitPath}}"></option>
+	{% if currPath != gitPath %}
+		<option value="{{currPath|parent:gitPath}}">../</option>
+	{% endif %}
+	{% for dr in subDirs %}
+		<option value="{{currPath|relpath:gitPath}}/{{dr}}">{{dr}}</option>
+	{%endfor%}
+</select>
+</form>
 {% endblock %}
 
 {% block contentBlock %}
@@ -19,28 +39,28 @@
 	}
 	);
 </script>
-
-<table id="repoTable" width="100%" class="gridTable">
-	<tr>
-		<th>Path</th>
-		<th>Description</th>
-		<th>Url</th>
-		<th>Tree</th>
-	</tr>
-	{% for rep in repos %}
-	<tr>
-		<td><a href="{%url gitview.views.commits%}?path={{rep.path}}">{{rep.path|relpath:gitPath}}</a></td>
-		<td>{{rep.get_description}}</td>
-		<td>{{gitBasicUrl}}{{rep.path|relpath:gitPath}}</td>
-		<td style="text-align:center;">
-			{% if rep.getHead %}
-				<a href="{% url gitview.views.tree%}?path={{rep.path}}&commit={{rep.getHead}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
-			{% else %}
-				<img src="/static/images/empty.png" title="Empty"/>
-			{% endif%}
-		</td>
-	</tr>
-	{% endfor %}
-</table>
-
+<div>
+	<table id="repoTable" width="100%" class="gridTable">
+		<tr>
+			<th>Path</th>
+			<th>Description</th>
+			<th>Url</th>
+			<th>Tree</th>
+		</tr>	
+		{% for rep in repos %}
+		<tr>
+			<td><img src="/static/images/favicon.png" style="width:24px; height:24px; vertical-align:middle;"  /><a href="{%url gitview.views.commits%}?path={{rep.path}}">{{rep.path|relpath:currPath}}</a></td>
+			<td>{{rep.get_description}}</td>
+			<td>{{gitBasicUrl}}{{rep.path|relpath:gitPath}}</td>
+			<td style="text-align:center;">
+				{% if rep.getHead %}
+					<a href="{% url gitview.views.tree%}?path={{rep.path}}&commit={{rep.getHead}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
+				{% else %}
+					<img src="/static/images/empty.png" title="Empty"/>
+				{% endif%}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
 {% endblock %}

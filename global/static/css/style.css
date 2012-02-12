@@ -160,4 +160,11 @@ input,select,textarea{
 	background-color: white;
 }
 
+.leftMenu{
+	float:left;
+	width:200px;
+}
+.rightContent{
+	padding-left:210px;
+}
 
