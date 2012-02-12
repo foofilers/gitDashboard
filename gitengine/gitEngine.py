@@ -20,12 +20,18 @@ class GitPathNotFound(Exception):
 
 class GitChange:
     """ Represent a Single File Change inside a commit  """
-    def __init__(self,commit,treeChange):
+    def __init__(self,commit,treeChange=None, oldSha=None,newSha=None,oldFileName=None,newFileName=None):
         self.commit=commit
-        self.oldFileName=treeChange[0][0]
-        self.newFileName=treeChange[0][1]
-        self.oldSha=treeChange[2][0]
-        self.newSha=treeChange[2][1]
+        if treeChange:
+            self.oldFileName=treeChange[0][0]
+            self.newFileName=treeChange[0][1]
+            self.oldSha=treeChange[2][0]
+            self.newSha=treeChange[2][1]
+        else:
+            self.oldSha=oldSha
+            self.newSha=newSha
+            self.oldFileName=oldFileName
+            self.newFileName=newFileName
         
     def getPrettyGHDiff(self):
         blobOld=self.commit.repo.get_blob(self.oldSha)
@@ -163,7 +169,27 @@ class GitCommit(Commit):
                 treeChange=((None,fl.fileName),(None,None),(None,fl.sha))
                 changes.append(GitChange(self,treeChange))
         return changes
-    
+    def getChange(self,fileName,parent=None):
+        if parent==None:
+            parents=self.parents()
+            pc=self.repo.commit(parents[0])
+        else:
+            pc=self.repo.commit(parent)
+        chIter = self.repo.object_store.tree_changes(pc.tree,self.tree)
+        found=False
+        try:
+            while not found:
+                tc = chIter.next()
+                ch = GitChange(self,tc)
+                if ch.newFileName==fileName:
+                    found=True
+        except StopIteration:
+            pass
+        if found:
+            return ch
+        else:
+            return None
+        
     def getTree(self):
         return GitTree(self.repo,self.tree)
     

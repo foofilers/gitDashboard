@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% load timeutils %}
-{% load highlight %}
+
 
 {% block repoHeader %}
 <b>Repository path:</b>{{ repoPath }}/[<a href="{%url gitview.views.commits%}?path={{repoPath}}">commits</a>]
@@ -44,10 +44,33 @@
 				<script>
 					$(function(){
 						$('#{{change.newSha}}_showBtn').click(function(){
-							$('#{{change.newSha}}_diff').toggle('blind',300);
+							$.get("{%url gitview.views.diff %}",{
+								path:"{{repoPath}}",
+								commit:"{{commit.id}}",
+								oldSha:"{{change.oldSha}}",
+								oldFileName:"{{change.oldFileName}}",
+								newFileName:"{{change.newFileName}}",
+								newSha:"{{change.newSha}}"
+							},
+							function(html){
+								$('#{{change.newSha}}_diff').html(html);
+								$('#{{change.newSha}}_diff').toggle('blind',300);	
+							});
 						});
 						$('#{{change.newSha}}_ghshowBtn').click(function(){
-							$('#{{change.newSha}}_ghdiff').toggle('blind',300);
+							$.get("{%url gitview.views.diff %}",{
+								path:"{{repoPath}}",
+								commit:"{{commit.id}}",
+								oldSha:"{{change.oldSha}}",
+								oldFileName:"{{change.oldFileName}}",
+								newFileName:"{{change.newFileName}}",
+								newSha:"{{change.newSha}}",
+								ghDiff:"1"
+							},
+							function(html){
+								$('#{{change.newSha}}_ghdiff').html(html);
+								$('#{{change.newSha}}_ghdiff').toggle('blind',300);	
+							});
 						});
 					});
 				</script>
@@ -64,12 +87,8 @@
 		</tr>
 		<tr>
 			<td colspan="2">
-				<div id="{{change.newSha}}_diff" style="display:none;background-color:#EEEEEE;overflow: auto;">
-					{{change.getPrettyDiff|highlight:'a.diff'|safe}}
-				</div>
-				<div id="{{change.newSha}}_ghdiff" style="display:none;background-color:#EEEEEE;overflow: auto;">
-					{{change.getPrettyGHDiff|safe}}
-				</div>
+				<div id="{{change.newSha}}_diff" style="display:none;background-color:#EEEEEE;overflow: auto;"></div>
+				<div id="{{change.newSha}}_ghdiff" style="display:none;background-color:#EEEEEE;overflow: auto;"></div>
 			</td>
 		</tr>
 	{% else %}

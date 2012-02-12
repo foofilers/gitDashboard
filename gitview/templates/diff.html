@@ -1,0 +1,6 @@
+{% load highlight %}
+{%if ghDiff %}
+	{{change.getPrettyGHDiff|safe}}
+{%else%}
+	{{change.getPrettyDiff|highlight:'a.diff'|safe}}
+{%endif%}

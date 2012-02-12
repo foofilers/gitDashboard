@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response,redirect
 from django.template import RequestContext
 from django.conf import settings
-from gitengine.gitEngine import GitRepo,GitGraph, GitDir
+from gitengine.gitEngine import GitRepo,GitGraph, GitDir,GitChange
 import gitengine.gitEngine as gitEngine
 from django import forms
 from os import sep
@@ -110,6 +110,28 @@ def commit(request):
     changes=commit.getChanges()
     return render_to_response("commit.html",{'repoPath':reposPath,'commit':commit,'changes':changes})
 
+
+def diff(request):
+    reposPath=request.GET['path']
+    commitId=request.GET['commit']
+    oldSha=request.GET['oldSha']
+    newSha=request.GET['newSha']
+    oldFileName=request.GET['oldFileName']
+    newFileName=request.GET['newFileName']
+    try:
+        request.GET['ghDiff']
+        ghDiff=True
+    except KeyError:
+        ghDiff=False
+    try:
+        parent=request.GET['parent']
+    except KeyError:
+        parent=None
+    repo = GitRepo(reposPath)
+    commit = repo.getCommit(commitId)
+    change=GitChange(commit=commit,oldSha=oldSha,newSha=newSha,oldFileName=oldFileName,newFileName=newFileName)
+    return render_to_response("diff.html",{'ghDiff':ghDiff,'change':change})
+    
 def compareCommit(request):
     """ Compare two commit"""
     reposPath=request.GET['path']
