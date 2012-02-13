@@ -401,10 +401,10 @@ class GitGraph:
             labeled.append(cmt.id)
             
             for tag in cmt.getTags():
-                self.G.add_node(tag.id,tooltip=tag.name,label=tag.name,shape="rect",fontsize="08",labeldistance=10,fillcolor="lightblue")
+                self.G.add_node(tag.id,tooltip=tag.name,label=tag.name,shape="rect",fontsize="10",labeldistance=10,fillcolor="lightblue")
                 self.G.add_edge(tag.id,cmt.id)    
             for branch in cmt.getBranches():
-                self.G.add_node(str(branch),tooltip=str(branch),label=str(branch),shape="rect",fontsize="08",fillcolor="green")
+                self.G.add_node(str(branch),tooltip=str(branch),label=str(branch),shape="rect",fontsize="10",fillcolor="green")
                 self.G.add_edge(str(branch),cmt.id)
             
         #cycle for arrow division
