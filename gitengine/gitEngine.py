@@ -373,7 +373,7 @@ class GitGraph:
         self.G.node_attr['shape']='circle'
         self.G.node_attr['width']='0.2'
         self.G.node_attr['height']='0.2'
-        self.G.node_attr['fillcolor']='lightblue'
+        self.G.node_attr['fillcolor']='black'
         parents={}
         dates={}
         labeled=[]
@@ -399,6 +399,14 @@ class GitGraph:
                 cmtUrl=""
             self.G.add_node(cmt.id,tooltip=htmlTooltip,label='',URL=cmtUrl,id=cmt.id+"_graph")
             labeled.append(cmt.id)
+            
+            for tag in cmt.getTags():
+                self.G.add_node(tag.id,tooltip=tag.name,label=tag.name,shape="rect",fontsize="08",labeldistance=10,fillcolor="lightblue")
+                self.G.add_edge(tag.id,cmt.id)    
+            for branch in cmt.getBranches():
+                self.G.add_node(str(branch),tooltip=str(branch),label=str(branch),shape="rect",fontsize="08",fillcolor="green")
+                self.G.add_edge(str(branch),cmt.id)
+            
         #cycle for arrow division
         for par in parents:
             for son in parents[par]:
