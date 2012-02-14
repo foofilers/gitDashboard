@@ -236,7 +236,7 @@ class NewReposForm(forms.Form):
     path=forms.CharField()
     description=forms.CharField(widget=forms.Textarea())
 
-@login_required(login_url='/login')
+@login_required(login_url='login')
 def new(request):
     """ Add New repository Page
     """
