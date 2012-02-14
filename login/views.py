@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django import forms
 from django.contrib.auth import authenticate,login,logout
 from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
 # Create your views here.
 
 class LoginForm(forms.Form):
@@ -29,7 +30,7 @@ def loginView(request):
     try:
         nextPage = request.GET['next']
     except KeyError:
-        nextPage='/'
+        nextPage=reverse('gitview.views.index')
     t = loader.get_template('login.html')
     c=RequestContext(request,{'loginForm':loginForm,'nextPage':nextPage,'errorMessage':errorMessage})
     return HttpResponse(t.render(c))
