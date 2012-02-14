@@ -37,9 +37,9 @@
 	</div>
 	<div class="loginPanel">
 			 {% if request.user.username %}
-                   {% blocktrans %}welcome{% endblocktrans %} {{request.user.first_name}} [ <a href="/logout">logout</a> ]
+                   {% blocktrans %}welcome{% endblocktrans %} {{request.user.first_name}} [ <a href="{%url login.views.logoutView %}">logout</a> ]
               {% else %}
-                  <a href="/login">login</a>
+                  <a href="{%url login.views.loginView %}">login</a>
               {%endif%}
 		</div>
 	<div class="repoHeader">
