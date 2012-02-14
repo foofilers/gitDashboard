@@ -91,6 +91,11 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
 )
+TEMPLATE_CONTEXT_PROCESSORS = (
+  'django.core.context_processors.request',
+  'django.core.context_processors.i18n',
+  'django.contrib.auth.context_processors.auth',
+)
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -119,7 +124,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
-	'global','gitview',
+	'global','gitview','login'
 )
 
 # A sample logging configuration. The only tangible logging

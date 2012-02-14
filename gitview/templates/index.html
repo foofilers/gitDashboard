@@ -10,7 +10,6 @@
 		});
 	});
 </script>
-
 <form id="subDirForm">
 <b>Git Main Directory :</b> {{ gitPath }}{% if currPath != gitPath %}{{currPath|relpath:gitPath}}{% endif %}
 <select id="subDirSel" name="path">

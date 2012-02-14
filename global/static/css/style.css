@@ -16,7 +16,6 @@ a {
 	background-color:white;
 	border:1px solid #CCCCCC;
 	height: 90px;
-	margin-bottom:10px;
 }
 .top img{
 	vertical-align: middle;
@@ -73,6 +72,15 @@ input,select,textarea{
 	padding-right: 15px;
 	margin:0px;
 }
+
+.loginPanel{
+	text-align:right;
+	padding-right:10px;
+	margin-bottom:10px;
+	border:1px solid #c5d5dd;
+	background-color: #e5f0f5;
+}
+
 
 .menuTable td.highlight{
 	background-color: #CCFFFF;

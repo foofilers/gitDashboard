@@ -1,3 +1,4 @@
+{% load i18n %}
 <html>
 <head>
 	<title>Git DashBoard</title>
@@ -25,11 +26,22 @@
 		<div class="menu">
 			<table class="menuTable" id="menuTable" cellspacing="0px;">
 				<tr>
-					<td><a href="{%url gitview.views.new %}">Create New Repository</a></td>
+					<td>
+						 {% if request.user.username %}
+						 	<a href="{%url gitview.views.new %}">Create New Repository</a><br/>
+		                {%endif%}
+					</td>
 				</tr>
 			</table>
 		</div>
 	</div>
+	<div class="loginPanel">
+			 {% if request.user.username %}
+                   {% blocktrans %}welcome{% endblocktrans %} {{request.user.first_name}} [ <a href="/logout">logout</a> ]
+              {% else %}
+                  <a href="/login">login</a>
+              {%endif%}
+		</div>
 	<div class="repoHeader">
 		{% block repoHeader %}  {% endblock %}
 	</div>

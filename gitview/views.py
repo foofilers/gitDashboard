@@ -10,6 +10,7 @@ import time
 import tempfile
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
 import re
 
 def index(request):
@@ -36,7 +37,7 @@ def index(request):
                     subDirs.append(content)
     subDirs=sorted(subDirs)
     repos=GitRepo.getRepos(currPath, False,settings.GIT_EXCLUDE_PATH)
-    return render_to_response("index.html",{'gitPath':gitPath,'currPath':currPath,'gitBasicUrl':settings.GIT_BASIC_URL,'subDirs':subDirs,'repos':repos})
+    return render_to_response("index.html",RequestContext(request,{'gitPath':gitPath,'currPath':currPath,'gitBasicUrl':settings.GIT_BASIC_URL,'subDirs':subDirs,'repos':repos}))
 
 class BranchForm(forms.Form):
     def __init__(self,repo,*args,**kwargs):
@@ -132,7 +133,7 @@ def commit(request):
     repo = GitRepo(reposPath)
     commit = repo.getCommit(commitId)
     changes=commit.getChanges()
-    return render_to_response("commit.html",{'repoPath':reposPath,'commit':commit,'changes':changes})
+    return render_to_response("commit.html",RequestContext(request,{'repoPath':reposPath,'commit':commit,'changes':changes}))
 
 
 def diff(request):
@@ -154,7 +155,7 @@ def diff(request):
     repo = GitRepo(reposPath)
     commit = repo.getCommit(commitId)
     change=GitChange(commit=commit,oldSha=oldSha,newSha=newSha,oldFileName=oldFileName,newFileName=newFileName)
-    return render_to_response("diff.html",{'ghDiff':ghDiff,'change':change})
+    return render_to_response("diff.html",RequestContext(request,{'ghDiff':ghDiff,'change':change}))
     
 def compareCommit(request):
     """ Compare two commit"""
@@ -168,7 +169,7 @@ def compareCommit(request):
         commit1=commit2
         commit2=swp
     changes=gitEngine.commitChanges(repo, commit1.id, commit2.id)
-    return render_to_response("compareCommit.html",{'repoPath':reposPath,'commit1':commit1,'commit2':commit2,'changes':changes})
+    return render_to_response("compareCommit.html",RequestContext(request,{'repoPath':reposPath,'commit1':commit1,'commit2':commit2,'changes':changes}))
 
 def view(request):
     """ View a single file of a commit """
@@ -178,7 +179,7 @@ def view(request):
     repo = GitRepo(reposPath)
     commit = repo.getCommit(commitId)
     fileSha = commit.getTree().getFile(filePath).sha
-    return render_to_response("view.html",{'repoPath':reposPath,'commitId':commitId,'fileName':filePath,'fileSha':fileSha})
+    return render_to_response("view.html",RequestContext(request,{'repoPath':reposPath,'commitId':commitId,'fileName':filePath,'fileSha':fileSha}))
 
 def fileContent(request):
     reposPath=request.GET['path']
@@ -186,7 +187,7 @@ def fileContent(request):
     filePath=request.GET['filePath']
     repo = GitRepo(reposPath)
     fileContent=str(repo.get_blob(sha))
-    return render_to_response("fileContent.html",{'repoPath':reposPath,'sha':sha,'fileName':filePath,'content':fileContent})
+    return render_to_response("fileContent.html",RequestContext(request,{'repoPath':reposPath,'sha':sha,'fileName':filePath,'content':fileContent}))
 
 def rawContent(request):
     reposPath=request.GET['path']
@@ -228,16 +229,19 @@ def tree(request):
         treeContent+="<li><span class=\"file\">"
         treeContent+="<a href='#' onclick=\"showContent('"+f.sha+"','"+f.fileName+"') \">"
         treeContent+=f.fileName.split("/")[-1]+"</a></span></li>"
-    return render_to_response("tree.html",{'repoPath':reposPath,'commitId':commitId,'treeContent':treeContent})
+    return render_to_response("tree.html",RequestContext(request,{'repoPath':reposPath,'commitId':commitId,'treeContent':treeContent}))
     
 """ ######################### New Repository ######################"""
 class NewReposForm(forms.Form):
     path=forms.CharField()
     description=forms.CharField(widget=forms.Textarea())
-    
+
+@login_required(login_url='/login')
 def new(request):
     """ Add New repository Page
     """
+    if not request.user.is_staff:
+        return render_to_response("notAlowed.html",RequestContext(request))
     gitPath=settings.GIT_PATH
     if request.method=='POST':
         newReposForm=NewReposForm(request.POST)
@@ -288,7 +292,7 @@ def graph(request):
     mapGraph.draw(mapTempFile, 'cmapx')
     mapTempFile.seek(0)
     graphUrl=str(reverse('gitview.views.graphImg'))+"?path="+repoPath+"&branch="+branch+"&since="+str(since)+"&until="+str(until)+"&num="+str(num)
-    return render_to_response("graph.html",{'graphUrl':graphUrl,'mapContent':mapTempFile.read()})
+    return render_to_response("graph.html",RequestContext(request,{'graphUrl':graphUrl,'mapContent':mapTempFile.read()}))
 
     
     
