@@ -391,7 +391,7 @@ class GitGraph:
                 dates[dt.strftime('%Y-%m')]=[cmt.id]
             htmlTooltip="Author:"+cmt.author+"<br/>"
             htmlTooltip+="Date:"+dt.strftime('%Y-%m-%d %H:%M')+"<br/><hr/>"
-            htmlTooltip+="Message:<br/>"+cmt.message.replace('\n',' ').encode('utf-8')
+            htmlTooltip+="Message:<br/>"+cmt.message.replace('\n',' ')
             
             if self.commitUrl:
                 cmtUrl=self.commitUrl.replace("$$",cmt.id)
