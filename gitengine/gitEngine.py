@@ -12,6 +12,7 @@ import tempfile
 from difflib  import unified_diff
 import ghdiff
 import re
+from django.utils.encoding import smart_unicode, smart_str
 
 class GitPathNotFound(Exception):
     def __init__(self, value):
@@ -397,7 +398,13 @@ class GitGraph:
                 cmtUrl=self.commitUrl.replace("$$",cmt.id)
             else:
                 cmtUrl=""
-            self.G.add_node(cmt.id,tooltip=htmlTooltip,label='',URL=cmtUrl,id=cmt.id+"_graph")
+            self.G.add_node(cmt.id,label='',URL=cmtUrl,id=cmt.id+"_graph")
+            
+            n=self.G.get_node(cmt.id)
+            try:
+                n.attr['tooltip']=smart_unicode(htmlTooltip)
+            except TypeError:
+                n.attr['tooltip']=htmlTooltip
             labeled.append(cmt.id)
             
             for tag in cmt.getTags():
