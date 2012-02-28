@@ -2,17 +2,23 @@
 {% load timeutils %}
 
 {% block repoHeader %}
-	<script>
-		$(function(){
-			$('#id_branch').change(function(){
-				$('#branchForm').submit();
-			});
-		})
-	</script>
-	<form id="branchForm" method="GET" style="margin:auto;" class="branchForm">
-		{{branchForm.path}}
-		<b>Repository path:</b>{{ repoPath }}/ {{branchForm.branch}}
-	</form>
+	{% if filePath %}
+		<b>FileName path:</b><a href="{% url gitview.views.commits %}?path={{ repoPath }}">{{ repoPath }}</a>/{{filePath}}
+	{%else%}
+		<script>
+			$(function(){
+				$('#id_branch').change(function(){
+					$('#branchForm').submit();
+				});
+			})
+		</script>
+		
+		<form id="branchForm" method="GET" style="margin:auto;" class="branchForm">
+			{{branchForm.path}}
+			<b>Repository path:</b><a href="{% url gitview.views.commits %}?path={{ repoPath }}">{{ repoPath }}</a>/ {{branchForm.branch}}
+		</form>
+	{% endif %}
+	
 {% endblock %}
 {% block contentBlock %}
 	<script type="text/javascript">
@@ -39,6 +45,9 @@
 			});
 		</script>
 		<form method="POST" id="filterForm" style="margin:auto;">{%csrf_token%}
+			{% if filePath %}
+				<input type="hidden" id="filePath" name="filePath" value="{{filePath}}">
+			{% endif %}
 			{{filterForm.page}}
 			{{ filterForm.no_field_errors }}
 			<table style="margin:auto;">
@@ -75,12 +84,16 @@
 			});
 		});
 	</script>
-	<div style="text-align:center">
-		<form >
-			<input id="showGraphBtn" type="button" value="Graph"/>
-		</form>
-	</div>
-	<div id="graphDiv" style="display:none;overflow: auto;margin:auto;text-align:center"><h2>Loading...</h2></div>
+	
+	{% if not filePath %}
+		<div style="text-align:center">
+			<form >
+				<input id="showGraphBtn" type="button" value="Graph"/>
+			</form>
+		</div>
+		<div id="graphDiv" style="display:none;overflow: auto;margin:auto;text-align:center"><h2>Loading...</h2></div>
+	{% endif %}
+	
 	<br/>
 	<form method="GET" action="{% url gitview.views.compareCommit %}">
 		<input type="hidden" name="path" value="{{ repoPath|safe }}"/>
@@ -117,8 +130,8 @@
 					{% endif %}
 				</td>
 				<td style="text-align:center;" nowrap="nowrap">
-					<a href="{% url gitview.views.commit %}?path={{repoPath}}&id={{cmt.id}}"><img src="/static/images/detail.png" border="0" title="Detail"/></a>
-					<a href="{% url gitview.views.tree%}?path={{repoPath}}&commit={{cmt.id}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
+					<a href="{% url gitview.views.commit %}?path={{repoPath}}&id={{cmt.id}}&branch={{branch}}"><img src="/static/images/detail.png" border="0" title="Detail"/></a>
+					<a href="{% url gitview.views.tree%}?path={{repoPath}}&commit={{cmt.id}}&branch={{branch}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
 				</td>
 			</tr>
 			{% endfor %}

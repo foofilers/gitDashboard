@@ -2,7 +2,7 @@
 {% load highlight %}
 
 {% block repoHeader %}
-<b>Repository path:</b>{{ repoPath }}/[commit:<a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{commitId}}">{{commitId}}</a>]
+<b>Repository path:</b><a href="{% url gitview.views.commits %}?path={{ repoPath }}&branch={{branch}}">{{ repoPath }}</a>/[commit:<a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{commitId}}&branch={{branch}}">{{commitId}}</a>]
 {%endblock%}
 
 {% block contentBlock %}

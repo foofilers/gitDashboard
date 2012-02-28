@@ -270,7 +270,7 @@ class GitRepo(Repo):
         """ Retrieve a GitCommit object represent single commit from reporistory  """
         return GitCommit(self.commit(commitId),self)
     
-    def getCommits(self,num=None,since=None,until=None,branch=None):
+    def getCommits(self,num=None,since=None,until=None,branch=None,path=None):
         """ Retrieve the commits of repository
             Args:
                 num: Number of commits to retrieve
@@ -279,11 +279,16 @@ class GitRepo(Repo):
             Returns:
                 A list of Commit object
         """
+        if path:
+            paths=[path]
+        else:
+            paths=None
+            
         if branch:
             if not isinstance(branch, list):
                 branch=[branch]
         try:
-            w=self.get_walker(max_entries=num,since=since,until=until,include=branch)
+            w=self.get_walker(max_entries=num,since=since,until=until,include=branch,paths=paths)
         except KeyError:
             return []
         we=w._next()

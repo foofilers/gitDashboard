@@ -80,8 +80,14 @@ def commits(request):
     since=None
     try:
         branch=request.GET['branch']
+        if branch=='':
+            branch=repo.head()
     except KeyError:
-        branch=None
+        branch=repo.head()
+    try:
+        filePath=request.GET['filePath']
+    except KeyError:
+        filePath=None
     page=1
     num=10
     numPerPages=15
@@ -94,12 +100,12 @@ def commits(request):
                 since=int(time.mktime(filterForm.cleaned_data['since'].timetuple()))
             if filterForm.cleaned_data['until']!=None:
                 until=int(time.mktime(filterForm.cleaned_data['until'].timetuple()))
-            commits=repo.getCommits(num=num,since=since,until=until,branch=branch)
+            commits=repo.getCommits(num=num,since=since,until=until,branch=branch,path=filePath)
         else:
-            commits=repo.getCommits(num,branch=branch)
+            commits=repo.getCommits(num,branch=branch,path=filePath)
     else:
         filterForm = FilterForm()
-        commits=repo.getCommits(num,branch=branch)
+        commits=repo.getCommits(num,branch=branch,path=filePath)
     #The page number is +1
     page-=1
     if len(commits)>numPerPages:
@@ -123,18 +129,22 @@ def commits(request):
             'commits':commits,
             'num':num,
             'numPages':range(numPages+1)[1:],
-            'page':page+1
+            'page':page+1,
+            'filePath':filePath
             }))
 
 def commit(request):
     """ View a single commit"""
     reposPath=request.GET['path']
     commitId=request.GET['id']
+    try:
+        branch=request.GET['branch']
+    except KeyError:
+        branch=''
     repo = GitRepo(reposPath)
     commit = repo.getCommit(commitId)
     changes=commit.getChanges()
-    return render_to_response("commit.html",RequestContext(request,{'repoPath':reposPath,'commit':commit,'changes':changes}))
-
+    return render_to_response("commit.html",RequestContext(request,{'repoPath':reposPath,'commit':commit,'changes':changes,'branch':branch}))
 
 def diff(request):
     reposPath=request.GET['path']
@@ -176,18 +186,26 @@ def view(request):
     reposPath=request.GET['path']
     commitId=request.GET['commit']
     filePath=request.GET['filePath']
+    try:
+        branch=request.GET['branch']
+    except KeyError:
+        branch=''
     repo = GitRepo(reposPath)
     commit = repo.getCommit(commitId)
     fileSha = commit.getTree().getFile(filePath).sha
-    return render_to_response("view.html",RequestContext(request,{'repoPath':reposPath,'commitId':commitId,'fileName':filePath,'fileSha':fileSha}))
+    return render_to_response("view.html",RequestContext(request,{'repoPath':reposPath,'commitId':commitId,'fileName':filePath,'fileSha':fileSha,'branch':branch}))
 
 def fileContent(request):
     reposPath=request.GET['path']
     sha=request.GET['sha']
     filePath=request.GET['filePath']
+    try:
+        branch=request.GET['branch']
+    except KeyError:
+        branch=''
     repo = GitRepo(reposPath)
     fileContent=str(repo.get_blob(sha))
-    return render_to_response("fileContent.html",RequestContext(request,{'repoPath':reposPath,'sha':sha,'fileName':filePath,'content':fileContent}))
+    return render_to_response("fileContent.html",RequestContext(request,{'repoPath':reposPath,'sha':sha,'fileName':filePath,'content':fileContent,'branch':branch}))
 
 def rawContent(request):
     reposPath=request.GET['path']
@@ -213,6 +231,10 @@ def tree(request):
     """ View a tree of a commit """
     reposPath=request.GET['path']
     commitId=request.GET['commit']
+    try:
+        branch=request.GET['branch']
+    except KeyError:
+        branch=''
     repo = GitRepo(reposPath)
     commit = repo.getCommit(commitId)
     tree=commit.getTree()
@@ -229,7 +251,7 @@ def tree(request):
         treeContent+="<li><span class=\"file\">"
         treeContent+="<a href='#' onclick=\"showContent('"+f.sha+"','"+f.fileName+"') \">"
         treeContent+=f.fileName.split("/")[-1]+"</a></span></li>"
-    return render_to_response("tree.html",RequestContext(request,{'repoPath':reposPath,'commitId':commitId,'treeContent':treeContent}))
+    return render_to_response("tree.html",RequestContext(request,{'repoPath':reposPath,'commitId':commitId,'treeContent':treeContent,'branch':branch}))
     
 """ ######################### New Repository ######################"""
 class NewReposForm(forms.Form):

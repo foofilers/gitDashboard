@@ -3,7 +3,7 @@
 
 
 {% block repoHeader %}
-<b>Repository path:</b>{{ repoPath }}/[<a href="{%url gitview.views.commits%}?path={{repoPath}}">commits</a>]
+<b>Repository path:</b><a href="{% url gitview.views.commits %}?path={{ repoPath }}&branch={{branch}}">{{ repoPath }}</a>
 {%endblock %}
 
 {% block contentBlock %}
@@ -78,10 +78,10 @@
 			</th>
 			<th style="text-align:left;">&nbsp;
 				{% if change.oldFileName == change.newFileName %}
-					<a href="{%url gitview.views.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.oldFileName}}">
+					<a href="{%url gitview.views.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.oldFileName}}&branch={{branch}}">
 						{{change.oldFileName}}</a>
 				{% else %}
-					{{change.oldFileName}} -> <a href="{%url gitview.views.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.newFileName}}">{{change.newFileName}}</a>
+					{{change.oldFileName}} -> <a href="{%url gitview.views.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.newFileName}}&branch={{branch}}">{{change.newFileName}}</a>
 				{% endif %}
 			</th>
 		</tr>
