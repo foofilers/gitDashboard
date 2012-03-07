@@ -278,39 +278,21 @@ def new(request):
         newReposForm=NewReposForm()
     return render_to_response("new.html",RequestContext(request,{'gitPath':gitPath,'newReposForm':newReposForm}))
 
-def graphImg(request):
-    """ Generate a Dynamic Graph Image called by graph method
-    """
-    repoPath = request.GET['path']
-    branch = request.GET['branch']
-    since = request.GET['since']
-    until = request.GET['until']
-    num = request.GET['num']
-    repo=GitRepo(repoPath)
- 
-    graph=GitGraphviz(repo,branch=branch,size=num,since=since,until=until)
-    graph.prepare();
-    
-    tfile = tempfile.NamedTemporaryFile()
-    graph.draw(tfile, 'png')
-    tfile.seek(0)
-    return HttpResponse(tfile.read(),mimetype="image/png")
-
 """ ################## GRAPH #################### """
 def graph(request):
     """ Generate a Page with the graph image and related map
         called by ajax 
     """
     repoPath = request.GET['path']
-    branch = request.GET['branch']
-    since = request.GET['since']
-    until = request.GET['until']
-    num = request.GET['num']
+    try:
+        branch=request.GET['branch']
+    except KeyError:
+        branch=''
     repo=GitRepo(repoPath)
     commitUrl=reverse('gitview.views.commit')
-    commitUrl+="?path="+repoPath+"&id=$$"
-    graph=GitGraphCanvas(repo,size=num,since=since,until=until,commitUrl=str(commitUrl),branch=branch)
-    return render_to_response("graph.html",RequestContext(request,{'canvasContent':graph.render(),'width':graph.getWidth(),'height':graph.getHeight()}))
+    commitUrl+="?path="+repoPath+'&branch='+branch+"&id=$$"
+    graph=GitGraphCanvas(repo,commitUrl=str(commitUrl))
+    return render_to_response("graph.html",RequestContext(request,{'repoPath':repoPath,'branch':branch,'canvasContent':graph.render(),'width':graph.getWidth(),'height':graph.getHeight()}))
 
     
     

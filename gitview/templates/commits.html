@@ -16,6 +16,7 @@
 		<form id="branchForm" method="GET" style="margin:auto;" class="branchForm">
 			{{branchForm.path}}
 			<b>Repository path:</b><a href="{% url gitview.views.commits %}?path={{ repoPath }}">{{ repoPath }}</a>/ {{branchForm.branch}}
+			{% if not filePath %}<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}"><img style="vertical-align:middle;" src="static/images/graph.png" border="0" title="Graph"/></a>{% endif %}
 		</form>
 	{% endif %}
 	
@@ -65,34 +66,7 @@
 			</table>
 		</form>
 	</div>
-	<script>
-		$(function(){
-			$('#showGraphBtn').click(function(){
-				$('#graphDiv').toggle('blind',500);
-				$.get("{%url gitview.views.graph %}",{
-						path:"{{repoPath}}",
-						branch:"{{repoBranch|default_if_none:''}}",
-						branch:"{{branch|default_if_none:''}}",
-						since:"{{since|default_if_none:''}}",
-						until:"{{until|default_if_none:''}}",
-						num:"{{num|default_if_none:''}}"
-					},
-					function(html){
-						$('#graphDiv').html(html);
-						$('#graphDiv').animate({scrollLeft:10000},100);
-					});
-			});
-		});
-	</script>
-	
-	{% if not filePath %}
-		<div style="text-align:center">
-			<form >
-				<input id="showGraphBtn" type="button" value="Graph"/>
-			</form>
-		</div>
-		<div id="graphDiv" style="display:none;overflow: auto;margin:auto;text-align:center"><h2>Loading...</h2></div>
-	{% endif %}
+
 	
 	<br/>
 	<form method="GET" action="{% url gitview.views.compareCommit %}">

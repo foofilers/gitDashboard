@@ -1,51 +1,87 @@
-<html>
-<head>
-	<script type="text/javascript" src="/static/js/kinetic-v3.8.2.min.js"></script>
-</head>
-<div id="graph" ></div>
-<script type="text/javascript">
-var stage = new Kinetic.Stage("graph", {{width}}, {{height}});
-var circlesLayer = new Kinetic.Layer();
-var linesLayer = new Kinetic.Layer();
-var tooltipLayer = new Kinetic.Layer();
-var context=linesLayer.context;
+{% extends "layout.html" %}
+{% load timeutils %}
 
-function line(x1,y1,x2,y2,color){
+
+{% block repoHeader %}
+<b>Repository path:</b><a href="{% url gitview.views.commits %}?path={{ repoPath }}&branch={{branch}}">{{ repoPath }}</a>
+{%endblock %}
+
+{% block contentBlock %}
+<script src="/static/js/kinetic-v3.8.2.min.js"></script>
+<div style="overflow:auto;">
+	<div id="canvasGraph" style="height:{{height}};width:{{width}}"></div>
+	</div>
+<script type="text/javascript">
+function line(x1,y1,x2,y2,color,layer){
 	var ln = new Kinetic.Shape({
         drawFunc: function(){
             var context = this.getContext();
             context.beginPath();
         	context.lineWidth = 2;
         	context.strokeStyle = color;
+        	oblique=false;
+        	vertical=false;
+        	if (x2-x1 != 0){
+        		m = (y2 - y1) / (x2 - x1)
+        		if (m!=0){
+            		oblique=true
+            	}
+        	}else{
+        		vertical=true
+        	}
         	context.moveTo(x1,y1);
-        	context.lineTo(x2,y2);
+        	if (!oblique){
+        		context.lineTo(x2,y2);
+        		if (vertical){
+        			if (y2<y1){
+        				//up
+        				context.moveTo(x2,y2+5);
+                		context.lineTo(x2-5,y2+10);
+                		context.moveTo(x2,y2+5);
+                		context.lineTo(x2+5,y2+10);
+        			}else{
+        				//down
+        				context.moveTo(x2,y2-5);
+                		context.lineTo(x2-10,y2-10);
+                		context.moveTo(x2,y2-5);
+                		context.lineTo(x2+10,y2-10);	
+        			}
+        		}else{
+        			//horizzontal
+        			context.moveTo(x2-5,y2);
+            		context.lineTo(x2-10,y2-5);
+            		context.moveTo(x2-5,y2);
+            		context.lineTo(x2-10,y2+5);
+        		}
+        	}else{
+        		//oblique
+        		context.lineTo(x1,y2);
+        		context.lineTo(x2,y2);
+        		context.moveTo(x2-5,y2);
+        		context.lineTo(x2-10,y2-5);
+        		context.moveTo(x2-5,y2);
+        		context.lineTo(x2-10,y2+5);
+        	}
         	context.stroke();
         	context.closePath();
         }});
-	linesLayer.add(ln);
+	layer.add(ln);
 }
-
-{{canvasContent|safe}}
-
-var tooltip = new Kinetic.Text({
-    text: "",
-    fontFamily: "Calibri",
-    fontSize: 12,
-    padding: 5,
-    visible: false,
-    fill: "#8ED6FF",
-    alpha: 0.75,
-    textFill: "black"
-});
-
-tooltipLayer.add(tooltip);
-
-stage.add(linesLayer);
-stage.add(circlesLayer);
-stage.add(tooltipLayer);
-
+window.onload = function(){
+	var stage = new Kinetic.Stage("canvasGraph", {{width}}, {{height}});
+	var circlesLayer = new Kinetic.Layer();
+	var textsLayer = new Kinetic.Layer();
+	var linesLayer = new Kinetic.Layer();
+	var tooltipLayer = new Kinetic.Layer();
+	
+	{{canvasContent|safe}}
+	
+	stage.add(textsLayer);
+	stage.add(linesLayer);
+	stage.add(circlesLayer);
+	stage.add(tooltipLayer);
+};
 </script>
-</html>
 
 
-<html>
+{% endblock %}
