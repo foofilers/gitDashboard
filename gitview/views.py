@@ -1,7 +1,8 @@
 from django.shortcuts import render_to_response,redirect
 from django.template import RequestContext
 from django.conf import settings
-from gitengine.gitEngine import GitRepo,GitGraph, GitDir,GitChange
+from gitengine.gitEngine import GitRepo, GitDir,GitChange
+from gitengine.gitGraph import GitGraphviz, GitGraphCanvas
 import gitengine.gitEngine as gitEngine
 from django import forms
 from os import sep,listdir
@@ -287,7 +288,7 @@ def graphImg(request):
     num = request.GET['num']
     repo=GitRepo(repoPath)
  
-    graph=GitGraph(repo,branch=branch,size=num,since=since,until=until)
+    graph=GitGraphviz(repo,branch=branch,size=num,since=since,until=until)
     graph.prepare();
     
     tfile = tempfile.NamedTemporaryFile()
@@ -308,13 +309,8 @@ def graph(request):
     repo=GitRepo(repoPath)
     commitUrl=reverse('gitview.views.commit')
     commitUrl+="?path="+repoPath+"&id=$$"
-    mapGraph=GitGraph(repo,branch=branch,size=num,since=since,until=until,commitUrl=str(commitUrl))
-    mapGraph.prepare();
-    mapTempFile = tempfile.NamedTemporaryFile()
-    mapGraph.draw(mapTempFile, 'cmapx')
-    mapTempFile.seek(0)
-    graphUrl=str(reverse('gitview.views.graphImg'))+"?path="+repoPath+"&branch="+branch+"&since="+str(since)+"&until="+str(until)+"&num="+str(num)
-    return render_to_response("graph.html",RequestContext(request,{'graphUrl':graphUrl,'mapContent':mapTempFile.read()}))
+    graph=GitGraphCanvas(repo,size=num,since=since,until=until,commitUrl=str(commitUrl),branch=branch)
+    return render_to_response("graph.html",RequestContext(request,{'canvasContent':graph.render(),'width':graph.getWidth(),'height':graph.getHeight()}))
 
     
     

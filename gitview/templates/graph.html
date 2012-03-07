@@ -1,5 +1,51 @@
-<script>
-	$("map *").tooltip({ showURL:false,positionLeft: true });
+<html>
+<head>
+	<script type="text/javascript" src="/static/js/kinetic-v3.8.2.min.js"></script>
+</head>
+<div id="graph" ></div>
+<script type="text/javascript">
+var stage = new Kinetic.Stage("graph", {{width}}, {{height}});
+var circlesLayer = new Kinetic.Layer();
+var linesLayer = new Kinetic.Layer();
+var tooltipLayer = new Kinetic.Layer();
+var context=linesLayer.context;
+
+function line(x1,y1,x2,y2,color){
+	var ln = new Kinetic.Shape({
+        drawFunc: function(){
+            var context = this.getContext();
+            context.beginPath();
+        	context.lineWidth = 2;
+        	context.strokeStyle = color;
+        	context.moveTo(x1,y1);
+        	context.lineTo(x2,y2);
+        	context.stroke();
+        	context.closePath();
+        }});
+	linesLayer.add(ln);
+}
+
+{{canvasContent|safe}}
+
+var tooltip = new Kinetic.Text({
+    text: "",
+    fontFamily: "Calibri",
+    fontSize: 12,
+    padding: 5,
+    visible: false,
+    fill: "#8ED6FF",
+    alpha: 0.75,
+    textFill: "black"
+});
+
+tooltipLayer.add(tooltip);
+
+stage.add(linesLayer);
+stage.add(circlesLayer);
+stage.add(tooltipLayer);
+
 </script>
-<img border="0" src="{{ graphUrl|safe }}" usemap="#gitGraph"/>
-{{mapContent|safe}}
+</html>
+
+
+<html>
