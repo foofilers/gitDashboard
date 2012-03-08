@@ -203,12 +203,13 @@ def canvasText(x,y,text,color,gitGraph):
     return textJS;
     
 class CommitGraph:
-    def __init__(self,cmt,x,y,color,gitGraph):
+    def __init__(self,cmt,x,y,color,gitGraph,branchName):
         self.x=x;
         self.y=y;
         self.cmt=cmt;
         self.color=color
         self.gitGraph=gitGraph
+        self.branchName=branchName
     def draw(self):
         radius=6
         tooltip=[]
@@ -216,6 +217,7 @@ class CommitGraph:
         cmprts=self.cmt._get_parents()
         for cmpr in cmprts:
             tooltip.append("parent: "+cmpr)
+        tooltip.append("Branch: "+self.branchName)
         tooltip.append("Author: "+self.cmt.author)
         dt = datetime.fromtimestamp(self.cmt.commit_time)
         tooltip.append("Date: "+dt.strftime('%Y-%m-%d %H:%M:%S'))
@@ -227,7 +229,7 @@ class CommitGraph:
         return canvasCircle(self.x, self.y, radius, self.color,tooltip,self.cmt.id,self.gitGraph)
 
 class GitGraphCanvas:
-    def __init__(self,repo,commitUrl=None):
+    def __init__(self,repo,since=None,until=None,commitUrl=None):
         self.repo=repo
         self.commitUrl=commitUrl
         self._width=0
@@ -235,7 +237,8 @@ class GitGraphCanvas:
         self._fontSize=10
         self._maxTooltipWidth=0
         self._maxTooltipHeight=0
-    
+        self.since=since
+        self.until=until
     def render(self):
         #recupero i branch
         allBranches = self.repo.getBranches();
@@ -267,7 +270,7 @@ class GitGraphCanvas:
             if len(branches[branchSha])>maxBranchNameLength:
                 maxBranchNameLength=len(branches[branchSha])
             parents[branchSha]=[]        
-            branchCmts=self.repo.getCommits(branch=[branchSha])            
+            branchCmts=self.repo.getCommits(branch=[branchSha],since=self.since,until=self.until)            
             branchDates={}
             for cmt in branchCmts:
                 cmts[cmt.id]=cmt
@@ -322,7 +325,7 @@ class GitGraphCanvas:
                             self._width=cmtX
                         cmtID=cmt.split('_')[0]
                         if cmtID not in cmtAdded:
-                            graphCmt = CommitGraph(cmts[cmtID],cmtX,y,color,self)
+                            graphCmt = CommitGraph(cmts[cmtID],cmtX,y,color,self,branches[branchSha])
                             graphCommits[branchSha].append(graphCmt)
                             #add circle positions on commitsPos dictionary
                             commitsPos[cmt]=graphCmt

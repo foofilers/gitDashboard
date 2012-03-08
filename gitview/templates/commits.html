@@ -16,7 +16,6 @@
 		<form id="branchForm" method="GET" style="margin:auto;" class="branchForm">
 			{{branchForm.path}}
 			<b>Repository path:</b><a href="{% url gitview.views.commits %}?path={{ repoPath }}">{{ repoPath }}</a>/ {{branchForm.branch}}
-			{% if not filePath %}<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}"><img style="vertical-align:middle;" src="/static/images/graph.png" border="0" title="Graph"/></a>{% endif %}
 		</form>
 	{% endif %}
 	
@@ -45,6 +44,7 @@
 				});
 			});
 		</script>
+		
 		<form method="POST" id="filterForm" style="margin:auto;">{%csrf_token%}
 			{% if filePath %}
 				<input type="hidden" id="filePath" name="filePath" value="{{filePath}}">
@@ -65,6 +65,7 @@
 			</tr>
 			</table>
 		</form>
+		{% if not filePath %}<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}"><img style="vertical-align:middle;" src="/static/images/graph.png" border="0" title="Graph"/></a>{% endif %}
 	</div>
 
 	

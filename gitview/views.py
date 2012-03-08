@@ -2,13 +2,12 @@ from django.shortcuts import render_to_response,redirect
 from django.template import RequestContext
 from django.conf import settings
 from gitengine.gitEngine import GitRepo, GitDir,GitChange
-from gitengine.gitGraph import GitGraphviz, GitGraphCanvas
+from gitengine.gitGraph import  GitGraphCanvas
 import gitengine.gitEngine as gitEngine
 from django import forms
 from os import sep,listdir
 from os.path import isdir
 import time
-import tempfile
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -288,10 +287,21 @@ def graph(request):
         branch=request.GET['branch']
     except KeyError:
         branch=''
+    
+    if len(request.GET['since'])>0:
+        since=int(request.GET['since'])
+    else:
+        since=None
+        
+    if len(request.GET['until'])>0:
+        until=int(request.GET['until'])
+    else:
+        until=None
+    
     repo=GitRepo(repoPath)
     commitUrl=reverse('gitview.views.commit')
     commitUrl+="?path="+repoPath+'&branch='+branch+"&id=$$"
-    graph=GitGraphCanvas(repo,commitUrl=str(commitUrl))
+    graph=GitGraphCanvas(repo,since=since,until=until,commitUrl=str(commitUrl))
     return render_to_response("graph.html",RequestContext(request,{'repoPath':repoPath,'branch':branch,'canvasContent':graph.render(),'width':graph.getWidth(),'height':graph.getHeight()}))
 
     
