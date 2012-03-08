@@ -1,4 +1,4 @@
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_unicode,DjangoUnicodeDecodeError
 import pygraphviz as pgv
 from datetime import datetime
 
@@ -101,7 +101,131 @@ class GitGraphviz:
         self.G.draw(path,prog='dot',format=dotFormat)
     def tostr(self):
         return self.G.to_string()
+
+def canvasTooltipRect(x,y,width,height,color):
+    rectJS='var rect = new Kinetic.Rect({'
+    rectJS+='x:'+str(x)+','
+    rectJS+='y:'+str(y)+','
+    rectJS+='width:'+str(width)+','
+    rectJS+='height:'+str(height)+','
+    rectJS+='fill:"'+color+'",'
+    rectJS+='alpha: 0.75,'
+    rectJS+='stroke: "black",'
+    rectJS+='strokeWidth: 1'
+    rectJS+='});\n'
+    rectJS+='tooltipLayer.add(rect);'
+    return rectJS
     
+def canvasTooltip(x,y,message):
+    tooltipJS='var tooltip = new Kinetic.Text({'
+    tooltipJS+='text: "'+message+'",'
+    tooltipJS+="x:"+str(x)+','
+    tooltipJS+="y:"+str(y)+','
+    tooltipJS+='fontFamily: "Verdana",'
+    tooltipJS+='fontSize: 10,'
+    tooltipJS+='padding: 5,'
+    tooltipJS+='textFill: "black"'
+    tooltipJS+='})\n;'
+    tooltipJS+='tooltipLayer.add(tooltip);'
+    return tooltipJS
+   
+def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
+    circleJS="var circle = new Kinetic.Circle({"
+    circleJS+="x:"+str(x)+','
+    circleJS+="y:"+str(y)+','
+    circleJS+="radius:"+str(radius)+','
+    circleJS+='fill:"'+color+'",'
+    circleJS+='stroke: "black",'
+    circleJS+='strokeWidth: 1'
+    circleJS+='});\n'
+    
+    circleJS+='circle.on("mousemove", function(){\n'
+    circleJS+='var mousePos = stage.getMousePosition();\n'
+    circleJS+='tooltipLayer.removeChildren();\n'
+    circleJS+='document.body.style.cursor = "pointer";\n'
+    tooltipY=5
+    maxLen=0
+    tooltips=""
+    for msg in tooltip:
+        message=str(msg).replace('"','')
+        if len(message)>maxLen:
+            maxLen=len(message)
+        try:
+            message=smart_unicode(message)
+        except TypeError:
+            pass
+        except DjangoUnicodeDecodeError:
+            message=message.decode('latin1')
+            
+        tooltips+=canvasTooltip(x+5, str(y+tooltipY+10), message);
+        tooltipY+=20
+    if tooltipY>gitGraph._maxTooltipHeight:
+        gitGraph._maxTooltipHeight=tooltipY
+        
+    if maxLen*8>gitGraph._maxTooltipWidth:
+        gitGraph._maxTooltipWidth=maxLen*8
+        
+    circleJS+=canvasTooltipRect(x+5, y+10, maxLen*8, str(tooltipY),color)
+    circleJS+=tooltips
+    circleJS+='tooltipLayer.show();\n'
+    circleJS+='tooltipLayer.draw();\n'
+    circleJS+='});\n'
+    
+    #mouseOut
+    circleJS+='circle.on("mouseout", function(){\n'
+    circleJS+='tooltipLayer.removeChildren();\n'
+    circleJS+='tooltipLayer.hide();\n'
+    circleJS+='tooltipLayer.draw();\n'
+    circleJS+='document.body.style.cursor = "default";\n'
+    circleJS+='});\n'
+    
+    #click
+    circleJS+='circle.on("mousedown", function(){\n'
+    if gitGraph.commitUrl:
+        cmtUrl=gitGraph.commitUrl.replace("$$",cmtID)
+    else:
+        cmtUrl=""
+    circleJS+='window.location = "'+cmtUrl+'";'
+    circleJS+='});\n'
+    circleJS+='circlesLayer.add(circle);\n'
+    return circleJS
+
+def canvasText(x,y,text,color,gitGraph):
+    textJS='var text= new Kinetic.Text({'
+    textJS+='x:'+str(x)+','
+    textJS+='y:'+str(y)+','
+    textJS+='fontFamily: "Verdana",'
+    textJS+='fontSize:'+str(gitGraph._fontSize)+','
+    textJS+='text:"'+text+'",'
+    textJS+='textFill:"'+color+'"'
+    textJS+='});\n'
+    textJS+='textsLayer.add(text);\n'
+    return textJS;
+    
+class CommitGraph:
+    def __init__(self,cmt,x,y,color,gitGraph):
+        self.x=x;
+        self.y=y;
+        self.cmt=cmt;
+        self.color=color
+        self.gitGraph=gitGraph
+    def draw(self):
+        radius=6
+        tooltip=[]
+        tooltip.append("id: "+self.cmt.id)
+        cmprts=self.cmt._get_parents()
+        for cmpr in cmprts:
+            tooltip.append("parent: "+cmpr)
+        tooltip.append("Author: "+self.cmt.author)
+        dt = datetime.fromtimestamp(self.cmt.commit_time)
+        tooltip.append("Date: "+dt.strftime('%Y-%m-%d %H:%M:%S'))
+        tooltip.append("--------------");
+        rows=self.cmt.message.split('\n')
+        for row in rows:
+            if len(row)>0:
+                tooltip.append(row)
+        return canvasCircle(self.x, self.y, radius, self.color,tooltip,self.cmt.id,self.gitGraph)
+
 class GitGraphCanvas:
     def __init__(self,repo,commitUrl=None):
         self.repo=repo
@@ -111,101 +235,6 @@ class GitGraphCanvas:
         self._fontSize=10
         self._maxTooltipWidth=0
         self._maxTooltipHeight=0
-        
-    def __tooltipRect(self,x,y,width,height,color):
-        rectJS='var rect = new Kinetic.Rect({'
-        rectJS+='x:'+str(x)+','
-        rectJS+='y:'+str(y)+','
-        rectJS+='width:'+str(width)+','
-        rectJS+='height:'+str(height)+','
-        rectJS+='fill:"'+color+'",'
-        rectJS+='alpha: 0.75,'
-        rectJS+='stroke: "black",'
-        rectJS+='strokeWidth: 1'
-        rectJS+='});\n'
-        rectJS+='tooltipLayer.add(rect);'
-        return rectJS
-        
-    def __tooltip(self,x,y,message):
-        tooltipJS='var tooltip = new Kinetic.Text({'
-        tooltipJS+='text: "'+message+'",'
-        tooltipJS+="x:"+str(x)+','
-        tooltipJS+="y:"+str(y)+','
-        tooltipJS+='fontFamily: "Verdana",'
-        tooltipJS+='fontSize: 10,'
-        tooltipJS+='padding: 5,'
-        tooltipJS+='textFill: "black"'
-        tooltipJS+='})\n;'
-        tooltipJS+='tooltipLayer.add(tooltip);'
-        return tooltipJS
-       
-    def __circle(self,x,y,radius,color,tooltip,cmtID):
-        circleJS="var circle = new Kinetic.Circle({"
-        circleJS+="x:"+str(x)+','
-        circleJS+="y:"+str(y)+','
-        circleJS+="radius:"+str(radius)+','
-        circleJS+='fill:"'+color+'",'
-        circleJS+='stroke: "black",'
-        circleJS+='strokeWidth: 1'
-        circleJS+='});\n'
-        
-        circleJS+='circle.on("mousemove", function(){\n'
-        circleJS+='var mousePos = stage.getMousePosition();\n'
-        circleJS+='tooltipLayer.removeChildren();\n'
-        circleJS+='document.body.style.cursor = "pointer";\n'
-        y=5
-        maxLen=0
-        tooltips=""
-        for msg in tooltip:
-            message=msg.replace('"','')
-            if len(message)>maxLen:
-                maxLen=len(message)
-            try:
-                message=smart_unicode(message)
-            except TypeError:
-                message=message
-            tooltips+=self.__tooltip('mousePos.x + 5', 'mousePos.y + '+str(y), message);
-            y+=20
-        if y>self._maxTooltipHeight:
-            self._maxTooltipHeight=y
-        if maxLen*8>self._maxTooltipWidth:
-            self._maxTooltipWidth=maxLen*8
-        circleJS+=self.__tooltipRect('mousePos.x + 5', 'mousePos.y', maxLen*8, str(y),color)
-        circleJS+=tooltips
-        circleJS+='tooltipLayer.show();\n'
-        circleJS+='tooltipLayer.draw();\n'
-        circleJS+='});\n'
-        
-        #mouseOut
-        circleJS+='circle.on("mouseout", function(){\n'
-        circleJS+='tooltipLayer.removeChildren();\n'
-        circleJS+='tooltipLayer.hide();\n'
-        circleJS+='tooltipLayer.draw();\n'
-        circleJS+='document.body.style.cursor = "default";\n'
-        circleJS+='});\n'
-        
-        #click
-        circleJS+='circle.on("mousedown", function(){\n'
-        if self.commitUrl:
-            cmtUrl=self.commitUrl.replace("$$",cmtID)
-        else:
-            cmtUrl=""
-        circleJS+='window.location = "'+cmtUrl+'";'
-        circleJS+='});\n'
-        circleJS+='circlesLayer.add(circle);\n'
-        return circleJS
-    
-    def __text(self,x,y,text,color):
-        textJS='var text= new Kinetic.Text({'
-        textJS+='x:'+str(x)+','
-        textJS+='y:'+str(y)+','
-        textJS+='fontFamily: "Verdana",'
-        textJS+='fontSize:'+str(self._fontSize)+','
-        textJS+='text:"'+text+'",'
-        textJS+='textFill:"'+color+'"'
-        textJS+='});\n'
-        textJS+='textsLayer.add(text);\n'
-        return textJS;
     
     def render(self):
         #recupero i branch
@@ -221,11 +250,11 @@ class GitGraphCanvas:
         canvas=""
         commitsPos={}
         cmtAdded=[]
+        graphCommits={}
         parents={}
         sons={}
         maxBranchNameLength=0
         cmts={}
-        
         dates=[]
         datesX={}
         sortedBranches=[self.repo.head()]
@@ -233,6 +262,7 @@ class GitGraphCanvas:
         tmp.extend(branches.keys())
         tmp.remove(self.repo.head())
         sortedBranches.extend(tmp)
+        
         for branchSha in sortedBranches:
             if len(branches[branchSha])>maxBranchNameLength:
                 maxBranchNameLength=len(branches[branchSha])
@@ -276,12 +306,10 @@ class GitGraphCanvas:
             x+=xDelay*xMax
         y=15
         for branchSha in sortedBranches:
-            #draw branch names
+            graphCommits[branchSha]=[]
             if branchSha == self.repo.head():
-                canvas+=self.__text(15, y, branches[branchSha], "red")
                 color="red"
-            else:
-                canvas+=self.__text(15, y, branches[branchSha], "black")
+            else:                
                 color="#8ED6FF"
             #draw commits
             for dt in dates:
@@ -294,26 +322,38 @@ class GitGraphCanvas:
                             self._width=cmtX
                         cmtID=cmt.split('_')[0]
                         if cmtID not in cmtAdded:
-                            tooltip=[]
-                            tooltip.append("Branch: "+branches[branchSha])
-                            tooltip.append("Author: "+cmts[cmtID].author)
-                            dt = datetime.fromtimestamp(cmts[cmtID].commit_time)
-                            tooltip.append("Date: "+dt.strftime('%Y-%m-%d %H:%M:%S'))
-                            tooltip.append("--------------");
-                            rows=cmts[cmtID].message.split('\n')
-                            for row in rows:
-                                if len(row)>0:
-                                    tooltip.append(row)
-                            #draw circle
-                            canvas+=self.__circle(cmtX, y, radius, color,tooltip,cmtID)
+                            graphCmt = CommitGraph(cmts[cmtID],cmtX,y,color,self)
+                            graphCommits[branchSha].append(graphCmt)
                             #add circle positions on commitsPos dictionary
-                            commitsPos[cmt]=(cmtX,y)
+                            commitsPos[cmt]=graphCmt
                             cmtAdded.append(cmtID)
                             cmtNum+=1
                 except KeyError:
                     pass
             #next branch y position
             y+=radius+20
+        
+        #draw branch names
+        y=15
+        branchToDrop=[]
+        for branchSha in sortedBranches:
+            if len(graphCommits[branchSha])>0:
+                if branchSha == self.repo.head():
+                    canvas+=canvasText(15, y, branches[branchSha], "red",self)
+                    color="red"
+                else:
+                    canvas+=canvasText(15, y, branches[branchSha], "black",self)
+                    color="#8ED6FF"
+                #draw circle
+                for grpCmt in graphCommits[branchSha]:
+                    grpCmt.y=y
+                    canvas+=grpCmt.draw()
+                y+=radius+20
+            else:
+                branchToDrop.append(branchSha)
+        for delSha in branchToDrop:
+            sortedBranches.remove(delSha)
+            
         #set the global height
         self._height=y
         #Lines
@@ -321,12 +361,12 @@ class GitGraphCanvas:
             for branchSha in sortedBranches:
                 parID=par+"_"+branchSha
                 if parID in commitsPos:
-                    xPar=commitsPos[parID][0]
-                    yPar=commitsPos[parID][1]
+                    xPar=commitsPos[parID].x
+                    yPar=commitsPos[parID].y
                     for son in sons[par]:
                         if son in commitsPos:
-                            x=commitsPos[son][0]
-                            y=commitsPos[son][1]
+                            x=commitsPos[son].x
+                            y=commitsPos[son].y
                             canvas+='line('+str(xPar)+','+str(yPar)+','+str(x)+','+str(y)+',"#000000",linesLayer);\n'
         return canvas
     def getWidth(self):

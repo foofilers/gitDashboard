@@ -8,9 +8,8 @@
 
 {% block contentBlock %}
 <script src="/static/js/kinetic-v3.8.2.min.js"></script>
-<div style="overflow:auto;">
-	<div id="canvasGraph" style="height:{{height}};width:{{width}}"></div>
-	</div>
+<div id="canvasGraph" style="height:{{height}};width:{{width}}"></div>
+
 <script type="text/javascript">
 function line(x1,y1,x2,y2,color,layer){
 	var ln = new Kinetic.Shape({
@@ -33,33 +32,34 @@ function line(x1,y1,x2,y2,color,layer){
         	if (!oblique){
         		context.lineTo(x2,y2);
         		if (vertical){
-        			if (y2<y1){
+        			if (y2<=y1){
         				//up
-        				context.moveTo(x2,y2+5);
+        				context.moveTo(x2,y2+7);
                 		context.lineTo(x2-5,y2+10);
-                		context.moveTo(x2,y2+5);
+                		context.moveTo(x2,y2+7);
                 		context.lineTo(x2+5,y2+10);
         			}else{
         				//down
-        				context.moveTo(x2,y2-5);
+        				context.moveTo(x2,y2-7);
                 		context.lineTo(x2-10,y2-10);
-                		context.moveTo(x2,y2-5);
+                		context.moveTo(x2,y2-7);
                 		context.lineTo(x2+10,y2-10);	
         			}
         		}else{
         			//horizzontal
-        			context.moveTo(x2-5,y2);
+        			context.moveTo(x2-7,y2);
             		context.lineTo(x2-10,y2-5);
-            		context.moveTo(x2-5,y2);
+            		context.moveTo(x2-7,y2);
             		context.lineTo(x2-10,y2+5);
         		}
         	}else{
         		//oblique
+        		context.strokeStyle="#8ED6FF";
         		context.lineTo(x1,y2);
         		context.lineTo(x2,y2);
-        		context.moveTo(x2-5,y2);
+        		context.moveTo(x2-7,y2);
         		context.lineTo(x2-10,y2-5);
-        		context.moveTo(x2-5,y2);
+        		context.moveTo(x2-7,y2);
         		context.lineTo(x2-10,y2+5);
         	}
         	context.stroke();
