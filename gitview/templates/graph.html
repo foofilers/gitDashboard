@@ -8,7 +8,7 @@
 
 {% block contentBlock %}
 <script src="/static/js/kinetic-v3.8.2.min.js"></script>
-<div id="canvasGraph" style="height:{{height}};width:{{width}}"></div>
+<div id="canvasGraph" style="border:1px solid #000000;margin:auto;height:{{height}};width:100%;"></div>
 
 <script type="text/javascript">
 function line(x1,y1,x2,y2,color,layer){
@@ -64,20 +64,52 @@ function line(x1,y1,x2,y2,color,layer){
         	}
         	context.stroke();
         	context.closePath();
+        	context.restore();
         }});
 	layer.add(ln);
 }
 window.onload = function(){
-	var stage = new Kinetic.Stage("canvasGraph", {{width}}, {{height}});
+	var width=document.getElementById("canvasGraph").offsetWidth;
+	width=width-20;
+	var stage = new Kinetic.Stage("canvasGraph", width, {{height}});
 	var circlesLayer = new Kinetic.Layer();
-	var textsLayer = new Kinetic.Layer();
-	var linesLayer = new Kinetic.Layer();
 	var tooltipLayer = new Kinetic.Layer();
 	
+	var lineGroup = new Kinetic.Group();
+	var circleGroup = new Kinetic.Group();
+	var textGroup = new Kinetic.Group();
+	
+	var backgroundRect=new Kinetic.Rect({
+		x:0,
+		y:0,
+		width:{{width}},
+		height:{{height}},
+		fill:'#FFFFFF',
+		alpha:0.0
+		
+	});
+	backgroundRect.on("mousemove",function(){
+		document.body.style.cursor = "move";
+	})
+	circleGroup.add(backgroundRect);
+
 	{{canvasContent|safe}}
 	
-	stage.add(textsLayer);
-	stage.add(linesLayer);
+	circlesLayer.add(lineGroup);
+	circlesLayer.add(circleGroup);
+	circlesLayer.add(textGroup);
+	
+	circlesLayer.draggableX(true);
+	
+
+	//prevent to move after left border
+	circlesLayer.on("dragend", function(e){
+        if (circlesLayer.x>0){
+        	circlesLayer.setPosition(0,0);
+        	circlesLayer.draw();
+        }
+    });
+	circlesLayer.move(-{{width}}+width-100,0);
 	stage.add(circlesLayer);
 	stage.add(tooltipLayer);
 };

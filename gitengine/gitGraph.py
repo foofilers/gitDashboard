@@ -130,7 +130,8 @@ def canvasTooltip(x,y,message):
     return tooltipJS
    
 def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
-    circleJS="var circle = new Kinetic.Circle({"
+    jsvar='circle_'+cmtID
+    circleJS="var "+jsvar+" = new Kinetic.Circle({"
     circleJS+="x:"+str(x)+','
     circleJS+="y:"+str(y)+','
     circleJS+="radius:"+str(radius)+','
@@ -139,40 +140,46 @@ def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
     circleJS+='strokeWidth: 1'
     circleJS+='});\n'
     
-    circleJS+='circle.on("mousemove", function(){\n'
+    circleJS+=jsvar+'.on("mouseover", function(){\n'
     circleJS+='var mousePos = stage.getMousePosition();\n'
     circleJS+='tooltipLayer.removeChildren();\n'
     circleJS+='document.body.style.cursor = "pointer";\n'
     tooltipY=5
     maxLen=0
     tooltips=""
+    numLines=0
     for msg in tooltip:
-        message=str(msg).replace('"','')
-        if len(message)>maxLen:
-            maxLen=len(message)
-        try:
-            message=smart_unicode(message)
-        except TypeError:
-            pass
-        except DjangoUnicodeDecodeError:
-            message=message.decode('latin1')
-            
-        tooltips+=canvasTooltip(x+5, str(y+tooltipY+10), message);
-        tooltipY+=20
-    if tooltipY>gitGraph._maxTooltipHeight:
-        gitGraph._maxTooltipHeight=tooltipY
+        if numLines<14:
+            if numLines==13:
+                message="[continua...]"
+            else:
+                message=str(msg).replace('"','')
+                if len(message)>maxLen:
+                    maxLen=len(message)
+                try:
+                    message=smart_unicode(message)
+                except TypeError:
+                    pass
+                except DjangoUnicodeDecodeError:
+                    message=message.decode('latin1')
+            tooltips+=canvasTooltip('mousePos.x+20', 'mousePos.y+'+str(tooltipY+20), message);
+            tooltipY+=20
+            numLines+=1
+        
+    if (tooltipY-20)>gitGraph._maxTooltipHeight:
+        gitGraph._maxTooltipHeight=tooltipY-20
         
     if maxLen*8>gitGraph._maxTooltipWidth:
         gitGraph._maxTooltipWidth=maxLen*8
         
-    circleJS+=canvasTooltipRect(x+5, y+10, maxLen*8, str(tooltipY),color)
+    circleJS+=canvasTooltipRect('mousePos.x+20', 'mousePos.y+20', maxLen*8, str(tooltipY),color)
     circleJS+=tooltips
-    circleJS+='tooltipLayer.show();\n'
+    circleJS+='tooltipLayer.show();\n'    
     circleJS+='tooltipLayer.draw();\n'
     circleJS+='});\n'
     
     #mouseOut
-    circleJS+='circle.on("mouseout", function(){\n'
+    circleJS+=jsvar+'.on("mouseout", function(){\n'
     circleJS+='tooltipLayer.removeChildren();\n'
     circleJS+='tooltipLayer.hide();\n'
     circleJS+='tooltipLayer.draw();\n'
@@ -180,14 +187,15 @@ def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
     circleJS+='});\n'
     
     #click
-    circleJS+='circle.on("mousedown", function(){\n'
+    circleJS+=jsvar+'.on("mousedown", function(){\n'
     if gitGraph.commitUrl:
         cmtUrl=gitGraph.commitUrl.replace("$$",cmtID)
     else:
         cmtUrl=""
     circleJS+='window.location = "'+cmtUrl+'";'
     circleJS+='});\n'
-    circleJS+='circlesLayer.add(circle);\n'
+    
+    circleJS+='circleGroup.add('+jsvar+');\n'
     return circleJS
 
 def canvasText(x,y,text,color,gitGraph):
@@ -199,7 +207,7 @@ def canvasText(x,y,text,color,gitGraph):
     textJS+='text:"'+text+'",'
     textJS+='textFill:"'+color+'"'
     textJS+='});\n'
-    textJS+='textsLayer.add(text);\n'
+    textJS+='textGroup.add(text);\n'
     return textJS;
     
 class CommitGraph:
@@ -370,10 +378,10 @@ class GitGraphCanvas:
                         if son in commitsPos:
                             x=commitsPos[son].x
                             y=commitsPos[son].y
-                            canvas+='line('+str(xPar)+','+str(yPar)+','+str(x)+','+str(y)+',"#000000",linesLayer);\n'
+                            canvas+='line('+str(xPar)+','+str(yPar)+','+str(x)+','+str(y)+',"#000000",lineGroup);\n'
         return canvas
     def getWidth(self):
-        return self._width+self._maxTooltipWidth
+        return self._width
     def getHeight(self):
         return self._height+self._maxTooltipHeight
     
