@@ -54,13 +54,30 @@ function line(x1,y1,x2,y2,color,layer){
         		}
         	}else{
         		//oblique
-        		context.strokeStyle="#8ED6FF";
-        		context.lineTo(x1,y2);
-        		context.lineTo(x2,y2);
-        		context.moveTo(x2-7,y2);
-        		context.lineTo(x2-10,y2-5);
-        		context.moveTo(x2-7,y2);
-        		context.lineTo(x2-10,y2+5);
+        		context.strokeStyle="blue";
+        		if (y2<=y1){
+        			//destination higher than source
+        			context.lineTo(x1,y2+15);
+            		context.lineTo(x2,y2+15);
+            		context.lineTo(x2,y2);
+            		//arrow
+            		context.moveTo(x2,y2+7);
+            		context.lineTo(x2-5,y2+10);
+            		context.moveTo(x2,y2+7);
+            		context.lineTo(x2+5,y2+10);
+        		}else{
+        			//destination lower than source
+        			context.lineTo(x1,y2-15);
+            		context.lineTo(x2,y2-15);
+            		context.lineTo(x2,y2);
+            		//arrow
+            		context.moveTo(x2,y2-7);
+            		context.lineTo(x2-5,y2-10);
+            		context.moveTo(x2,y2-7);
+            		context.lineTo(x2+5,y2-10);
+            		
+        		}
+        		
         	}
         	context.stroke();
         	context.closePath();
@@ -84,8 +101,8 @@ window.onload = function(){
 		y:0,
 		width:{{width}},
 		height:{{height}},
-		fill:'#FFFFFF',
-		alpha:0.0
+		fill:'#CCFFFF',
+		alpha:0.2
 		
 	});
 	backgroundRect.on("mousemove",function(){
@@ -109,7 +126,7 @@ window.onload = function(){
         	circlesLayer.draw();
         }
     });
-	circlesLayer.move(-{{width}}+width-100,0);
+	circlesLayer.move(-{{width}}+Math.floor(width/2),0);
 	stage.add(circlesLayer);
 	stage.add(tooltipLayer);
 };
