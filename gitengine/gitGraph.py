@@ -115,6 +115,20 @@ def canvasTooltipRect(x,y,width,height,color):
     rectJS+='});\n'
     rectJS+='tooltipLayer.add(rect);'
     return rectJS
+
+def canvasDateRect(x,y,width,color):
+    rectJS='var dateRect = new Kinetic.Rect({'
+    rectJS+='x:'+str(x)+','
+    rectJS+='y:'+str(y)+','
+    rectJS+='width:'+str(width)+','
+    rectJS+='height:20,'
+    rectJS+='fill:"'+color+'",'
+    rectJS+='alpha: 0.75,'
+    rectJS+='stroke: "white",'
+    rectJS+='strokeWidth: 1'
+    rectJS+='});\n'
+    rectJS+='textGroup.add(dateRect);'
+    return rectJS
     
 def canvasTooltip(x,y,message):
     tooltipJS='var tooltip = new Kinetic.Text({'
@@ -198,12 +212,15 @@ def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
     circleJS+='circleGroup.add('+jsvar+');\n'
     return circleJS
 
-def canvasText(x,y,text,color,gitGraph):
+def canvasText(x,y,text,color,gitGraph,fontSize=None):
     textJS='var text= new Kinetic.Text({'
     textJS+='x:'+str(x)+','
     textJS+='y:'+str(y)+','
     textJS+='fontFamily: "Verdana",'
-    textJS+='fontSize:'+str(gitGraph._fontSize)+','
+    if fontSize:
+        textJS+='fontSize:'+str(fontSize)+','
+    else:
+        textJS+='fontSize:'+str(gitGraph._fontSize)+','
     textJS+='text:"'+text+'",'
     textJS+='textFill:"'+color+'"'
     textJS+='});\n'
@@ -248,7 +265,42 @@ class GitGraphCanvas:
         self.since=since
         self.until=until
     def render(self):
-        #recupero i branch
+        #the return string
+        canvas=""
+        #Dict key:cmtID value: (x,y)
+        commitsPos={}
+        #Commit already added
+        cmtAdded=[]
+        #Dict key:cmtID value:instance of GraphCommit
+        graphCommits={}
+        #Dict key:sonId value=[parentID,...]
+        parents={}
+        #Dict key:parentId value=[sonID,...]
+        sons={}
+        #Max lenght(calculated based numchar*8) of name of branch
+        maxBranchNameLength=0
+        #Dict Key:cmtID value:instance of GitCommit
+        cmts={}
+        #all dates
+        dates=[]
+        #Date associated to x coordinate
+        datesX={}
+        #List of years
+        years=[]
+        #Dict key:year value=(xMin,xMax)
+        yearX={}
+        #List of months
+        months=[]
+        #Dict key:month value=(xMin,xMax)
+        monthX={}
+        #List of months
+        days=[]
+        #Dict key:day value=(xMin,xMax)
+        daysX={}
+        #Dict key:date value:[cmtID,...]
+        branchesCmtsDates = {}
+        
+        #fetch branches
         allBranches = self.repo.getBranches();
         branches={}
         for ab in allBranches:
@@ -256,24 +308,13 @@ class GitGraphCanvas:
                 branches[allBranches[ab]] = ab
             else:
                 branches[allBranches[ab]]+=" "+ab
-        branchesCmtsDates = {}
-        #tutte le date presenti
-        canvas=""
-        commitsPos={}
-        cmtAdded=[]
-        graphCommits={}
-        parents={}
-        sons={}
-        maxBranchNameLength=0
-        cmts={}
-        dates=[]
-        datesX={}
         sortedBranches=[self.repo.head()]
         tmp=[]
         tmp.extend(branches.keys())
         tmp.remove(self.repo.head())
         sortedBranches.extend(tmp)
         
+        #associate commits to its date
         for branchSha in sortedBranches:
             if len(branches[branchSha])>maxBranchNameLength:
                 maxBranchNameLength=len(branches[branchSha])
@@ -282,8 +323,8 @@ class GitGraphCanvas:
             branchDates={}
             for cmt in branchCmts:
                 cmts[cmt.id]=cmt
-                dt = datetime.fromtimestamp(cmt.commit_time)
-                dates.append(dt.strftime('%Y-%m-%d-%H-%M-%s'))
+                dt = cmt.commit_time
+                dates.append(dt)
                 cmtID=cmt.id+"_"+branchSha
                 if cmtID in parents[branchSha] or cmt.id==branchCmts[0].id:
                     if len(cmt._get_parents())>0:
@@ -295,17 +336,59 @@ class GitGraphCanvas:
                                 sons[prt].append(cmtID)
                             else:
                                 sons[prt]=[cmtID]
-                    if dt.strftime('%Y-%m-%d-%H-%M-%s') in branchDates:
-                        branchDates[dt.strftime('%Y-%m-%d-%H-%M-%s')].append(cmtID)
+                    if dt in branchDates:
+                        branchDates[dt].append(cmtID)
                     else:
-                        branchDates[dt.strftime('%Y-%m-%d-%H-%M-%s')]=[cmtID]
+                        branchDates[dt]=[cmtID]
             branchesCmtsDates[branchSha] = branchDates;
         dates=sorted(set(dates))
-        radius=6
+        radius=10
         x=maxBranchNameLength*(self._fontSize-2)
         xDelay=((radius*2)+10)
+        
+        #find the first x coordinate for each date
+        currMonth=""
+        currDay=""
+        currYear=""
+        lastDt = dates[len(dates)-1]
         for dt in dates:
             xMax=1
+            #YEARS
+            year = datetime.fromtimestamp(dt).strftime('%Y')
+            if currYear!=year:
+                #the first year
+                if currYear!="":
+                    yearX[currYear]=(yearX[currYear][0],x)
+                years.append(year)
+                yearX[year]=(x,x)
+                currYear=year
+            else:
+                if dt==lastDt:
+                    yearX[currYear]=(yearX[currYear][0],x+xDelay*xMax)
+            #MONTHS
+            month = datetime.fromtimestamp(dt).strftime('%Y-%m')
+            if currMonth!=month:
+                #the first month
+                if currMonth!="":
+                    monthX[currMonth]=(monthX[currMonth][0],x)
+                months.append(month)
+                monthX[month]=(x,x)
+                currMonth=month
+            else:
+                if dt==lastDt:
+                    monthX[currMonth]=(monthX[currMonth][0],x+xDelay*xMax)
+            #DAYS 
+            day = datetime.fromtimestamp(dt).strftime('%Y-%m-%d')
+            if currDay!=day:
+                #the first month
+                if currDay!="":
+                    daysX[currDay]=(daysX[currDay][0],x)
+                days.append(day)
+                daysX[day]=(x,x)
+                currDay=day
+            else:
+                if dt==lastDt:
+                    daysX[currDay]=(daysX[currDay][0],x+xDelay*xMax)
             #find maximum number of commit for each date
             for branchSha in sortedBranches:
                 try:
@@ -315,7 +398,7 @@ class GitGraphCanvas:
                     pass
             datesX[dt]=x
             x+=xDelay*xMax
-        y=15
+        #creation of commits graphs structures
         for branchSha in sortedBranches:
             graphCommits[branchSha]=[]
             if branchSha == self.repo.head():
@@ -324,6 +407,7 @@ class GitGraphCanvas:
                 color="#8ED6FF"
             #draw commits
             for dt in dates:
+                
                 cmtNum=0
                 try:
                     for cmt in branchesCmtsDates[branchSha][dt]:
@@ -333,7 +417,8 @@ class GitGraphCanvas:
                             self._width=cmtX
                         cmtID=cmt.split('_')[0]
                         if cmtID not in cmtAdded:
-                            graphCmt = CommitGraph(cmts[cmtID],cmtX,y,color,self,branches[branchSha])
+                            #do not set y because it will be recalculate later
+                            graphCmt = CommitGraph(cmts[cmtID],cmtX,0,color,self,branches[branchSha])
                             graphCommits[branchSha].append(graphCmt)
                             #add circle positions on commitsPos dictionary
                             commitsPos[cmt]=graphCmt
@@ -341,12 +426,28 @@ class GitGraphCanvas:
                             cmtNum+=1
                 except KeyError:
                     pass
-            #next branch y position
-            y+=radius+20
+        #DRAW!
+        #draw date row
         
-        #draw branch names
-        y=15
-        branchToDrop=[]
+        years = sorted(years)
+        for y in years:
+            canvas+=canvasDateRect(yearX[y][0]-radius-5, 7, yearX[y][1]-yearX[y][0],"black");
+            yX=yearX[y][0]+((yearX[y][1]-yearX[y][0])/2)-radius-10
+            canvas+=canvasText(yX,12,y,'white',self,fontSize=8)
+        
+        months = sorted(months)
+        for mn in months:
+            canvas+=canvasDateRect(monthX[mn][0]-radius-5, 27, monthX[mn][1]-monthX[mn][0],"#202020");
+            mnX=monthX[mn][0]+((monthX[mn][1]-monthX[mn][0])/2)-radius-10
+            canvas+=canvasText(mnX,32,mn.split('-')[1],'white',self,fontSize=8)
+        days = sorted(days)
+        for d in days:
+            canvas+=canvasDateRect(daysX[d][0]-radius-5, 47, daysX[d][1]-daysX[d][0],"#404040");
+            dX=daysX[d][0]+((daysX[d][1]-daysX[d][0])/2)-radius-10
+            canvas+=canvasText(dX,52,d.split('-')[2],'white',self,fontSize=8)
+        #y delay
+        y=80
+        branchToDrop=[] #list of branch to drop because is empty
         for branchSha in sortedBranches:
             if len(graphCommits[branchSha])>0:
                 if branchSha == self.repo.head():
