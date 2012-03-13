@@ -12,7 +12,6 @@ from difflib  import unified_diff
 import ghdiff
 import re
 
-from gitGraph import GitGraphviz
 
 class GitPathNotFound(Exception):
     def __init__(self, value):
@@ -349,27 +348,5 @@ class GitRepo(Repo):
             return self.head()
         except KeyError:
             return None
-        
-def main(argv=None):
-    if argv is None:
-        argv=sys.argv
-    print("controllo directory:"+argv[1])
-    repos = GitRepo.getRepos(argv[1],True)
-    for rep in repos:
-        print("dir:"+rep.path+" desc:"+rep.get_description())
-        commits = rep.getCommits(1)
-        if len(commits)==1:
-            print ("last commit:"+commits[0].message)
 
-def main2(argv=None):
-    repo = GitRepo('/home/igor/git/copdProxy')
-    graph = GitGraphviz(repo,size=10,commitUrl="/git/commit/ciao?path=/home/pippo&id=$$")
-    graph.prepare()
-    tmpFile=tempfile.NamedTemporaryFile(delete=False)
-    graph.draw(tmpFile,'png')
-    print tmpFile.name
-    graph.draw("/tmp/py.png")
-    graph.draw("/tmp/py.map",'cmapx')
-    
-if __name__ == "__main__":
-    sys.exit(main2())
+
