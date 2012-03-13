@@ -360,7 +360,10 @@ class GitGraphCanvas:
                 if currYear!="":
                     yearX[currYear]=(yearX[currYear][0],x)
                 years.append(year)
-                yearX[year]=(x,x)
+                if dt==lastDt:
+                    yearX[year]=(x,xDelay*xMax)
+                else:
+                    yearX[year]=(x,x)
                 currYear=year
             else:
                 if dt==lastDt:
@@ -372,7 +375,10 @@ class GitGraphCanvas:
                 if currMonth!="":
                     monthX[currMonth]=(monthX[currMonth][0],x)
                 months.append(month)
-                monthX[month]=(x,x)
+                if dt==lastDt:
+                    monthX[month]=(x,xDelay*xMax)
+                else:
+                    monthX[month]=(x,x)
                 currMonth=month
             else:
                 if dt==lastDt:
@@ -380,11 +386,14 @@ class GitGraphCanvas:
             #DAYS 
             day = datetime.fromtimestamp(dt).strftime('%Y-%m-%d')
             if currDay!=day:
-                #the first month
+                #the first day
                 if currDay!="":
                     daysX[currDay]=(daysX[currDay][0],x)
                 days.append(day)
-                daysX[day]=(x,x)
+                if dt==lastDt:
+                    daysX[day]=(x,x+xDelay*xMax)
+                else:
+                    daysX[day]=(x,x)
                 currDay=day
             else:
                 if dt==lastDt:
