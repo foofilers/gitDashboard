@@ -48,7 +48,15 @@
 		</tr>	
 		{% for rep in repos %}
 		<tr>
-			<td><img src="/static/images/favicon.png" style="width:24px; height:24px; vertical-align:middle;"  /><a href="{%url gitview.views.commits%}?path={{rep.path}}">{{rep.path|relpath:currPath}}</a></td>
+			<td><img src="/static/images/favicon.png" style="width:24px; height:24px; vertical-align:middle;"  />
+				{% if rep.getHead %}
+				<a href="{%url gitview.views.commits%}?path={{rep.path}}">
+					{{rep.path|relpath:currPath}}
+				</a>
+				{% else %}
+					{{rep.path|relpath:currPath}} (NO-HEAD)
+				{% endif %}
+			</td>
 			<td>{{rep.get_description}}</td>
 			<td>{{gitBasicUrl}}{{rep.path|relpath:gitPath}}</td>
 			<td style="text-align:center;">
