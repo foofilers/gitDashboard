@@ -151,6 +151,14 @@ class CommitGraph:
             if len(row)>0:
                 tooltip.append(row)
         return canvasCircle(self.x, self.y, radius, self.color,tooltip,self.cmt.id,self.gitGraph)
+    def drawTags(self):
+        tagStr = ''
+        for tg in self.cmt.getTags():
+            tagStr+=tg.name+' '
+        if tagStr!='':
+            return 'tag('+str(self.x)+','+str(self.y+5)+',"'+tagStr+'",circleGroup);\n'
+        else:
+            return ''
 
 class GitGraphCanvas:
     def __init__(self,repo,since=None,until=None,commitUrl=None):
@@ -368,6 +376,7 @@ class GitGraphCanvas:
                 for grpCmt in graphCommits[branchSha]:
                     grpCmt.y=y
                     canvas+=grpCmt.draw()
+                    canvas+=grpCmt.drawTags()
                 y+=radius+20
             else:
                 branchToDrop.append(branchSha)

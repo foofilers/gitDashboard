@@ -85,12 +85,53 @@ function line(x1,y1,x2,y2,color,layer){
         }});
 	layer.add(ln);
 }
+
+
+function tag(x,y,tagText,layer){
+	var length = tagText.length*07;
+	var tag = new Kinetic.Shape({
+        drawFunc: function(){
+        	var context = this.getContext();
+            context.beginPath();
+        	context.lineWidth = 2;
+        	context.moveTo(x,y);
+        	context.lineTo(x+7,y+7);
+        	context.moveTo(x,y);
+        	context.lineTo(x-7,y+7);
+        	context.lineTo(x-7,y+length+7);
+        	context.lineTo(x+7,y+length+7);
+        	context.lineTo(x+7,y+7);
+        	context.closePath();
+            this.fillStroke();
+        },
+        fill: "#404040",
+        stroke: "black",
+        strokeWidth: 1,
+        alpha:0.6
+	});
+	layer.add(tag);
+	ytext=y+7;
+	xtext=x+5;
+	var simpleText = new Kinetic.Text({
+		x:xtext,
+		y:ytext,
+        text:tagText,
+        fontSize: 8,
+        textFill: "white",
+        fontFamily:"Verdana",        
+        rotationDeg:90,
+        
+    });
+	layer.add(simpleText);
+}
+
 window.onload = function(){
 	var width=document.getElementById("canvasGraph").offsetWidth;
 	width=width-20;
 	var stage = new Kinetic.Stage("canvasGraph", width, {{height}});
 	var circlesLayer = new Kinetic.Layer();
 	var tooltipLayer = new Kinetic.Layer();
+	var tagLayer = new Kinetic.Layer();
 	
 	var lineGroup = new Kinetic.Group();
 	var circleGroup = new Kinetic.Group();
@@ -129,6 +170,7 @@ window.onload = function(){
 	circlesLayer.move(-{{width}}+Math.floor(width/2),0);
 	stage.add(circlesLayer);
 	stage.add(tooltipLayer);
+	stage.add(tagLayer);
 };
 </script>
 
