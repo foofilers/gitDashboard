@@ -203,7 +203,7 @@ class GitCommit(Commit):
         branches=[]
         for branch in repoBranches.keys():
             if repoBranches[branch]==self.id:
-                branches.append(branch)
+                branches.append(branch[11:])
         return branches
 
 def commitChanges(repo,sha1,sha2):

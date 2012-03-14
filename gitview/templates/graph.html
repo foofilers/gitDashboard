@@ -87,7 +87,7 @@ function line(x1,y1,x2,y2,color,layer){
 }
 
 
-function tag(x,y,tagText,layer){
+function label(x,y,tagText,layer,bgcolor,fgcolor){
 	var length = tagText.length*07;
 	var tag = new Kinetic.Shape({
         drawFunc: function(){
@@ -104,8 +104,8 @@ function tag(x,y,tagText,layer){
         	context.closePath();
             this.fillStroke();
         },
-        fill: "#404040",
-        stroke: "black",
+        fill: bgcolor,
+        stroke: fgcolor,
         strokeWidth: 1,
         alpha:0.6
 	});
@@ -135,6 +135,7 @@ window.onload = function(){
 	
 	var lineGroup = new Kinetic.Group();
 	var circleGroup = new Kinetic.Group();
+	var labelGroup = new Kinetic.Group();
 	var textGroup = new Kinetic.Group();
 	
 	var backgroundRect=new Kinetic.Rect({
@@ -155,6 +156,7 @@ window.onload = function(){
 	
 	circlesLayer.add(lineGroup);
 	circlesLayer.add(circleGroup);
+	circlesLayer.add(labelGroup);
 	circlesLayer.add(textGroup);
 	
 	circlesLayer.draggableX(true);
