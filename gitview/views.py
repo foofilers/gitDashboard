@@ -210,9 +210,12 @@ def fileContent(request):
 def rawContent(request):
     reposPath=request.GET['path']
     sha=request.GET['sha']
+    fileName=request.GET['fileName']
     repo = GitRepo(reposPath)
     fileContent=str(repo.get_blob(sha))
-    return HttpResponse(fileContent,"text/plain")
+    response=HttpResponse(fileContent)
+    response._headers['content-disposition'] = ('Content-Disposition', 'attachment; filename='+fileName)
+    return response
     
 def dir_to_ul(gitdir,repoPath):
     content="<li><span class=\"folder\">"+gitdir.path.split("/")[-1]+"</span><ul>"
