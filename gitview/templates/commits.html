@@ -97,9 +97,7 @@
 				<td nowrap="nowrap">{{cmt.author}}</td>
 				<td>
 					{{cmt.message}}
-					{% if cmt.getTags %}
-						{% for tag in cmt.getTags %}<span class="tag">{{tag.name}}</span>{%endfor%}
-					{% endif %}
+					{% for tag in cmt.getTags %}<span class="tag">{{tag}}</span>{%endfor%}
 					{% if cmt.getBranches %}
 						{% for branch in cmt.getBranches %}<span class="branch">{{branch}}</span>{%endfor%}
 					{% endif %}

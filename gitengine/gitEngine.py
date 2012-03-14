@@ -5,13 +5,9 @@ from os import listdir,makedirs
 from io import open
 import os
 from os.path import isdir,sep
-import sys
-
-import tempfile
 from difflib  import unified_diff
 import ghdiff
 import re
-
 
 class GitPathNotFound(Exception):
     def __init__(self, value):
@@ -195,11 +191,11 @@ class GitCommit(Commit):
         return GitTree(self.repo,self.tree)
     
     def getTags(self):
-        repoTags=self.repo.getTags()
+        repoTags=self.repo.getTagsRef()
         tags=[]
-        for tag in repoTags:
-            if tag._object_sha==self.id:
-                tags.append(tag)
+        for tagName in repoTags.keys():
+            if repoTags[tagName]==self.id:
+                tags.append(tagName[10:])
         return tags
     
     def getBranches(self):
@@ -248,13 +244,16 @@ class GitRepo(Repo):
                 descFile.close()
         return self.description
     
-    def getTags(self):
-        tags=[]
+    def getTagsRef(self):
+        tags={}
         refs=self.get_refs()
         for ref in refs.keys():
-            t = self.get_object(refs[ref])
-            if t.get_type()==4:
-                tags.append(t)
+            if ref.find('refs/tags/')!=-1:
+                obj=self.get_object(refs[ref])
+                if obj.get_type()==4:
+                    tags[ref]=obj._object_sha
+                else:
+                    tags[ref]=refs[ref]
         return tags
     
     def getBranches(self):

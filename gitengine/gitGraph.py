@@ -154,7 +154,7 @@ class CommitGraph:
     def drawTags(self):
         tagStr = ''
         for tg in self.cmt.getTags():
-            tagStr+=tg.name+' '
+            tagStr+=tg+' '
         if tagStr!='':
             return 'tag('+str(self.x)+','+str(self.y+5)+',"'+tagStr+'",circleGroup);\n'
         else:
