@@ -353,7 +353,7 @@ def zipTree(request):
     archive.close()
     wrapper = FileWrapper(temp)
     response = HttpResponse(wrapper, content_type='application/zip')
-    response['Content-Disposition'] = 'attachment; filename='+reposPath[len(__getGitPath()):].replace(".git","")+".zip"
+    response['Content-Disposition'] = 'attachment; filename='+reposPath[len(__getGitPath()):].replace('/','_').replace(".git","")+".zip"
     response['Content-Length'] = temp.tell()
     temp.seek(0)
     return response
