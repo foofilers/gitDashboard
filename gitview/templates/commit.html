@@ -29,8 +29,9 @@
 		</td>
 	</tr>
 	<tr>
-		<th colspan="2" style="padding:2px; text-align:center">
-			<img src="/static/images/file_tree.png" title="File Tree" style="vertical-align:middle;"/> <a href="{% url gitview.views.tree%}?path={{repoPath}}&commit={{commit.id}}"><b>File Tree</b></a>
+		<th colspan="2" style="padding:2px; text-align:right;">
+			<a href="{% url gitview.views.tree%}?path={{repoPath}}&commit={{commit.id}}" title="File Tree"><img src="/static/images/file_tree.png" title="File Tree" style="vertical-align:middle;"/></a>
+			<a href="{% url gitview.views.zipTree%}?path={{repoPath}}&commit={{commit.id}}" title="Zip Tree"><img src="/static/images/archive.png" border="0" title="Zip Tree" style="vertical-align:middle;" /></a>
 		</th>
 	</tr>
 </table>
