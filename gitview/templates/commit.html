@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% load timeutils %}
-
+{% load linkutils %}
 
 {% block repoHeader %}
 <b>Repository path:</b><a href="{% url gitview.views.commits %}?path={{ repoPath }}&branch={{branch}}">{{ repoPath }}</a>
@@ -10,7 +10,7 @@
 <table  style="width:100%;" cellpadding="2px;" class="commitTable">
 	<tr>
 		<th colspan="2">
-			{{commit.message|linebreaks}}
+			{{commit.message|issueLink|safe|linebreaks}}
 		</th>
 	</tr>
 	<tr>

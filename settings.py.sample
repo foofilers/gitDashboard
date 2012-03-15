@@ -154,3 +154,7 @@ GIT_PATH='[PATH OF REPOSITORIES PARENT]'
 #List of regexp paths to exclude from repositories search  
 GIT_EXCLUDE_PATH=[]
 GIT_BASIC_URL="http://www.example.com/gitRepos"
+#ViewGit Project mapping (for compatibility with viewgit url)
+#VIEWGIT_MAP_PROJECTS={}
+#ISSUE_URL="http://www.example.com/mantis/view.php?id=%ID%"
+#MESSAGE_ID_PATTERN="Issue #%ID%"
