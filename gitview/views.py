@@ -318,7 +318,10 @@ def viewgit(request):
         commitId=request.GET['h']
     except KeyError:
         return redirect('gitview.views.index')
-    viewGitMap = settings.VIEWGIT_MAP_PROJECTS
-    repoPath = __getGitPath()+viewGitMap[projectName]
+    try:
+        viewGitMap = settings.VIEWGIT_MAP_PROJECTS
+        repoPath = __getGitPath()+viewGitMap[projectName]
+    except AttributeError:
+        repoPath=projectName
     return redirect(reverse('gitview.views.commit')+"?path="+repoPath+"&id="+commitId)
     
