@@ -62,6 +62,7 @@
 			<td style="text-align:center;">
 				{% if rep.getHead %}
 					<a href="{% url gitview.views.tree%}?path={{rep.path}}&commit={{rep.getHead}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
+					<a href="{% url gitview.views.zipTree%}?path={{rep.path}}&commit={{rep.getHead}}"><img src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
 				{% else %}
 					<img src="/static/images/empty.png" title="Empty"/>
 				{% endif%}

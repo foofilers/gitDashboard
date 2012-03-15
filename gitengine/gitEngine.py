@@ -309,6 +309,7 @@ class GitRepo(Repo):
         repos=[]
         for content in contents:
             fullPath=path+sep+content
+            fullPath=fullPath.replace('//','/')
             if isdir(fullPath):
                 try:
                     toAdd=True

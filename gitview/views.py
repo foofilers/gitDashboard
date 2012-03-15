@@ -12,6 +12,9 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 import re
+import zipfile
+import tempfile
+from django.core.servers.basehttp import FileWrapper
 
 def __getGitPath():
     if settings.GIT_PATH[-1]=='/':
@@ -162,10 +165,6 @@ def diff(request):
         ghDiff=True
     except KeyError:
         ghDiff=False
-    try:
-        parent=request.GET['parent']
-    except KeyError:
-        parent=None
     repo = GitRepo(reposPath)
     commit = repo.getCommit(commitId)
     change=GitChange(commit=commit,oldSha=oldSha,newSha=newSha,oldFileName=oldFileName,newFileName=newFileName)
@@ -324,4 +323,38 @@ def viewgit(request):
     except AttributeError:
         repoPath=projectName
     return redirect(reverse('gitview.views.commit')+"?path="+repoPath+"&id="+commitId)
+
+def dirFiles(gitdir,files):
+    subdir=gitdir.getSubDirs()
+    for sd in subdir:
+        dirFiles(sd,files)
+    contentFiles=gitdir.getFiles()
+    for fl in contentFiles:
+        files.append(fl)
+
+def zipTree(request):
+    """ zip a tree of a commit """
+    reposPath=request.GET['path']
+    commitId=request.GET['commit']
+    repo = GitRepo(reposPath)
+    commit = repo.getCommit(commitId)
+    tree=commit.getTree()
+    content=tree.getRoot()
+    rootFiles=[]
+    for c in content:
+        if isinstance(c, GitDir):
+            dirFiles(c,rootFiles)
+        else:
+            rootFiles.append(c)
+    temp = tempfile.TemporaryFile()
+    archive = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
+    for f in rootFiles:
+        archive.writestr(f.fileName,str(repo.get_blob(f.sha)))
+    archive.close()
+    wrapper = FileWrapper(temp)
+    response = HttpResponse(wrapper, content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename='+reposPath[len(__getGitPath()):].replace(".git","")+".zip"
+    response['Content-Length'] = temp.tell()
+    temp.seek(0)
+    return response
     
