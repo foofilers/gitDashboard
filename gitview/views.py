@@ -13,11 +13,15 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 import re
 
-def index(request):
+def __getGitPath():
     if settings.GIT_PATH[-1]=='/':
         gitPath=settings.GIT_PATH
     else:
         gitPath=settings.GIT_PATH+"/"
+    return gitPath
+
+def index(request):
+    gitPath=__getGitPath()
     try:
         pathpar=request.GET['path']
     except KeyError:
@@ -307,5 +311,14 @@ def graph(request):
     graph=GitGraphCanvas(repo,since=since,until=until,commitUrl=str(commitUrl))
     return render_to_response("graph.html",RequestContext(request,{'repoPath':repoPath,'branch':branch,'canvasContent':graph.render(),'width':graph.getWidth(),'height':graph.getHeight()}))
 
-    
+""" redirect per compatibilita' con viewgit"""
+def viewgit(request):
+    try:
+        projectName=request.GET['p']
+        commitId=request.GET['h']
+    except KeyError:
+        return redirect('gitview.views.index')
+    viewGitMap = settings.VIEWGIT_MAP_PROJECTS
+    repoPath = __getGitPath()+viewGitMap[projectName]
+    return redirect(reverse('gitview.views.commit')+"?path="+repoPath+"&id="+commitId)
     
