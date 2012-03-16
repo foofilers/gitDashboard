@@ -126,10 +126,17 @@ def commits(request):
         branchForm=BranchForm(repo,request.GET)
     else:
         branchForm=BranchForm(repo)
+    
+    repoName=reposPath[len(__getGitPath()):].split('/')[-1]
+    moduleName=reposPath.replace(repoName,"")
+    modulePath=reposPath.replace(__getGitPath(),"").replace(repoName,"")
     return render_to_response("commits.html",RequestContext(request,{
             'branchForm':branchForm,
             'filterForm':filterForm,
             'repoPath':reposPath,
+            'modulePath':modulePath,
+            'moduleName':moduleName,
+            'repoName':repoName,
             'branch':branch,
             'since':since,
             'until':until,

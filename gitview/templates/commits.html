@@ -3,7 +3,7 @@
 
 {% block repoHeader %}
 	{% if filePath %}
-		<b>FileName path:</b><a href="{% url gitview.views.commits %}?path={{ repoPath }}">{{ repoPath }}</a>/{{filePath}}
+		<b>FileName path:</b><a href="{% url gitview.views.index %}?path={{ modulePath }}">{{ modulePath }}</a>/{{ repoName }}/{{filePath}}
 	{%else%}
 		<script>
 			$(function(){
@@ -15,7 +15,7 @@
 		
 		<form id="branchForm" method="GET" style="margin:auto;" class="branchForm">
 			{{branchForm.path}}
-			<b>Repository path:</b><a href="{% url gitview.views.commits %}?path={{ repoPath }}">{{ repoPath }}</a>/ {{branchForm.branch}}
+			<b>Repository path:</b><a href="{% url gitview.views.index %}?path={{ modulePath }}">{{ moduleName }}</a>{{ repoName }}/ {{branchForm.branch}}
 		</form>
 	{% endif %}
 	
