@@ -84,7 +84,6 @@ def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
         
     if maxLen*8>gitGraph._maxTooltipWidth:
         gitGraph._maxTooltipWidth=maxLen*8
-        
     circleJS+=canvasTooltipRect('mousePos.x+20', 'mousePos.y+20', maxLen*8, str(tooltipY),color)
     circleJS+=tooltips
     circleJS+='tooltipLayer.show();\n'    
@@ -94,7 +93,7 @@ def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
     #mouseOut
     circleJS+=jsvar+'.on("mouseout", function(){\n'
     circleJS+='tooltipLayer.removeChildren();\n'
-    circleJS+='tooltipLayer.hide();\n'
+    circleJS+='//tooltipLayer.hide();\n'
     circleJS+='tooltipLayer.draw();\n'
     circleJS+='document.body.style.cursor = "default";\n'
     circleJS+='});\n'

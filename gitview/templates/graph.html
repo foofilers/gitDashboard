@@ -7,7 +7,7 @@
 {%endblock %}
 
 {% block contentBlock %}
-<script src="/static/js/kinetic-v3.8.2.min.js"></script>
+<script src="/static/js/kinetic-v3.8.5.min.js"></script>
 <div id="canvasGraph" style="border:1px solid #000000;margin:auto;height:{{height}};width:100%;"></div>
 
 <script type="text/javascript">
@@ -159,9 +159,9 @@ window.onload = function(){
 	circlesLayer.add(labelGroup);
 	circlesLayer.add(textGroup);
 	
-	circlesLayer.draggableX(true);
+	circlesLayer.draggable(true);
+	circlesLayer.setDragConstraint("horizontal");
 	
-
 	//prevent to move after left border
 	circlesLayer.on("dragend", function(e){
         if (circlesLayer.x>0){
