@@ -8,6 +8,7 @@ from os.path import isdir,sep
 from difflib  import unified_diff
 import ghdiff
 import re
+from django.utils.encoding import smart_unicode,DjangoUnicodeDecodeError
 
 class GitPathNotFound(Exception):
     def __init__(self, value):
@@ -33,13 +34,20 @@ class GitChange:
     def getPrettyGHDiff(self):
         blobOld=self.commit.repo.get_blob(self.oldSha)
         blobNew=self.commit.repo.get_blob(self.newSha)
-        return ghdiff.diff(str(blobOld).splitlines(),str(blobNew).splitlines())
-    
+        try:
+            diffContent =  ghdiff.diff(smart_unicode(blobOld).splitlines(),smart_unicode(blobNew).splitlines())
+        except DjangoUnicodeDecodeError:
+            diffContent =  ghdiff.diff(str(blobOld).decode('latin1').splitlines(),str(blobNew).decode('latin1').splitlines())
+        return diffContent
     def getPrettyDiff(self):
         blobOld=self.commit.repo.get_blob(self.oldSha)
         blobNew=self.commit.repo.get_blob(self.newSha)
         diff=''
-        for line in unified_diff(str(blobOld).splitlines(),str(blobNew).splitlines(),self.oldFileName,self.newFileName):
+        try:
+            diffs=unified_diff(smart_unicode(blobOld).splitlines(),smart_unicode(blobNew).splitlines(),self.oldFileName,self.newFileName)
+        except DjangoUnicodeDecodeError:
+            diffs=unified_diff(str(blobOld).decode('latin1').splitlines(),str(blobNew).decode('latin1').splitlines(),self.oldFileName,self.newFileName)
+        for line in diffs:
             diff+=line+'\n'
         diff=diff.replace('\n\n', '\n')
         return diff
