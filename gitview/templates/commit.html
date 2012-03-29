@@ -32,6 +32,7 @@
 		<th colspan="2" style="padding:2px; text-align:right;">
 			<a href="{% url gitview.views.tree%}?path={{repoPath}}&commit={{commit.id}}" title="File Tree"><img src="/static/images/file_tree.png" title="File Tree" style="vertical-align:middle;"/></a>
 			<a href="{% url gitview.views.zipTree%}?path={{repoPath}}&commit={{commit.id}}" title="Zip Tree"><img src="/static/images/archive.png" border="0" title="Zip Tree" style="vertical-align:middle;" /></a>
+			<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{commit.id}}"><img style="vertical-align:middle;" src="/static/images/point.png" border="0" title="Show in the graph"/></a>
 		</th>
 	</tr>
 </table>

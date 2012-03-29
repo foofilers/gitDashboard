@@ -310,12 +310,18 @@ def graph(request):
         until=int(request.GET['until'])
     else:
         until=None
+    try:
+        cmtId=request.GET['id']
+        highlights="highlightsCircle(stage,circlesLayer,circle_"+cmtId+");"
+    except KeyError:
+        highlights=None;
     
     repo=GitRepo(repoPath)
     commitUrl=reverse('gitview.views.commit')
     commitUrl+="?path="+repoPath+'&branch='+branch+"&id=$$"
     graph=GitGraphCanvas(repo,since=since,until=until,commitUrl=str(commitUrl))
-    return render_to_response("graph.html",RequestContext(request,{'repoPath':repoPath,'branch':branch,'canvasContent':graph.render(),'width':graph.getWidth(),'height':graph.getHeight()}))
+    
+    return render_to_response("graph.html",RequestContext(request,{'repoPath':repoPath,'branch':branch,'canvasContent':graph.render(),'width':graph.getWidth(),'height':graph.getHeight(),'highlights':highlights}))
 
 """ redirect per compatibilita' con viewgit"""
 def viewgit(request):

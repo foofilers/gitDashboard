@@ -106,6 +106,7 @@
 					<a href="{% url gitview.views.commit %}?path={{repoPath}}&id={{cmt.id}}&branch={{branch}}"><img src="/static/images/detail.png" border="0" title="Detail"/></a>
 					<a href="{% url gitview.views.tree%}?path={{repoPath}}&commit={{cmt.id}}&branch={{branch}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
 					<a href="{% url gitview.views.zipTree%}?path={{repoPath}}&commit={{cmt.id}}"><img src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
+					<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{cmt.id}}"><img style="vertical-align:middle;" src="/static/images/point.png" border="0" title="Show in the graph"/></a>
 				</td>
 			</tr>
 			{% endfor %}

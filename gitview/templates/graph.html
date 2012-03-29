@@ -125,6 +125,18 @@ function label(x,y,tagText,layer,bgcolor,fgcolor){
 	layer.add(simpleText);
 }
 
+function highlightsCircle(stage,layer,circle){
+	if (circle!=null){
+		var period = 2000;
+		stage.onFrame(function(frame){
+			var scale = Math.sin(frame.time * 2 * Math.PI / period) + 0.5;
+			circle.setScale(scale);
+			layer.draw();
+		});
+		stage.start();
+	}
+}
+
 window.onload = function(){
 	var width=document.getElementById("canvasGraph").offsetWidth;
 	width=width-20;
@@ -173,6 +185,7 @@ window.onload = function(){
 	stage.add(circlesLayer);
 	stage.add(tooltipLayer);
 	stage.add(tagLayer);
+	{{highlights}}
 };
 </script>
 
