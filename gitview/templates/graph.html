@@ -129,8 +129,8 @@ function highlightsCircle(stage,layer,circle){
 	if (circle!=null){
 		var period = 2000;
 		stage.onFrame(function(frame){
-			var scale = Math.sin(frame.time * 2 * Math.PI / period) + 0.5;
-			circle.setScale(scale);
+			var scale = Math.sin(frame.time * 2 * Math.PI / period) + 0.001;
+			circle.setScale(scale*1.5);
 			layer.draw();
 		});
 		stage.start();
