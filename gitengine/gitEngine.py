@@ -117,11 +117,14 @@ class GitTree():
         entries=self.repo.tree(self.sha).entries()
         root=[]
         for e in entries:
-            obj = self.repo.get_object(e[2])
-            if obj.get_type()==3:
-                root.append(GitFile(self.repo,e[2],e[1]))
-            else:
-                root.append(GitDir(self.repo,e[2],e[1],))
+            try:
+                obj = self.repo.get_object(e[2])
+                if obj.get_type()==3:
+                    root.append(GitFile(self.repo,e[2],e[1]))
+                else:
+                    root.append(GitDir(self.repo,e[2],e[1],))
+            except KeyError:
+                pass
         return root
     
     def __getTreeFiles(self,sha,path=""):
