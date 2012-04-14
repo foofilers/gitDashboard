@@ -8,6 +8,10 @@
 
 {% block contentBlock %}
 <script src="/static/js/kinetic-v3.8.5.min.js"></script>
+<form>
+	<label>Show Tag</label>
+	<input type="checkbox" id="shotTagsChk" checked></input>
+</form>
 <div id="canvasGraph" style="border:1px solid #000000;margin:auto;height:{{height}};width:100%;"></div>
 
 <script type="text/javascript">
@@ -115,18 +119,19 @@ function highlightsCircle(stage,layer,circle){
 		stage.start();
 	}
 }
-
+var labelGroup = new Kinetic.Group();
+var circlesLayer = new Kinetic.Layer();
 window.onload = function(){
 	var width=document.getElementById("canvasGraph").offsetWidth;
 	width=width-20;
 	var stage = new Kinetic.Stage("canvasGraph", width, {{height}});
-	var circlesLayer = new Kinetic.Layer();
+	
 	var tooltipLayer = new Kinetic.Layer();
 	var tagLayer = new Kinetic.Layer();
 	
 	var lineGroup = new Kinetic.Group();
 	var circleGroup = new Kinetic.Group();
-	var labelGroup = new Kinetic.Group();
+	
 	var textGroup = new Kinetic.Group();
 	
 	var backgroundRect=new Kinetic.Rect({
@@ -166,7 +171,18 @@ window.onload = function(){
 	stage.add(tagLayer);
 	{{highlights|default_if_none:''|safe}}
 };
-</script>
 
+</script>
+<script>
+$('#shotTagsChk').change(function(){
+	if ( $('#shotTagsChk').is(':checked') ){
+		labelGroup.show();
+		circlesLayer.draw();
+	}else{
+		labelGroup.hide();
+		circlesLayer.draw();
+	}
+});
+</script>
 
 {% endblock %}
