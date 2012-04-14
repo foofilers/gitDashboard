@@ -29,7 +29,7 @@ def index(request):
         pathpar=request.GET['path']
     except KeyError:
         pathpar=""
-    currPath=settings.GIT_PATH+pathpar
+    currPath=__getGitPath()+pathpar
     subDirs=[]
     contents = listdir(currPath)
     for content in contents:
@@ -276,19 +276,18 @@ def new(request):
     """ Add New repository Page
     """
     if not request.user.is_staff:
-        return render_to_response("notAlowed.html",RequestContext(request))
-    gitPath=settings.GIT_PATH
+        return render_to_response("notAlowed.html",RequestContext(request))    
     if request.method=='POST':
         newReposForm=NewReposForm(request.POST)
         if newReposForm.is_valid():
             newPath=newReposForm.data['path']
             if newPath[0]=='/':
                 newPath=newPath[1:]
-            GitRepo.create_bare(settings.GIT_PATH+sep+newPath,newReposForm.data['description'])
+            GitRepo.create_bare(__getGitPath()+sep+newPath,newReposForm.data['description'])
             return redirect('gitview.views.index')
     else:
         newReposForm=NewReposForm()
-    return render_to_response("new.html",RequestContext(request,{'gitPath':gitPath,'newReposForm':newReposForm}))
+    return render_to_response("new.html",RequestContext(request,{'gitPath':__getGitPath(),'newReposForm':newReposForm}))
 
 """ ################## GRAPH #################### """
 def graph(request):
