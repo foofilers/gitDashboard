@@ -31,50 +31,29 @@ function line(x1,y1,x2,y2,color,layer){
         	context.moveTo(x1,y1);
         	if (!oblique){
         		context.lineTo(x2,y2);
-        		if (vertical){
-        			if (y2<=y1){
-        				//up
-        				context.moveTo(x2,y2+7);
-                		context.lineTo(x2-5,y2+10);
-                		context.moveTo(x2,y2+7);
-                		context.lineTo(x2+5,y2+10);
-        			}else{
-        				//down
-        				context.moveTo(x2,y2-7);
-                		context.lineTo(x2-10,y2-10);
-                		context.moveTo(x2,y2-7);
-                		context.lineTo(x2+10,y2-10);	
-        			}
-        		}else{
-        			//horizzontal
-        			context.moveTo(x2-7,y2);
-            		context.lineTo(x2-10,y2-5);
-            		context.moveTo(x2-7,y2);
-            		context.lineTo(x2-10,y2+5);
-        		}
         	}else{
         		//oblique
         		context.strokeStyle="blue";
         		if (y2<=y1){
         			//destination higher than source
-        			context.lineTo(x1,y2+15);
-            		context.lineTo(x2,y2+15);
+        			context.lineTo(x1,y2+20);
+            		context.lineTo(x2-15,y2+20);
             		context.lineTo(x2,y2);
             		//arrow
-            		context.moveTo(x2,y2+7);
-            		context.lineTo(x2-5,y2+10);
-            		context.moveTo(x2,y2+7);
-            		context.lineTo(x2+5,y2+10);
+            		context.moveTo(x2-5,y2+5);
+            		context.lineTo(x2-13,y2+9);
+            		context.moveTo(x2-5,y2+5);
+            		context.lineTo(x2-3,y2+13);
         		}else{
         			//destination lower than source
-        			context.lineTo(x1,y2-15);
-            		context.lineTo(x2,y2-15);
+        			context.lineTo(x1,y2-20);
+            		context.lineTo(x2-15,y2-20);
             		context.lineTo(x2,y2);
             		//arrow
-            		context.moveTo(x2,y2-7);
-            		context.lineTo(x2-5,y2-10);
-            		context.moveTo(x2,y2-7);
-            		context.lineTo(x2+5,y2-10);
+            		context.moveTo(x2-5,y2-5);
+            		context.lineTo(x2-13,y2-9);
+            		context.moveTo(x2-5,y2-5);
+            		context.lineTo(x2-3,y2-13);
             		
         		}
         		
