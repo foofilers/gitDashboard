@@ -19,11 +19,9 @@ form {
 	padding : 0;
 }
 
-
 .menuPanel{
 	background-image:url("/static/images/ui-bg_diagonals-thick_20_666666_40x40.png");
-	
-	height:25px;
+	height:22px;
 	width: 100%;	
 }
 .menu{
@@ -31,7 +29,7 @@ form {
 	margin-left:5px;
 	color: white;
 	font-weight: bold;
-	font-family: sans-serif,verdana;
+	font-family: serif,sans-serif,verdana;
 }
 .menu a visited{
 	color:white;
@@ -46,7 +44,7 @@ form {
 	padding-top:3px;
 	margin-right:5px;
 	font-weight: bold;
-	font-family: sans-serif,verdana;
+	font-family: serif,sans-serif,verdana;
 }
 
 .loginPanel a visited{
@@ -73,8 +71,6 @@ form {
 }
 
 .center{
-	margin-left:5px;
-	margin-right:5px;
 	background-color:white;
 	border:1px solid #CCCCCC;
 	padding:5px;

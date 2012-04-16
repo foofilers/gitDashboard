@@ -68,13 +68,13 @@ class BranchForm(forms.Form):
                 head=''
         except KeyError:
             head=''
-        self.fields['branch']=forms.ChoiceField(branches,initial=head);
+        self.fields['branch']=forms.ChoiceField(branches,initial=head,widget=forms.Select(attrs={'class':'ui-corner-all'}));
         self.fields['path']=forms.CharField(initial=repo.path,widget=forms.HiddenInput())
 
 class FilterForm(forms.Form):
-    since=forms.DateTimeField(required=False)
-    until=forms.DateTimeField(required=False)
-    number=forms.IntegerField(initial="10",widget=forms.TextInput(attrs={'size':'5'}))
+    since=forms.DateTimeField(required=False,widget=forms.DateInput(attrs={'class':'ui-corner-all'}))
+    until=forms.DateTimeField(required=False,widget=forms.DateInput(attrs={'class':'ui-corner-all'}))
+    number=forms.IntegerField(initial="10",widget=forms.TextInput(attrs={'size':'5','class':'ui-corner-all'}))
     page=forms.IntegerField(widget=forms.HiddenInput(),initial=1)
 
 def commits(request):

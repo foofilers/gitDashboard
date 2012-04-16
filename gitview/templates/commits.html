@@ -67,7 +67,7 @@
 				<td> {{ filterForm.until.errors }}<label for="id_until">Until:</label>{{filterForm.until}}</td>
 				<td> {{ filterForm.number.errors }}<label for="id_number">Num.Commits:</label>{{filterForm.number}}</td>
 				<td>
-					<input type="submit" value="Filter"/>
+					<input type="submit" value="Filter" class="ui-corner-all"/>
 				</td>
 				<td>
 				{% if not filePath %}
@@ -84,10 +84,7 @@
 			</tr>
 			</table>
 		</form>
-		
 	</div>
-
-	
 	<br/>
 	<form method="GET" action="{% url gitview.views.compareCommit %}">
 		<input type="hidden" name="path" value="{{ repoPath|safe }}"/>
@@ -111,14 +108,22 @@
 			</tr>
 			{% for cmt in commits %}
 			<tr>
-				<td><input type="checkbox" name="compareCommitId" value="{{cmt.id}}"></td>
+				<td><input type="checkbox" name="compareCommitId" value="{{cmt.id}}" ></td>
 				<td nowrap="nowrap">{{cmt.commit_time|timestamp:'%Y-%m-%d %H:%M'}}</td>
 				<td nowrap="nowrap">{{cmt.author}}</td>
 				<td>
 					{{cmt.message}}
-					{% for tag in cmt.getTags %}<span class="tag">{{tag}}</span>{%endfor%}
+					{% for tag in cmt.getTags %}
+						{% if tag != '' %}
+							<span class="tag">{{tag}}</span>
+						{% endif %}
+					{%endfor%}
 					{% if cmt.getBranches %}
-						{% for branch in cmt.getBranches %}<span class="branch">{{branch}}</span>{%endfor%}
+						{% for branch in cmt.getBranches %}
+							{% if branch != '' %}
+								<span class="branch">{{branch}}</span>
+							{% endif %}
+						{%endfor%}
 					{% endif %}
 				</td>
 				<td style="text-align:center;" nowrap="nowrap">
@@ -147,7 +152,7 @@
 						{%endfor%}
 					</div>
 					<div id="compareDiv">
-						<input type="submit" value="Compare"/>
+						<input type="submit" value="Compare" class="ui-corner-all"/>
 					</div>
 				</td>
 			</tr>

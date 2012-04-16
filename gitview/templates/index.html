@@ -11,7 +11,7 @@
 </script>
 <form id="subDirForm">
 <b>Current Directory :</b> /{% if currPath != gitPath %}{{currPath|relpath:gitPath}}{% endif %}
-<select id="subDirSel" name="path">
+<select id="subDirSel" name="path" class="ui-corner-all">
 	<option value="{{currPath|relpath:gitPath}}"></option>
 	{% if currPath != gitPath %}
 		<option value="{{currPath|parent:gitPath}}">../</option>

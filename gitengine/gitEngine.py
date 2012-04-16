@@ -214,7 +214,7 @@ class GitCommit(Commit):
         branches=[]
         for branch in repoBranches.keys():
             if repoBranches[branch]==self.id:
-                branches.append(branch[11:])
+                branches.append(branch.replace('refs/','').replace('heads/',''))
         return branches
 
 def commitChanges(repo,sha1,sha2):
@@ -306,7 +306,13 @@ class GitRepo(Repo):
             commits.append(GitCommit(we.commit,self))
             we=w._next()
         return commits
-        
+            
+    def getHead(self):
+        try:
+            return self.head()
+        except KeyError:
+            return None
+    
     @staticmethod
     def getRepos(path,recursive=False,excludePath=[]):
         """ Retrieve a list of git repositories from a partent path
@@ -353,11 +359,3 @@ class GitRepo(Repo):
             finally:
                 newdescFile.close()
         return nrp
-    
-    def getHead(self):
-        try:
-            return self.head()
-        except KeyError:
-            return None
-
-
