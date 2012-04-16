@@ -11,6 +11,7 @@ import time
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 import re
+import md5
 
 def getGitPath():
     if settings.GIT_PATH[-1]=='/':
@@ -156,7 +157,8 @@ def commit(request):
     repo = GitRepo(getGitPath()+sep+reposPath)
     commit = repo.getCommit(commitId)
     changes=commit.getChanges()
-    return render_to_response("commit.html",RequestContext(request,{'gitPath':getGitPath(),'repoPath':reposPath,'commit':commit,'changes':changes,'branch':branch}))
+    gravatarMd5=md5.new(commit.committer.split('<')[1].replace('>','')).hexdigest()
+    return render_to_response("commit.html",RequestContext(request,{'gitPath':getGitPath(),'repoPath':reposPath,'commit':commit,'changes':changes,'branch':branch,'gravatarMd5':gravatarMd5}))
 
 def compareCommit(request):
     """ Compare two commit"""

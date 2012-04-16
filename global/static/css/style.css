@@ -31,7 +31,7 @@ form {
 	margin-left:5px;
 	color: white;
 	font-weight: bold;
-	font-family: serif;
+	font-family: sans-serif,verdana;
 }
 .menu a visited{
 	color:white;
@@ -46,7 +46,7 @@ form {
 	padding-top:3px;
 	margin-right:5px;
 	font-weight: bold;
-	font-family: serif;
+	font-family: sans-serif,verdana;
 }
 
 .loginPanel a visited{

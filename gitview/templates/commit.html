@@ -15,6 +15,11 @@
 		</th>
 	</tr>
 	<tr>
+		<td rowspan="2" style="width: 64px;">
+		<img src="http://www.gravatar.com/avatar/{{gravatarMd5}}"/>
+		</td>
+	</tr>
+	<tr>
 		<td>
 			<b>Id:</b>	{{commit.id}}<br/>
 			<b>Parents:</b>
@@ -23,7 +28,7 @@
 				{% endfor %}<br/>
 			<b>Author:</b> {{commit.author}}<br/>
 			<b>Commit Date:</b>	{{commit.commit_time|timestamp:'%Y-%m-%d %H:%M'}}<br/>
-			<b>Committer:</b> {{commit.committer}}<br/>
+			<b>Committer:</b>{{commit.committer}}<br/>
 			{% if commit.getTags %}
 				<b>Tag:</b> <span class="tag">{% for tag in commit.getTags %} {{tag.name}}</span> {%endfor%}
 			{% endif %}
