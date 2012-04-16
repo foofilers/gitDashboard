@@ -2,6 +2,7 @@ body{
 	font-family: verdana;
 	font-size:12px;
 	background-color: #EEEEEE;
+	margin:0px;
 }
 table{
 	font-size:12px;
@@ -12,20 +13,72 @@ a visited{
 a {
 	color:black;
 }
+
+form {
+	margin : 0;
+	padding : 0;
+}
+
+
+.menuPanel{
+	background-image:url("/static/images/ui-bg_diagonals-thick_20_666666_40x40.png");
+	
+	height:25px;
+	width: 100%;	
+}
+.menu{
+	padding-top:3px;
+	margin-left:5px;
+	color: white;
+	font-weight: bold;
+	font-family: serif;
+}
+.menu a visited{
+	color:white;
+}
+.menu a {
+	color:white;
+}
+
+.loginPanel{
+	float:right;
+	color:white;
+	padding-top:3px;
+	margin-right:5px;
+	font-weight: bold;
+	font-family: serif;
+}
+
+.loginPanel a visited{
+	color:white;
+}
+.loginPanel a {
+	color:white;
+}
+
+.login{
+	border:1px solid #000000;
+	float:right;
+	margin-right:10px;
+}
+
 .top{
+	
 	background-color:white;
 	border:1px solid #CCCCCC;
-	height: 90px;
+	height: 50px;
 }
 .top img{
 	vertical-align: middle;
 }
 
 .center{
+	margin-left:5px;
+	margin-right:5px;
 	background-color:white;
 	border:1px solid #CCCCCC;
 	padding:5px;
-	margin:0px;
+	
 }
 
 .bottom{
@@ -38,10 +91,10 @@ a {
 }
 
 .repoHeader{
+	margin-top:5px;
 	background-color:white;
 	border:1px solid #CCCCCC;
 	margin-bottom:5px;
-	
 	padding:5px;
 }
 
@@ -51,45 +104,9 @@ input,select,textarea{
 }
 
 .title{
-	font-size: 30px;
 	font-weight: bold;
 	float:left;
 	clear:left;
-}
-
-.menu{
-	float:right;
-	margin-right:50px;
-	margin-top:0px;
-}
-
-.menuTable{
-	font-size:20px;
-}
-
-.menuTable td{
-	padding-left: 15px;
-	padding-right: 15px;
-	margin:0px;
-}
-
-.loginPanel{
-	text-align:right;
-	padding-right:10px;
-	margin-bottom:10px;
-	border:1px solid #c5d5dd;
-	background-color: #e5f0f5;
-}
-
-
-.menuTable td.highlight{
-	background-color: #CCFFFF;
-}
-
-.login{
-	border:1px solid #000000;
-	float:right;
-	margin-right:10px;
 }
 
 .content{

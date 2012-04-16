@@ -22,7 +22,7 @@
 	});
 	
 	function showContent(fileSha,fileName){
-		$.get("{%url gitview.views.fileContent%}",{
+		$.get("{%url gitview.fileViews.fileContent%}",{
 			path:"{{repoPath}}",
 			sha:fileSha,
 			filePath:fileName

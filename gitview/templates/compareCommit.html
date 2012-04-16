@@ -81,10 +81,9 @@
 			</th>
 			<th style="text-align:left;">&nbsp;
 				{% if change.oldFileName == change.newFileName %}
-					<a href="{%url gitview.views.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.oldFileName}}">
-						{{change.oldFileName}}</a>
+						{{change.oldFileName}}
 				{% else %}
-					{{change.oldFileName}} -> <a href="{%url gitview.views.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.newFileName}}">{{change.newFileName}}</a>
+					{{change.oldFileName}} -> {{change.newFileName}}
 				{% endif %}
 			</th>
 		</tr>

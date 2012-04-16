@@ -1,22 +1,18 @@
 from django.shortcuts import render_to_response,redirect
 from django.template import RequestContext
 from django.conf import settings
-from gitengine.gitEngine import GitRepo, GitDir,GitChange
+from gitengine.gitEngine import GitRepo
 from gitengine.gitGraph import  GitGraphCanvas
 import gitengine.gitEngine as gitEngine
 from django import forms
 from os import sep,listdir
 from os.path import isdir
 import time
-from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 import re
-import zipfile
-import tempfile
-from django.core.servers.basehttp import FileWrapper
 
-def __getGitPath():
+def getGitPath():
     if settings.GIT_PATH[-1]=='/':
         gitPath=settings.GIT_PATH
     else:
@@ -24,12 +20,12 @@ def __getGitPath():
     return gitPath
 
 def index(request):
-    gitPath=__getGitPath()
+    gitPath=getGitPath()
     try:
         pathpar=request.GET['path']
     except KeyError:
         pathpar=""
-    currPath=__getGitPath()+pathpar
+    currPath=getGitPath()+pathpar
     subDirs=[]
     contents = listdir(currPath)
     for content in contents:
@@ -82,7 +78,7 @@ class FilterForm(forms.Form):
 
 def commits(request):
     reposPath=request.GET['path'].replace("//","/")
-    repo = GitRepo(reposPath)
+    repo = GitRepo(getGitPath()+sep+reposPath)
     until=None
     since=None
     try:
@@ -127,14 +123,15 @@ def commits(request):
     else:
         branchForm=BranchForm(repo)
     
-    repoName=reposPath[len(__getGitPath()):].split('/')[-1]
-    moduleName=reposPath.replace(repoName,"")
-    modulePath=reposPath.replace(__getGitPath(),"").replace(repoName,"")
+    repoName=reposPath.split('/')[-1]
+    if reposPath.rfind('/')>0:
+        moduleName=reposPath[:reposPath.rfind('/')]
+    else:
+        moduleName=''
     return render_to_response("commits.html",RequestContext(request,{
             'branchForm':branchForm,
             'filterForm':filterForm,
             'repoPath':reposPath,
-            'modulePath':modulePath,
             'moduleName':moduleName,
             'repoName':repoName,
             'branch':branch,
@@ -144,7 +141,8 @@ def commits(request):
             'num':num,
             'numPages':range(numPages+1)[1:],
             'page':page+1,
-            'filePath':filePath
+            'filePath':filePath,
+            'gitPath':getGitPath()
             }))
 
 def commit(request):
@@ -155,33 +153,16 @@ def commit(request):
         branch=request.GET['branch']
     except KeyError:
         branch=''
-    repo = GitRepo(reposPath)
+    repo = GitRepo(getGitPath()+sep+reposPath)
     commit = repo.getCommit(commitId)
     changes=commit.getChanges()
-    return render_to_response("commit.html",RequestContext(request,{'repoPath':reposPath,'commit':commit,'changes':changes,'branch':branch}))
+    return render_to_response("commit.html",RequestContext(request,{'gitPath':getGitPath(),'repoPath':reposPath,'commit':commit,'changes':changes,'branch':branch}))
 
-def diff(request):
-    reposPath=request.GET['path']
-    commitId=request.GET['commit']
-    oldSha=request.GET['oldSha']
-    newSha=request.GET['newSha']
-    oldFileName=request.GET['oldFileName']
-    newFileName=request.GET['newFileName']
-    try:
-        request.GET['ghDiff']
-        ghDiff=True
-    except KeyError:
-        ghDiff=False
-    repo = GitRepo(reposPath)
-    commit = repo.getCommit(commitId)
-    change=GitChange(commit=commit,oldSha=oldSha,newSha=newSha,oldFileName=oldFileName,newFileName=newFileName)
-    return render_to_response("diff.html",RequestContext(request,{'ghDiff':ghDiff,'change':change}))
-    
 def compareCommit(request):
     """ Compare two commit"""
     reposPath=request.GET['path']
     commitIds=request.GET.getlist('compareCommitId')
-    repo = GitRepo(reposPath)
+    repo = GitRepo(getGitPath()+sep+reposPath)
     commit1=repo.getCommit(commitIds[0])
     commit2=repo.getCommit(commitIds[1])
     if (commit1.commit_time>commit2.commit_time):
@@ -191,80 +172,6 @@ def compareCommit(request):
     changes=gitEngine.commitChanges(repo, commit1.id, commit2.id)
     return render_to_response("compareCommit.html",RequestContext(request,{'repoPath':reposPath,'commit1':commit1,'commit2':commit2,'changes':changes}))
 
-def view(request):
-    """ View a single file of a commit """
-    reposPath=request.GET['path']
-    commitId=request.GET['commit']
-    filePath=request.GET['filePath']
-    try:
-        branch=request.GET['branch']
-    except KeyError:
-        branch=''
-    repo = GitRepo(reposPath)
-    commit = repo.getCommit(commitId)
-    fileSha = commit.getTree().getFile(filePath).sha
-    return render_to_response("view.html",RequestContext(request,{'repoPath':reposPath,'commitId':commitId,'fileName':filePath,'fileSha':fileSha,'branch':branch}))
-
-def fileContent(request):
-    reposPath=request.GET['path']
-    sha=request.GET['sha']
-    filePath=request.GET['filePath']
-    try:
-        branch=request.GET['branch']
-    except KeyError:
-        branch=''
-    repo = GitRepo(reposPath)
-    fileContent=str(repo.get_blob(sha))
-    return render_to_response("fileContent.html",RequestContext(request,{'repoPath':reposPath,'sha':sha,'fileName':filePath,'content':fileContent,'branch':branch}))
-
-def rawContent(request):
-    reposPath=request.GET['path']
-    sha=request.GET['sha']
-    fileName=request.GET['fileName']
-    repo = GitRepo(reposPath)
-    fileContent=str(repo.get_blob(sha))
-    response=HttpResponse(fileContent)
-    response._headers['content-disposition'] = ('Content-Disposition', 'attachment; filename='+fileName)
-    return response
-    
-def dir_to_ul(gitdir,repoPath):
-    content="<li><span class=\"folder\">"+gitdir.path.split("/")[-1]+"</span><ul>"
-    subdir=gitdir.getSubDirs()
-    for sd in subdir:
-        content+=dir_to_ul(sd,repoPath)
-    files=gitdir.getFiles()
-    for fl in files:
-        content+="<li><span class=\"file\">"
-        content+="<a href='#' onclick=\"showContent('"+fl.sha+"','"+fl.fileName+"') \">"
-        content+=fl.fileName.split("/")[-1]+"</a></span></li>"
-    content+="</ul></li>"
-    return content
-        
-def tree(request):
-    """ View a tree of a commit """
-    reposPath=request.GET['path']
-    commitId=request.GET['commit']
-    try:
-        branch=request.GET['branch']
-    except KeyError:
-        branch=''
-    repo = GitRepo(reposPath)
-    commit = repo.getCommit(commitId)
-    tree=commit.getTree()
-    content=tree.getRoot()
-    treeContent=""
-    rootFiles=[]
-    for c in content:
-        if isinstance(c, GitDir):
-            treeContent+=dir_to_ul(c,reposPath)
-        else:
-            rootFiles.append(c)
-    #add files at the end
-    for f in rootFiles:
-        treeContent+="<li><span class=\"file\">"
-        treeContent+="<a href='#' onclick=\"showContent('"+f.sha+"','"+f.fileName+"') \">"
-        treeContent+=f.fileName.split("/")[-1]+"</a></span></li>"
-    return render_to_response("tree.html",RequestContext(request,{'repoPath':reposPath,'commitId':commitId,'treeContent':treeContent,'branch':branch}))
     
 """ ######################### New Repository ######################"""
 class NewReposForm(forms.Form):
@@ -283,11 +190,11 @@ def new(request):
             newPath=newReposForm.data['path']
             if newPath[0]=='/':
                 newPath=newPath[1:]
-            GitRepo.create_bare(__getGitPath()+sep+newPath,newReposForm.data['description'])
+            GitRepo.create_bare(getGitPath()+sep+newPath,newReposForm.data['description'])
             return redirect('gitview.views.index')
     else:
         newReposForm=NewReposForm()
-    return render_to_response("new.html",RequestContext(request,{'gitPath':__getGitPath(),'newReposForm':newReposForm}))
+    return render_to_response("new.html",RequestContext(request,{'gitPath':getGitPath(),'newReposForm':newReposForm}))
 
 """ ################## GRAPH #################### """
 def graph(request):
@@ -301,12 +208,12 @@ def graph(request):
         branch=''
     
     if len(request.GET['since'])>0:
-        since=int(request.GET['since'])
+        since=int(time.mktime(time.strptime(request.GET['since'],"%Y-%m-%d %H:%M")))
     else:
         since=None
         
     if len(request.GET['until'])>0:
-        until=int(request.GET['until'])
+        until=int(time.mktime(time.strptime(request.GET['until'],"%Y-%m-%d %H:%M")))
     else:
         until=None
     try:
@@ -315,7 +222,7 @@ def graph(request):
     except KeyError:
         highlights=None;
     
-    repo=GitRepo(repoPath)
+    repo=GitRepo(getGitPath()+sep+repoPath)
     commitUrl=reverse('gitview.views.commit')
     commitUrl+="?path="+repoPath+'&branch='+branch+"&id=$$"
     graph=GitGraphCanvas(repo,since=since,until=until,commitUrl=str(commitUrl))
@@ -331,42 +238,10 @@ def viewgit(request):
         return redirect('gitview.views.index')
     try:
         viewGitMap = settings.VIEWGIT_MAP_PROJECTS
-        repoPath = __getGitPath()+viewGitMap[projectName]
+        repoPath = getGitPath()+viewGitMap[projectName]
     except AttributeError:
         repoPath=projectName
     return redirect(reverse('gitview.views.commit')+"?path="+repoPath+"&id="+commitId)
 
-def dirFiles(gitdir,files):
-    subdir=gitdir.getSubDirs()
-    for sd in subdir:
-        dirFiles(sd,files)
-    contentFiles=gitdir.getFiles()
-    for fl in contentFiles:
-        files.append(fl)
 
-def zipTree(request):
-    """ zip a tree of a commit """
-    reposPath=request.GET['path']
-    commitId=request.GET['commit']
-    repo = GitRepo(reposPath)
-    commit = repo.getCommit(commitId)
-    tree=commit.getTree()
-    content=tree.getRoot()
-    rootFiles=[]
-    for c in content:
-        if isinstance(c, GitDir):
-            dirFiles(c,rootFiles)
-        else:
-            rootFiles.append(c)
-    temp = tempfile.TemporaryFile()
-    archive = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
-    for f in rootFiles:
-        archive.writestr(f.fileName,str(repo.get_blob(f.sha)))
-    archive.close()
-    wrapper = FileWrapper(temp)
-    response = HttpResponse(wrapper, content_type='application/zip')
-    response['Content-Disposition'] = 'attachment; filename='+reposPath[len(__getGitPath()):].replace('/','_').replace(".git","")+".zip"
-    response['Content-Length'] = temp.tell()
-    temp.seek(0)
-    return response
     

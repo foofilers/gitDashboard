@@ -1,8 +1,11 @@
 {% extends "layout.html" %}
 {% load timeutils %}
+{% load pathutils %}
 
 {% block repoHeader %}
 	{% if filePath %}
+		{% if moduleName != "" %}<b>Folder:</b> <a href="{% url gitview.views.index %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{%endif%}
+		<b>Name:</b> {{ repoName }}<br/>
 		<b>FileName path:</b><a href="{% url gitview.views.index %}?path={{ modulePath }}">{{ modulePath }}</a>/{{ repoName }}/{{filePath}}
 	{%else%}
 		<script>
@@ -15,7 +18,9 @@
 		
 		<form id="branchForm" method="GET" style="margin:auto;" class="branchForm">
 			{{branchForm.path}}
-			<b>Repository path:</b><a href="{% url gitview.views.index %}?path={{ modulePath }}">{{ moduleName }}</a>{{ repoName }}/ {{branchForm.branch}}
+			{% if moduleName != "" %}<b>Folder:</b> <a href="{% url gitview.views.index %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{%endif%}
+			<b>Name:</b> {{ repoName }}<br/>
+			<b>Branch:</b> {{branchForm.branch}}<br/>
 		</form>
 	{% endif %}
 	
@@ -37,10 +42,10 @@
 		<script type="text/javascript">
 			$(function(){
 				$('#id_since').datetimepicker({
-					dateFormat:'dd/mm/yy'
+					dateFormat:'yy-mm-dd'
 				});
 				$('#id_until').datetimepicker({
-					dateFormat:'dd/mm/yy'
+					dateFormat:'yy-mm-dd'
 				});
 			});
 		</script>
@@ -49,11 +54,13 @@
 			{% if filePath %}
 				<input type="hidden" id="filePath" name="filePath" value="{{filePath}}">
 			{% endif %}
+			<input type="hidden" name="path" value="{{repoPath}}"/>
+			<input type="hidden" name="branch" value="{{branch}}"/>
 			{{filterForm.page}}
 			{{ filterForm.no_field_errors }}
 			<table style="margin:auto;">
 			<tr>
-				<th colspan="4" align="center">Filter</th>
+				<th colspan="5" align="center">Filter</th>
 			</tr>
 			<tr>
 				<td> {{ filterForm.since.errors }}<label for="id_since">Since:</label>{{filterForm.since}}</td>
@@ -62,10 +69,22 @@
 				<td>
 					<input type="submit" value="Filter"/>
 				</td>
+				<td>
+				{% if not filePath %}
+						<input id="graphBtn" type="image" style="border:0px;" src="/static/images/graph.png" title="Graph"/>
+						<script type="text/javascript">
+							$('#graphBtn').click(function(){
+								$('#filterForm').get(0).setAttribute('method', 'GET');
+								$('#filterForm').get(0).setAttribute('action', '{%url gitview.views.graph %}');
+								filterForm.submit();
+							});
+						</script>
+					{% endif %}
+				</td>
 			</tr>
 			</table>
 		</form>
-		{% if not filePath %}<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}"><img style="vertical-align:middle;" src="/static/images/graph.png" border="0" title="Graph"/></a>{% endif %}
+		
 	</div>
 
 	
@@ -104,9 +123,9 @@
 				</td>
 				<td style="text-align:center;" nowrap="nowrap">
 					<a href="{% url gitview.views.commit %}?path={{repoPath}}&id={{cmt.id}}&branch={{branch}}"><img src="/static/images/detail.png" border="0" title="Detail"/></a>
-					<a href="{% url gitview.views.tree%}?path={{repoPath}}&commit={{cmt.id}}&branch={{branch}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
-					<a href="{% url gitview.views.zipTree%}?path={{repoPath}}&commit={{cmt.id}}"><img src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
-					<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{cmt.id}}"><img style="vertical-align:middle;" src="/static/images/point.png" border="0" title="Show in the graph"/></a>
+					<a href="{% url gitview.fileViews.tree%}?path={{repoPath}}&commit={{cmt.id}}&branch={{branch}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
+					<a href="{% url gitview.fileViews.zipTree%}?path={{repoPath}}&commit={{cmt.id}}"><img src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
+					<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{cmt.id}}"><img src="/static/images/point.png" border="0" title="Show in the graph" height="22px" width="22px"/></a>
 				</td>
 			</tr>
 			{% endfor %}

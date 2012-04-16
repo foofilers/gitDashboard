@@ -1,9 +1,10 @@
 {% extends "layout.html" %}
 {% load timeutils %}
 {% load linkutils %}
+{% load pathutils %}
 
 {% block repoHeader %}
-<b>Repository path:</b><a href="{% url gitview.views.commits %}?path={{ repoPath }}&branch={{branch}}">{{ repoPath }}</a>
+<b>Repository:</b> <a href="{% url gitview.views.commits %}?path={{ repoPath }}&branch={{branch}}">/{{ repoPath }}</a>
 {%endblock %}
 
 {% block contentBlock %}
@@ -30,9 +31,9 @@
 	</tr>
 	<tr>
 		<th colspan="2" style="padding:2px; text-align:right;">
-			<a href="{% url gitview.views.tree%}?path={{repoPath}}&commit={{commit.id}}" title="File Tree"><img src="/static/images/file_tree.png" title="File Tree" style="vertical-align:middle;"/></a>
-			<a href="{% url gitview.views.zipTree%}?path={{repoPath}}&commit={{commit.id}}" title="Zip Tree"><img src="/static/images/archive.png" border="0" title="Zip Tree" style="vertical-align:middle;" /></a>
-			<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{commit.id}}"><img style="vertical-align:middle;" src="/static/images/point.png" border="0" title="Show in the graph"/></a>
+			<a href="{% url gitview.fileViews.tree%}?path={{repoPath}}&commit={{commit.id}}" title="File Tree"><img src="/static/images/file_tree.png" title="File Tree"/></a>
+			<a href="{% url gitview.fileViews.zipTree%}?path={{repoPath}}&commit={{commit.id}}" title="Zip Tree"><img src="/static/images/archive.png" border="0" title="Zip Tree"  /></a>
+			<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{commit.id}}"><img src="/static/images/point.png" height="22px" width="22px" border="0" title="Show in the graph"/></a>
 		</th>
 	</tr>
 </table>
@@ -46,7 +47,7 @@
 				<script>
 					$(function(){
 						$('#{{change.newSha}}_showBtn').click(function(){
-							$.get("{%url gitview.views.diff %}",{
+							$.get("{%url gitview.fileViews.diff %}",{
 								path:"{{repoPath}}",
 								commit:"{{commit.id}}",
 								oldSha:"{{change.oldSha}}",
@@ -60,7 +61,7 @@
 							});
 						});
 						$('#{{change.newSha}}_ghshowBtn').click(function(){
-							$.get("{%url gitview.views.diff %}",{
+							$.get("{%url gitview.fileViews.diff %}",{
 								path:"{{repoPath}}",
 								commit:"{{commit.id}}",
 								oldSha:"{{change.oldSha}}",
@@ -80,10 +81,10 @@
 			</th>
 			<th style="text-align:left;">&nbsp;
 				{% if change.oldFileName == change.newFileName %}
-					<a href="{%url gitview.views.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.oldFileName}}&branch={{branch}}">
+					<a href="{%url gitview.fileViews.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.oldFileName}}&branch={{branch}}">
 						{{change.oldFileName}}</a>
 				{% else %}
-					{{change.oldFileName}} -> <a href="{%url gitview.views.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.newFileName}}&branch={{branch}}">{{change.newFileName}}</a>
+					{{change.oldFileName}} -> <a href="{%url gitview.fileViews.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.newFileName}}&branch={{branch}}">{{change.newFileName}}</a>
 				{% endif %}
 			</th>
 		</tr>
@@ -97,7 +98,7 @@
 		{% if change.newFileName == None %}
 			<tr><th style="text-align:left;">&nbsp;<span class="gd">deleted</span> {{change.oldFileName}}</th></tr>
 		{% else %}
-			<tr><th style="text-align:left;">&nbsp;<span class="gi">created</span> <a href="{%url gitview.views.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.newFileName}}">{{change.newFileName}}</a></th></tr>
+			<tr><th style="text-align:left;">&nbsp;<span class="gi">created</span> <a href="{%url gitview.fileViews.view %}?path={{repoPath}}&commit={{commit.id}}&filePath={{change.newFileName}}">{{change.newFileName}}</a></th></tr>
 		{% endif %}
 	{% endif %}
 </table>

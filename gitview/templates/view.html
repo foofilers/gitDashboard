@@ -7,7 +7,7 @@
 {% block contentBlock %}
 <script>
 	$(function(){
-		$.get("{%url gitview.views.fileContent%}",{
+		$.get("{%url gitview.fileViews.fileContent%}",{
 			path:"{{repoPath}}",
 			sha:"{{fileSha}}",
 			filePath:"{{fileName}}",
