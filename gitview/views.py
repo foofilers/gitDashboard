@@ -50,7 +50,7 @@ class BranchForm(forms.Form):
         branches = []
         shas = {}
         try:
-            shas[repo.head()]='HEAD'
+            shas[repo.head]='HEAD'
             for key in refs.keys():
                 if key!='HEAD':
                     if refs[key] in shas:
@@ -58,12 +58,12 @@ class BranchForm(forms.Form):
                     else:
                         shas[refs[key]]=key
                         
-            branches.append( (repo.head(),shas[repo.head()]) )
+            branches.append( (repo.head,shas[repo.head]) )
             for sh in shas.keys():
-                if sh!=repo.head():
+                if sh!=repo.head:
                     branches.append( (sh,shas[sh]) )
             try:
-                head=repo.head()
+                head=repo.head
             except KeyError:
                 head=''
         except KeyError:
@@ -85,9 +85,9 @@ def commits(request):
     try:
         branch=request.GET['branch']
         if branch=='':
-            branch=repo.head()
+            branch=repo.head.commit.hexsha
     except KeyError:
-        branch=repo.head()
+        branch=repo.head.commit.hexsha
     try:
         filePath=request.GET['filePath']
     except KeyError:
@@ -157,7 +157,7 @@ def commit(request):
     repo = GitRepo(getGitPath()+sep+reposPath)
     commit = repo.getCommit(commitId)
     changes=commit.getChanges()
-    gravatarMd5=md5.new(commit.committer.split('<')[1].replace('>','')).hexdigest()
+    gravatarMd5=md5.new(commit.commit.committer.email).hexdigest()
     return render_to_response("commit.html",RequestContext(request,{'gitPath':getGitPath(),'repoPath':reposPath,'commit':commit,'changes':changes,'branch':branch,'gravatarMd5':gravatarMd5}))
 
 def compareCommit(request):

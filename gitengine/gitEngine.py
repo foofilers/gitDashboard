@@ -1,6 +1,3 @@
-from dulwich.repo import Repo
-from dulwich.objects import Commit
-from dulwich.errors import NotGitRepository
 from os import listdir,makedirs
 from io import open
 import os
@@ -10,251 +7,19 @@ import ghdiff
 import re
 from django.utils.encoding import smart_unicode,DjangoUnicodeDecodeError
 
-class GitPathNotFound(Exception):
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
-
-class GitChange:
-    """ Represent a Single File Change inside a commit  """
-    def __init__(self,commit,treeChange=None, oldSha=None,newSha=None,oldFileName=None,newFileName=None):
-        self.commit=commit
-        if treeChange:
-            self.oldFileName=treeChange[0][0]
-            self.newFileName=treeChange[0][1]
-            self.oldSha=treeChange[2][0]
-            self.newSha=treeChange[2][1]
-        else:
-            self.oldSha=oldSha
-            self.newSha=newSha
-            self.oldFileName=oldFileName
-            self.newFileName=newFileName
-        
-    def getPrettyGHDiff(self):
-        blobOld=self.commit.repo.get_blob(self.oldSha)
-        blobNew=self.commit.repo.get_blob(self.newSha)
-        try:
-            diffContent =  ghdiff.diff(smart_unicode(blobOld).splitlines(),smart_unicode(blobNew).splitlines())
-        except DjangoUnicodeDecodeError:
-            diffContent =  ghdiff.diff(str(blobOld).decode('latin1').splitlines(),str(blobNew).decode('latin1').splitlines())
-        return diffContent
-    def getPrettyDiff(self):
-        blobOld=self.commit.repo.get_blob(self.oldSha)
-        blobNew=self.commit.repo.get_blob(self.newSha)
-        diff=''
-        try:
-            diffs=unified_diff(smart_unicode(blobOld).splitlines(),smart_unicode(blobNew).splitlines(),self.oldFileName,self.newFileName)
-        except DjangoUnicodeDecodeError:
-            diffs=unified_diff(str(blobOld).decode('latin1').splitlines(),str(blobNew).decode('latin1').splitlines(),self.oldFileName,self.newFileName)
-        for line in diffs:
-            diff+=line+'\n'
-        diff=diff.replace('\n\n', '\n')
-        return diff
-    
-    
-class GitDir:
-    def __init__(self,repo,sha,path,parent=None):
-        self.repo=repo
-        self.sha=sha
-        self.path=path
-        self.parent=parent
-    def getFiles(self):
-        entries=self.repo.get_object(self.sha).entries()
-        files=[]
-        for e in entries:
-            obj = self.repo.get_object(e[2])
-            if obj.get_type()==3:
-                files.append(GitFile(self.repo,e[2],self.path+os.sep+e[1],self))
-        return files
-    
-    def getSubDirs(self):
-        dirs=[]
-        curTree=self.repo.get_object(self.sha)
-        entries=curTree.entries()
-        for e in entries:
-            obj = self.repo.get_object(e[2])
-            if obj.get_type()==2:
-                dirs.append(GitDir(self.repo,e[2],self.path+os.sep+e[1],self))
-        return dirs
-    
-class GitFile:
-    def __init__(self,repo,sha,fileName,parent=None):
-        self.repo=repo
-        self.sha=sha
-        self.fileName=fileName
-        self.parent=parent
-    def getContent(self):
-        return str(self.repo.get_blob(self.sha))
-    
-class GitTree():
-    def __init__(self,repo,sha):
-        self.repo=repo
-        self.tree=repo.tree(sha)
-        self.sha=sha
-        
-    def getFile(self,path):
-        subdirs = path.split(os.sep)
-        treeEntries = self.tree.iteritems()
-        found=False
-        for sd in subdirs[:-1]:
-            for te in treeEntries:
-                if te.path==sd:
-                    treeEntries=self.repo.tree(te.sha).iteritems()
-                    found=True
-                    break
-            if found==False:
-                raise GitPathNotFound('Path:'+path+' not found')
-            else:
-                found=False
-        fileName = subdirs[-1]
-        for entry in treeEntries:
-            if entry.path==fileName:
-                return GitFile(self.repo, entry.sha, path)
-        raise GitPathNotFound('Path:'+path+' not found')
-    
-    def getRoot(self):
-        entries=self.repo.tree(self.sha).entries()
-        root=[]
-        for e in entries:
-            try:
-                obj = self.repo.get_object(e[2])
-                if obj.get_type()==3:
-                    root.append(GitFile(self.repo,e[2],e[1]))
-                else:
-                    root.append(GitDir(self.repo,e[2],e[1],))
-            except KeyError:
-                pass
-        return root
-    
-    def __getTreeFiles(self,sha,path=""):
-        files=[]
-        entries=self.repo.tree(sha).entries()
-        for e in entries:
-            obj = self.repo.get_object(e[2])
-            if obj.get_type()==3:
-                #e' un file
-                files.append(GitFile(self.repo,e[2],path+e[1]))
-            else:
-                if obj.get_type()==2:
-                    #e' una directory
-                    files.extend(self.__getTreeFiles(e[2],path+e[1]+os.sep))
-        return files
-    
-    def getAllFiles(self):
-        """ Retrieve all files in the tree 
-            Return:
-                return a GitFile list
-        """
-        return self.__getTreeFiles(self.sha)
-    
-class GitCommit(Commit):
-    """ Represent A single Commit  """
-    def __init__(self,c,repo):
-        Commit.__init__(self)
-        for slot in c.__slots__:
-            setattr(self,slot,getattr(c,slot))
-        self.repo=repo
-    def parents(self):
-        return self._get_parents()
-    def getChanges(self):
-        changes=[]
-        parents=self.parents()
-        if len(parents)>0:
-            for p in parents:
-                pc = self.repo.commit(p)
-                chIter = self.repo.object_store.tree_changes(pc.tree,self.tree)
-                try:
-                    while True:
-                        tc = chIter.next()
-                        changes.append(GitChange(self,tc))
-                except StopIteration:
-                    pass
-        else:
-            #nessun parent(first commit)
-            files=self.getTree().getAllFiles()
-            for fl in files:
-                treeChange=((None,fl.fileName),(None,None),(None,fl.sha))
-                changes.append(GitChange(self,treeChange))
-        return changes
-    def getChange(self,fileName,parent=None):
-        if parent==None:
-            parents=self.parents()
-            pc=self.repo.commit(parents[0])
-        else:
-            pc=self.repo.commit(parent)
-        chIter = self.repo.object_store.tree_changes(pc.tree,self.tree)
-        found=False
-        try:
-            while not found:
-                tc = chIter.next()
-                ch = GitChange(self,tc)
-                if ch.newFileName==fileName:
-                    found=True
-        except StopIteration:
-            pass
-        if found:
-            return ch
-        else:
-            return None
-        
-    def getTree(self):
-        return GitTree(self.repo,self.tree)
-    
-    def getTags(self):
-        repoTags=self.repo.getTagsRef()
-        tags=[]
-        for tagName in repoTags.keys():
-            if repoTags[tagName]==self.id:
-                tags.append(tagName[10:])
-        return tags
-    
-    def getBranches(self):
-        repoBranches=self.repo.getBranches()
-        branches=[]
-        for branch in repoBranches.keys():
-            if repoBranches[branch]==self.id:
-                branches.append(branch.replace('refs/','').replace('heads/',''))
-        return branches
-
-def commitChanges(repo,sha1,sha2):
-    """ Return a list of GitChange between two commit """
-    c1=repo.getCommit(sha1)
-    c2=repo.getCommit(sha2)
-    chIter = repo.object_store.tree_changes(c1.tree,c2.tree)
-    changes=[]
-    try:
-        while True:
-            tc = chIter.next()
-            changes.append(GitChange(c1,tc))
-    except StopIteration:
-        pass
-    return changes
+from git import Repo,Commit,Blob
+from git.repo.fun import is_git_dir
+from git.exc import InvalidGitRepositoryError
+from binascii import unhexlify
 
 class GitRepo(Repo):
     """ Rapresent a Git Repository """
     def __init__(self,*args,**kwargs):
         super(GitRepo,self).__init__(*args,**kwargs)
-        self.description=None
+        self.path=self.working_dir
     def __cmp__(self,other):
         return cmp(self.path,other.path)
-    def get_description(self):
-        """ Get the repository description
-            Returns:
-                The content of 'description' files without CR
-        """
-        if self.description!=None:
-            return self.description
-        descFile = self.get_named_file('description')
-        self.description=''
-        if descFile!=None:
-            try:
-                for line in descFile.readlines():
-                    self.description+=line.replace('\n',' ')
-            finally:
-                descFile.close()
-        return self.description
-    
+
     def getTagsRef(self):
         tags={}
         refs=self.get_refs()
@@ -269,16 +34,14 @@ class GitRepo(Repo):
     
     def getBranches(self):
         branches={}
-        refs=self.get_refs()
-        for ref in refs.keys():
-            if ref.find('refs/tags/')==-1:
-                branches[ref]=refs[ref]
+        for ref in self.branches:
+            branches[ref.name]=ref.commit.hexsha
         return branches
     
     def getCommit(self,commitId):
         """ Retrieve a GitCommit object represent single commit from reporistory  """
-        return GitCommit(self.commit(commitId),self)
-    
+        return GitCommit(self.commit(commitId))
+        
     def getCommits(self,num=None,since=None,until=None,branch=None,path=None):
         """ Retrieve the commits of repository
             Args:
@@ -287,29 +50,21 @@ class GitRepo(Repo):
                 until: timestamp until to retrieve commits
             Returns:
                 A list of Commit object
-        """
-        if path:
-            paths=[path]
-        else:
-            paths=None
-            
-        if branch:
-            if not isinstance(branch, list):
-                branch=[branch]
-        try:
-            w=self.get_walker(max_entries=num,since=since,until=until,include=branch,paths=paths)
-        except KeyError:
-            return []
-        we=w._next()
+        """ 
+        params={}
+        if since:
+            params['since']=since
+        if until:
+            params['until']=until
+        cmts=self.iter_commits(rev=branch,paths=path,max_count=num,**params)
         commits=[]
-        while we !=None:
-            commits.append(GitCommit(we.commit,self))
-            we=w._next()
+        for cmt in cmts:
+            commits.append(GitCommit(cmt))
         return commits
             
     def getHead(self):
         try:
-            return self.head()
+            return self.head
         except KeyError:
             return None
     
@@ -335,7 +90,7 @@ class GitRepo(Repo):
                             toAdd=False
                     if toAdd:
                         repos.append(GitRepo(fullPath))
-                except NotGitRepository:
+                except InvalidGitRepositoryError:
                     if recursive==True:
                         repos.extend(GitRepo.getRepos(fullPath,True))
         return sorted(repos)
@@ -359,3 +114,174 @@ class GitRepo(Repo):
             finally:
                 newdescFile.close()
         return nrp
+
+class GitCommit():
+    """ Represent A single Commit  """
+    def __init__(self,commit):
+        self.commit=commit
+    
+    """ Retireve the tree changes from parents"""
+    def getChanges(self):
+        parents=self.commit.parents
+        if len(parents)>0:
+            for p in parents:
+                pc = self.commit.repo.commit(p)
+                return pc.diff(self.commit)
+        else:
+            #nessun parent(first commit)
+            """files=self.getTree().getAllFiles()
+            for fl in files:
+                treeChange=((None,fl.fileName),(None,None),(None,fl.sha))
+                changes.append(GitChange(self,treeChange))"""
+            pass
+
+    def getChange(self,fileName,parent=None):
+        """if parent==None:
+            parents=self.parents()
+            pc=self.repo.commit(parents[0])
+        else:
+            pc=self.repo.commit(parent)
+        chIter = self.repo.object_store.tree_changes(pc.tree,self.tree)
+        found=False
+        try:
+            while not found:
+                tc = chIter.next()
+                ch = GitChange(self,tc)
+                if ch.newFileName==fileName:
+                    found=True
+        except StopIteration:
+            pass
+        if found:
+            return ch
+        else:
+            return None"""
+        pass
+        
+    def getTree(self):
+        return GitTree(self.commit.repo,self.commit.tree)
+    
+    def getTags(self):
+        repoTags=self.commit.repo.tags
+        tags=[]
+        for tag in repoTags:
+            if tag.commit.hexsha==self.commit.hexsha:
+                tags.append(tag.name)
+        return tags
+        
+    def getBranches(self):
+        repoBranches=self.commit.repo.branches
+        branches=[]
+        for branch in repoBranches:
+            if branch.commit.hexsha == self.commit.hexsha:
+                branches.append(branch.name)
+        return branches
+
+
+class GitTree():
+    def __init__(self,repo,tree):
+        self.repo=repo
+        self.tree=tree
+        
+    def getFile(self,path):
+        try:
+            blob = self.tree[path]
+            return GitFile(blob)
+        except KeyError:
+            raise GitPathNotFound('Path:'+path+' not found')
+    
+    def getRoot(self):
+        """ Retreive the root tree"""
+        root=[]
+        for subTree in  self.tree.trees:
+            root.append(GitDir(subTree))
+        for blob in self.tree.blobs:
+            root.append(GitFile(blob))
+        return root
+    
+    def __getTreeFiles(self,tree,path=""):
+        files=[]
+        for subTree in tree.trees:
+            files.extend(self.__getTreeFiles(subTree, path))
+        for blob in tree.tree.blobs:
+            files.append(GitFile(blob))
+        return files
+    
+    def getAllFiles(self):
+        """ Retrieve all files in the tree 
+            Return:
+                return a GitFile list
+        """
+        return self.__getTreeFiles(self.sha)
+
+class GitPathNotFound(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
+class GitChange:
+    """ Represent a Single File Change inside a commit  """
+    def __init__(self,commit,oldSha=None,newSha=None):
+        self.commit=commit
+        self.oldSha=oldSha
+        self.newSha=newSha
+        
+    def getPrettyGHDiff(self):
+        blobOld=Blob(self.commit.commit.repo,unhexlify(self.oldSha)).data_stream.read()
+        blobNew=Blob(self.commit.commit.repo,unhexlify(self.newSha)).data_stream.read()
+        try:
+            diffContent =  ghdiff.diff(smart_unicode(blobOld).splitlines(),smart_unicode(blobNew).splitlines())
+        except DjangoUnicodeDecodeError:
+            diffContent =  ghdiff.diff(str(blobOld).decode('latin1').splitlines(),str(blobNew).decode('latin1').splitlines())
+        return diffContent
+    def getPrettyDiff(self):
+        blobOld=Blob(self.commit.commit.repo,unhexlify(self.oldSha)).data_stream.read()
+        blobNew=Blob(self.commit.commit.repo,unhexlify(self.newSha)).data_stream.read()
+        diff=''
+        try:
+            diffs=unified_diff(smart_unicode(blobOld).splitlines(),smart_unicode(blobNew).splitlines())
+        except DjangoUnicodeDecodeError:
+            diffs=unified_diff(str(blobOld).decode('latin1').splitlines(),str(blobNew).decode('latin1').splitlines())
+        for line in diffs:
+            diff+=line+'\n'
+        diff=diff.replace('\n\n', '\n')
+        return diff
+    
+    
+class GitDir:
+    def __init__(self,tree,parent=None):
+        self.tree=tree
+        self.parent=parent
+    def getFiles(self):
+        files=[]
+        for blob in self.tree.blobs:
+            files.append(GitFile(blob))
+        return files
+    
+    def getSubDirs(self):
+        dirs=[]
+        for subTree in self.tree.trees:
+            dirs.append(GitDir(subTree))
+        return dirs
+    
+class GitFile:
+    def __init__(self,blob):
+        self.blob=blob
+    def getContent(self):
+        return self.blob.data_stream.read()
+
+def commitChanges(repo,sha1,sha2):
+    """ Return a list of GitChange between two commit """
+    c1=repo.getCommit(sha1)
+    c2=repo.getCommit(sha2)
+    chIter = repo.object_store.tree_changes(c1.tree,c2.tree)
+    changes=[]
+    try:
+        while True:
+            tc = chIter.next()
+            changes.append(GitChange(c1,tc))
+    except StopIteration:
+        pass
+    return changes
+
+

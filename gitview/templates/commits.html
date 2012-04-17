@@ -108,11 +108,11 @@
 			</tr>
 			{% for cmt in commits %}
 			<tr>
-				<td><input type="checkbox" name="compareCommitId" value="{{cmt.id}}" ></td>
-				<td nowrap="nowrap">{{cmt.commit_time|timestamp:'%Y-%m-%d %H:%M'}}</td>
-				<td nowrap="nowrap">{{cmt.author}}</td>
+				<td><input type="checkbox" name="compareCommitId" value="{{cmt.commit.id}}" ></td>
+				<td nowrap="nowrap">{{cmt.commit.committed_date|timestamp:'%Y-%m-%d %H:%M'}}</td>
+				<td nowrap="nowrap">{{cmt.commit.author.name}} - {{cmt.commit.author.email}}</td>
 				<td>
-					{{cmt.message}}
+					{{cmt.commit.message}}
 					{% for tag in cmt.getTags %}
 						{% if tag != '' %}
 							<span class="tag">{{tag}}</span>
@@ -127,9 +127,9 @@
 					{% endif %}
 				</td>
 				<td style="text-align:center;" nowrap="nowrap">
-					<a href="{% url gitview.views.commit %}?path={{repoPath}}&id={{cmt.id}}&branch={{branch}}"><img src="/static/images/detail.png" border="0" title="Detail"/></a>
-					<a href="{% url gitview.fileViews.tree%}?path={{repoPath}}&commit={{cmt.id}}&branch={{branch}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
-					<a href="{% url gitview.fileViews.zipTree%}?path={{repoPath}}&commit={{cmt.id}}"><img src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
+					<a href="{% url gitview.views.commit %}?path={{repoPath}}&id={{cmt.commit.hexsha}}&branch={{branch}}"><img src="/static/images/detail.png" border="0" title="Detail"/></a>
+					<a href="{% url gitview.fileViews.tree%}?path={{repoPath}}&commit={{cmt.commit.hexsha}}&branch={{branch}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
+					<a href="{% url gitview.fileViews.zipTree%}?path={{repoPath}}&commit={{cmt.commit.hexsha}}"><img src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
 					<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{cmt.id}}"><img src="/static/images/point.png" border="0" title="Show in the graph" height="22px" width="22px"/></a>
 				</td>
 			</tr>

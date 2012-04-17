@@ -21,10 +21,11 @@
 	    	});
 	});
 	
-	function showContent(fileSha,fileName){
+	function showContent(fileName){
 		$.get("{%url gitview.fileViews.fileContent%}",{
 			path:"{{repoPath}}",
-			sha:fileSha,
+			commitId:"{{commit.commit.hexsha}}",
+			branch:"{{branch}}",			
 			filePath:fileName
 		},function(html){
 			$('#fileContent').html(html);

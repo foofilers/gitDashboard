@@ -9,7 +9,7 @@
 	$(function(){
 		$.get("{%url gitview.fileViews.fileContent%}",{
 			path:"{{repoPath}}",
-			sha:"{{fileSha}}",
+			commitId:"{{commitId}}",
 			filePath:"{{fileName}}",
 			branch:"{{branch}}"
 		},function(html){

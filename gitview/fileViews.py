@@ -14,8 +14,6 @@ def diff(request):
     commitId=request.GET['commit']
     oldSha=request.GET['oldSha']
     newSha=request.GET['newSha']
-    oldFileName=request.GET['oldFileName']
-    newFileName=request.GET['newFileName']
     try:
         request.GET['ghDiff']
         ghDiff=True
@@ -23,7 +21,7 @@ def diff(request):
         ghDiff=False
     repo = GitRepo(getGitPath()+sep+reposPath)
     commit = repo.getCommit(commitId)
-    change=GitChange(commit=commit,oldSha=oldSha,newSha=newSha,oldFileName=oldFileName,newFileName=newFileName)
+    change=GitChange(commit=commit,oldSha=oldSha,newSha=newSha)
     return render_to_response("diff.html",RequestContext(request,{'ghDiff':ghDiff,'change':change}))
 
 def view(request):
@@ -37,29 +35,31 @@ def view(request):
         branch=''
     repo = GitRepo(getGitPath()+sep+reposPath)
     commit = repo.getCommit(commitId)
-    fileSha = commit.getTree().getFile(filePath).sha
+    fileSha = commit.getTree().getFile(filePath).blob.hexsha
     return render_to_response("view.html",RequestContext(request,{'repoPath':reposPath,'commitId':commitId,'fileName':filePath,'fileSha':fileSha,'branch':branch}))
 
 def fileContent(request):
     reposPath=request.GET['path']
-    sha=request.GET['sha']
+    commitId=request.GET['commitId']
     filePath=request.GET['filePath']
     try:
         branch=request.GET['branch']
     except KeyError:
         branch=''
     repo = GitRepo(getGitPath()+sep+reposPath)
-    fileContent=str(repo.get_blob(sha))
-    return render_to_response("fileContent.html",RequestContext(request,{'repoPath':reposPath,'sha':sha,'fileName':filePath,'content':fileContent,'branch':branch}))
+    commit = repo.getCommit(commitId)
+    gitFile=commit.getTree().getFile(filePath)
+    return render_to_response("fileContent.html",RequestContext(request,{'repoPath':reposPath,'commitId':commitId,'gitFile':gitFile,'branch':branch}))
 
 def rawContent(request):
     reposPath=request.GET['path']
-    sha=request.GET['sha']
-    fileName=request.GET['fileName']
+    commitId=request.GET['commitId']
+    filePath=request.GET['filePath']
     repo = GitRepo(getGitPath()+sep+reposPath)
-    fileContent=str(repo.get_blob(sha))
-    response=HttpResponse(fileContent)
-    response._headers['content-disposition'] = ('Content-Disposition', 'attachment; filename='+fileName)
+    commit = repo.getCommit(commitId)
+    gitFile=commit.getTree().getFile(filePath)
+    response=HttpResponse(gitFile.getContent())
+    response._headers['content-disposition'] = ('Content-Disposition', 'attachment; filename='+gitFile.blob.name)
     return response
 
 def dirFiles(gitdir,files):
@@ -87,7 +87,7 @@ def zipTree(request):
     temp = tempfile.TemporaryFile()
     archive = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
     for f in rootFiles:
-        archive.writestr(f.fileName,str(repo.get_blob(f.sha)))
+        archive.writestr(f.blob.path,f.getContent())
     archive.close()
     wrapper = FileWrapper(temp)
     response = HttpResponse(wrapper, content_type='application/zip')
@@ -98,15 +98,15 @@ def zipTree(request):
 
 
 def dir_to_ul(gitdir,repoPath):
-    content="<li><span class=\"folder\">"+gitdir.path.split("/")[-1]+"</span><ul>"
+    content="<li><span class=\"folder\">"+gitdir.tree.path.split("/")[-1]+"</span><ul>"
     subdir=gitdir.getSubDirs()
     for sd in subdir:
         content+=dir_to_ul(sd,repoPath)
     files=gitdir.getFiles()
     for fl in files:
         content+="<li><span class=\"file\">"
-        content+="<a href='#' onclick=\"showContent('"+fl.sha+"','"+fl.fileName+"') \">"
-        content+=fl.fileName.split("/")[-1]+"</a></span></li>"
+        content+="<a href='#' onclick=\"showContent('"+fl.blob.path+"') \">"
+        content+=fl.blob.name+"</a></span></li>"
     content+="</ul></li>"
     return content
 
@@ -132,6 +132,6 @@ def tree(request):
     #add files at the end
     for f in rootFiles:
         treeContent+="<li><span class=\"file\">"
-        treeContent+="<a href='#' onclick=\"showContent('"+f.sha+"','"+f.fileName+"') \">"
-        treeContent+=f.fileName.split("/")[-1]+"</a></span></li>"
+        treeContent+="<a href='#' onclick=\"showContent('"+f.blob.path+"') \">"
+        treeContent+=f.blob.name+"</a></span></li>"
     return render_to_response("tree.html",RequestContext(request,{'repoPath':reposPath,'commitId':commitId,'treeContent':treeContent,'branch':branch}))

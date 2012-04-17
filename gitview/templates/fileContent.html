@@ -5,15 +5,15 @@
 <table class="gridTable" width="100%">
 	<tr>
 		<th style="font-weight:normal;text-align:left;padding-left:10px;">
-			{{fileName}} 
-			<a href="{%url gitview.fileViews.rawContent%}?path={{repoPath}}&sha={{sha}}&filePath={{fileName}}&branch={{branch}}&fileName={{fileName}}">Raw</a>
-			<a href="{%url gitview.views.commits%}?path={{repoPath}}&filePath={{fileName}}&branch={{branch}}">History</a>
+			{{gitFile.blob.path}} 
+			<a href="{%url gitview.fileViews.rawContent%}?path={{repoPath}}&filePath={{gitFile.blob.path}}&branch={{branch}}&commitId={{commitId}}">Raw</a>
+			<a href="{%url gitview.views.commits%}?path={{repoPath}}&filePath={{gitFile.blob.path}}&branch={{branch}}">History</a>
 		</th>
 	</tr>
 	<tr>
 		<td>
 			<div class="code">
-				{{content|highlightTable:fileName|safe}}
+				{{gitFile.getContent|highlightTable:gitFile.blob.name|safe}}
 			</div>
 		</td>
 	</tr>
