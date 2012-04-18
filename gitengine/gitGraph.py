@@ -260,7 +260,7 @@ class GitGraphCanvas:
             branchesCmtsDates[branchSha] = branchDates;
         dates=sorted(set(dates))
 
-        x=maxBranchNameLength*(self._fontSize-2)
+        x=maxBranchNameLength*(self._fontSize)
         
         
         #find the first x coordinate for each date
@@ -353,7 +353,6 @@ class GitGraphCanvas:
                     pass
         #DRAW!
         #draw date row
-        
         years = sorted(years)
         for y in years:
             canvas+=canvasDateRect(yearX[y][0]-self.radius-5, 7, yearX[y][1]-yearX[y][0],"black");
