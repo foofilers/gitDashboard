@@ -1,14 +1,11 @@
 from os import listdir,makedirs
-from io import open
-import os
 from os.path import isdir,sep
 from difflib  import unified_diff
 import ghdiff
 import re
 from django.utils.encoding import smart_unicode,DjangoUnicodeDecodeError
 
-from git import Repo,Commit,Blob
-from git.repo.fun import is_git_dir
+from git import Repo,Blob
 from git.exc import InvalidGitRepositoryError
 from binascii import unhexlify
 
@@ -56,7 +53,9 @@ class GitRepo(Repo):
             params['since']=since
         if until:
             params['until']=until
-        cmts=self.iter_commits(rev=branch,paths=path,max_count=num,**params)
+        if num:
+            params['max_count']=num
+        cmts=self.iter_commits(rev=branch,paths=path,**params)
         commits=[]
         for cmt in cmts:
             commits.append(GitCommit(cmt))
@@ -64,8 +63,8 @@ class GitRepo(Repo):
             
     def getHead(self):
         try:
-            return self.head
-        except KeyError:
+            return self.head.commit.hexsha
+        except ValueError:
             return None
     
     @staticmethod
@@ -103,16 +102,8 @@ class GitRepo(Repo):
                 description: description of new repository
         """
         makedirs (path)
-        nrp = GitRepo.init_bare(path)
-        descFile = nrp.get_named_file('description')
-        if description!=None and descFile!=None:
-            descFilePath = descFile.name
-            descFile.close()
-            newdescFile = open (descFilePath,'w')
-            try:
-                newdescFile.write(description)
-            finally:
-                newdescFile.close()
+        nrp = GitRepo.init(path,bare=True)
+        nrp.description=description
         return nrp
 
 class GitCommit():

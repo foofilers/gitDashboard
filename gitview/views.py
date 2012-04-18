@@ -50,20 +50,19 @@ class BranchForm(forms.Form):
         branches = []
         shas = {}
         try:
-            shas[repo.head]='HEAD'
+            shas[repo.head.commit.hexsha]='HEAD'
             for key in refs.keys():
                 if key!='HEAD':
                     if refs[key] in shas:
                         shas[refs[key]]=shas[refs[key]]+" - "+key
                     else:
                         shas[refs[key]]=key
-                        
-            branches.append( (repo.head,shas[repo.head]) )
+            branches.append( (repo.head.commit.hexsha,shas[repo.head.commit.hexsha]) )
             for sh in shas.keys():
-                if sh!=repo.head:
+                if sh!=repo.head.commit.hexsha:
                     branches.append( (sh,shas[sh]) )
             try:
-                head=repo.head
+                head=repo.head.commit.hexsha
             except KeyError:
                 head=''
         except KeyError:

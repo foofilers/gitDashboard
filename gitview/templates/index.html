@@ -84,7 +84,7 @@
 					{{rep.path|relpath:currPath}} (NO-HEAD)
 				{% endif %}
 			</td>
-			<td>{{rep.get_description}}</td>
+			<td>{%if rep.bare %} {{rep.description}}{%endif%}</td>
 			<td>{{gitBasicUrl}}{{rep.path|relpath:gitPath}}</td>
 			<td style="text-align:center;">
 				{% if rep.getHead %}

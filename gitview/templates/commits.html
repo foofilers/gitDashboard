@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% load timeutils %}
 {% load pathutils %}
+{% load gravatar %}
 
 {% block repoHeader %}
 	{% if filePath %}
@@ -110,7 +111,7 @@
 			<tr>
 				<td><input type="checkbox" name="compareCommitId" value="{{cmt.commit.id}}" ></td>
 				<td nowrap="nowrap">{{cmt.commit.committed_date|timestamp:'%Y-%m-%d %H:%M'}}</td>
-				<td nowrap="nowrap">{{cmt.commit.author.name}} - {{cmt.commit.author.email}}</td>
+				<td nowrap="nowrap"><img style="vertical-align:middle;" src="{{cmt.commit.author.email|gravatarImageUrl:22}}"/>&nbsp;{{cmt.commit.author.name}} &lt;{{cmt.commit.author.email}}&gt;</td>
 				<td>
 					{{cmt.commit.message}}
 					{% for tag in cmt.getTags %}

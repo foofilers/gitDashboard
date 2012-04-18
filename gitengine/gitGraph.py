@@ -1,5 +1,8 @@
 from django.utils.encoding import smart_unicode,DjangoUnicodeDecodeError
 from datetime import datetime
+import logging
+
+logger = logging.getLogger("gitGraph")
 
 def canvasTooltipRect(x,y,width,height,color):
     rectJS='var rect = new Kinetic.Rect({'
@@ -66,15 +69,15 @@ def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
             if numLines==13:
                 message="[continua...]"
             else:
-                message=str(msg).replace('"','')
-                if len(message)>maxLen:
-                    maxLen=len(message)
+                if len(msg)>maxLen:
+                    maxLen=len(msg)
                 try:
-                    message=smart_unicode(message)
+                    message=smart_unicode(msg)
                 except TypeError:
                     pass
                 except DjangoUnicodeDecodeError:
-                    message=message.decode('latin1')
+                    message=msg.decode('latin1')
+                message=msg.replace('"','')
             tooltips+=canvasTooltip('mousePos.x+20', 'mousePos.y+'+str(tooltipY+20), message);
             tooltipY+=20
             numLines+=1
@@ -136,20 +139,21 @@ class CommitGraph:
     def draw(self):
         radius=6
         tooltip=[]
-        tooltip.append("id: "+self.cmt.id)
-        cmprts=self.cmt._get_parents()
+        tooltip.append("id: "+self.cmt.commit.hexsha)
+        cmprts=self.cmt.commit.parents
         for cmpr in cmprts:
-            tooltip.append("parent: "+cmpr)
+            tooltip.append("parent: "+cmpr.hexsha)
         tooltip.append("Branch: "+self.branchName)
-        tooltip.append("Author: "+self.cmt.author)
-        dt = datetime.fromtimestamp(self.cmt.commit_time)
+        tooltip.append("Author: "+self.cmt.commit.author.name)
+        dt = datetime.fromtimestamp(self.cmt.commit.committed_date)
         tooltip.append("Date: "+dt.strftime('%Y-%m-%d %H:%M:%S'))
         tooltip.append("--------------");
-        rows=self.cmt.message.split('\n')
+        message=self.cmt.commit.message
+        rows=smart_unicode(message).split('\n')
         for row in rows:
             if len(row)>0:
                 tooltip.append(row)
-        return canvasCircle(self.x, self.y, radius, self.color,tooltip,self.cmt.id,self.gitGraph)
+        return canvasCircle(self.x, self.y, radius, self.color,tooltip,self.cmt.commit.hexsha,self.gitGraph)
     def drawLabels(self):
         labelStr = ''
         labels=self.cmt.getTags()
@@ -213,39 +217,42 @@ class GitGraphCanvas:
         #fetch branches
         allBranches = self.repo.getBranches();
         branches={}
-        for ab in allBranches:
+        
+        for ab in allBranches.keys():
             if allBranches[ab] not in branches:
                 branches[allBranches[ab]] = ab
             else:
                 branches[allBranches[ab]]+=" "+ab
-        sortedBranches=[self.repo.head()]
+        sortedBranches=[self.repo.head.commit.hexsha]
         tmp=[]
         tmp.extend(branches.keys())
-        tmp.remove(self.repo.head())
+        tmp.remove(self.repo.head.commit.hexsha)
         sortedBranches.extend(tmp)
         
         #associate commits to its date
         for branchSha in sortedBranches:
+            
             if len(branches[branchSha])>maxBranchNameLength:
                 maxBranchNameLength=len(branches[branchSha])
             parents[branchSha]=[]        
-            branchCmts=self.repo.getCommits(branch=[branchSha],since=self.since,until=self.until)            
+            branchCmts=self.repo.getCommits(branch=branchSha,since=self.since,until=self.until)
             branchDates={}
             for cmt in branchCmts:
-                cmts[cmt.id]=cmt
-                dt = cmt.commit_time
+                
+                cmts[cmt.commit.hexsha]=cmt
+                dt = cmt.commit.committed_date
                 dates.append(dt)
-                cmtID=cmt.id+"_"+branchSha
-                if cmtID in parents[branchSha] or cmt.id==branchCmts[0].id:
-                    if len(cmt._get_parents())>0:
-                        firstPrt=cmt._get_parents()[0]
+                cmtID=cmt.commit.hexsha+"_"+branchSha
+                if cmtID in parents[branchSha] or cmt.commit.hexsha==branchCmts[0].commit.hexsha:
+                    if len(cmt.commit.parents)>0:
+                        firstPrt=cmt.commit.parents[0].hexsha
                         firstprtID=firstPrt+"_"+branchSha
                         parents[branchSha].append(firstprtID)
-                        for prt in cmt._get_parents():
-                            if prt in sons:
-                                sons[prt].append(cmtID)
+                        for prt in cmt.commit.parents:
+                            if prt.hexsha in sons:
+                                sons[prt.hexsha].append(cmtID)
                             else:
-                                sons[prt]=[cmtID]
+                                sons[prt.hexsha]=[cmtID]
                     if dt in branchDates:
                         branchDates[dt].append(cmtID)
                     else:
@@ -320,13 +327,12 @@ class GitGraphCanvas:
         #creation of commits graphs structures
         for branchSha in sortedBranches:
             graphCommits[branchSha]=[]
-            if branchSha == self.repo.head():
+            if branchSha == self.repo.head.commit.hexsha:
                 color="red"
             else:                
                 color="#8ED6FF"
             #draw commits
             for dt in dates:
-                
                 cmtNum=0
                 try:
                     for cmt in branchesCmtsDates[branchSha][dt]:
@@ -369,7 +375,7 @@ class GitGraphCanvas:
         branchToDrop=[] #list of branch to drop because is empty
         for branchSha in sortedBranches:
             if len(graphCommits[branchSha])>0:
-                if branchSha == self.repo.head():
+                if branchSha == self.repo.head.commit.hexsha:
                     canvas+=canvasText(15, y, branches[branchSha], "red",self)
                     color="red"
                 else:

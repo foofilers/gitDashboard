@@ -2,6 +2,7 @@
 {% load timeutils %}
 {% load linkutils %}
 {% load pathutils %}
+{% load gravatar %}
 
 {% block repoHeader %}
 <b>Repository:</b> <a href="{% url gitview.views.commits %}?path={{ repoPath }}&branch={{branch}}">/{{ repoPath }}</a>
@@ -16,7 +17,7 @@
 	</tr>
 	<tr>
 		<td rowspan="2" style="width: 64px;height:64px;">
-		<img src="http://www.gravatar.com/avatar/{{gravatarMd5}}?d=mm"/>
+		<img style="vertical-align:middle;" src="{{commit.commit.author.email|gravatarImageUrl:64}}"/>
 		</td>
 	</tr>
 	<tr>
@@ -26,7 +27,7 @@
 				{% for par in commit.commit.parents %}
 					<a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{par}}">{{par}}</a>
 				{% endfor %}<br/>
-			<b>Author:</b> {{commit.commit.author}}<br/>
+			<b>Author:</b> {{commit.commit.author.name}} &lt;{{commit.commit.author.email}}&gt; <br/>
 			<b>Commit Date:</b>	{{commit.commit.committed_date|timestamp:'%Y-%m-%d %H:%M'}}<br/>
 			<b>Committer:</b>{{commit.commit.committer}}<br/>
 			{% if commit.getTags %}
@@ -38,7 +39,7 @@
 		<th colspan="2" style="padding:2px; text-align:right;">
 			<a href="{% url gitview.fileViews.tree%}?path={{repoPath}}&commit={{commit.id}}" title="File Tree"><img src="/static/images/file_tree.png" title="File Tree"/></a>
 			<a href="{% url gitview.fileViews.zipTree%}?path={{repoPath}}&commit={{commit.id}}" title="Zip Tree"><img src="/static/images/archive.png" border="0" title="Zip Tree"  /></a>
-			<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{commit.id}}"><img src="/static/images/point.png" height="22px" width="22px" border="0" title="Show in the graph"/></a>
+			<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{commit.commit.hexsha}}"><img src="/static/images/point.png" height="22px" width="22px" border="0" title="Show in the graph"/></a>
 		</th>
 	</tr>
 </table>
