@@ -109,7 +109,7 @@
 			</tr>
 			{% for cmt in commits %}
 			<tr>
-				<td><input type="checkbox" name="compareCommitId" value="{{cmt.commit.id}}" ></td>
+				<td><input type="checkbox" name="compareCommitId" value="{{cmt.commit.hexsha}}" ></td>
 				<td nowrap="nowrap">{{cmt.commit.committed_date|timestamp:'%Y-%m-%d %H:%M'}}</td>
 				<td nowrap="nowrap"><img style="vertical-align:middle;" src="{{cmt.commit.author.email|gravatarImageUrl:22}}"/>&nbsp;{{cmt.commit.author.name}} &lt;{{cmt.commit.author.email}}&gt;</td>
 				<td>
@@ -131,7 +131,7 @@
 					<a href="{% url gitview.views.commit %}?path={{repoPath}}&id={{cmt.commit.hexsha}}&branch={{branch}}"><img src="/static/images/detail.png" border="0" title="Detail"/></a>
 					<a href="{% url gitview.fileViews.tree%}?path={{repoPath}}&commit={{cmt.commit.hexsha}}&branch={{branch}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
 					<a href="{% url gitview.fileViews.zipTree%}?path={{repoPath}}&commit={{cmt.commit.hexsha}}"><img src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
-					<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{cmt.id}}"><img src="/static/images/point.png" border="0" title="Show in the graph" height="22px" width="22px"/></a>
+					<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{cmt.commit.hexsha}}"><img src="/static/images/point.png" border="0" title="Show in the graph" height="22px" width="22px"/></a>
 				</td>
 			</tr>
 			{% endfor %}

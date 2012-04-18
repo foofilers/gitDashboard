@@ -265,14 +265,6 @@ def commitChanges(repo,sha1,sha2):
     """ Return a list of GitChange between two commit """
     c1=repo.getCommit(sha1)
     c2=repo.getCommit(sha2)
-    chIter = repo.object_store.tree_changes(c1.tree,c2.tree)
-    changes=[]
-    try:
-        while True:
-            tc = chIter.next()
-            changes.append(GitChange(c1,tc))
-    except StopIteration:
-        pass
-    return changes
+    return c1.commit.diff(c2.commit)
 
 

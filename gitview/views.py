@@ -166,11 +166,11 @@ def compareCommit(request):
     repo = GitRepo(getGitPath()+sep+reposPath)
     commit1=repo.getCommit(commitIds[0])
     commit2=repo.getCommit(commitIds[1])
-    if (commit1.commit_time>commit2.commit_time):
+    if (commit1.commit.committed_date>commit2.commit.committed_date):
         swp=commit1
         commit1=commit2
         commit2=swp
-    changes=gitEngine.commitChanges(repo, commit1.id, commit2.id)
+    changes=gitEngine.commitChanges(repo, commit1.commit.hexsha, commit2.commit.hexsha)
     return render_to_response("compareCommit.html",RequestContext(request,{'repoPath':reposPath,'commit1':commit1,'commit2':commit2,'changes':changes}))
 
     
@@ -209,12 +209,18 @@ def graph(request):
         branch=''
     
     if len(request.GET['since'])>0:
-        since=int(time.mktime(time.strptime(request.GET['since'],"%Y-%m-%d %H:%M")))
+        try:
+            since= int(request.GET['since'])
+        except ValueError:
+            since=int(time.mktime(time.strptime(request.GET['since'],"%Y-%m-%d %H:%M")))
     else:
         since=None
         
     if len(request.GET['until'])>0:
-        until=int(time.mktime(time.strptime(request.GET['until'],"%Y-%m-%d %H:%M")))
+        try:
+            until=int(request.GET['until'])
+        except ValueError:
+            until=int(time.mktime(time.strptime(request.GET['until'],"%Y-%m-%d %H:%M")))
     else:
         until=None
     try:
