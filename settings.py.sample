@@ -154,6 +154,18 @@ GIT_PATH='[PATH OF REPOSITORIES PARENT]'
 #List of regexp paths to exclude from repositories search  
 GIT_EXCLUDE_PATH=[]
 GIT_BASIC_URL="http://www.example.com/gitRepos"
+
+"""
+    SECURITY SYSTEM
+        manual:managed by external/manual system (SSH/APACHE/...)
+        gitolite:gitolite system NEED to set GITOLITE_PATH and GITOLITE_URL variables
+"""
+SECURITY_SYSTEM="gitolite"
+# GITOLITE_PATH: working dir of gitolite-admin
+GITOLITE_PATH="/path/example/gitolite-admin"
+# GITOLITE_URL: url of origin repo
+GITOLITE_URL="git@localhost:gitolite-admin"
+
 #ViewGit Project mapping (for compatibility with viewgit url)
 #VIEWGIT_MAP_PROJECTS={}
 #ISSUE_URL="http://www.example.com/mantis/view.php?id=%ID%"

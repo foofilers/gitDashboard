@@ -184,7 +184,12 @@ def new(request):
     """ Add New repository Page
     """
     if not request.user.is_staff:
-        return render_to_response("notAlowed.html",RequestContext(request))    
+        return render_to_response("notAlowed.html",RequestContext(request))
+    try:
+        if settings.SECURITY_SYSTEM.lower()=='gitolite':
+            return redirect('gitview.gitolite.index')
+    except KeyError:
+        pass 
     if request.method=='POST':
         newReposForm=NewReposForm(request.POST)
         if newReposForm.is_valid():
@@ -249,6 +254,3 @@ def viewgit(request):
     except AttributeError:
         repoPath=projectName
     return redirect(reverse('gitview.views.commit')+"?path="+repoPath+"&id="+commitId)
-
-
-    

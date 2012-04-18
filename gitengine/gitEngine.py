@@ -106,6 +106,7 @@ class GitRepo(Repo):
         nrp.description=description
         return nrp
 
+
 class GitCommit():
     """ Represent A single Commit  """
     def __init__(self,commit):
@@ -125,6 +126,7 @@ class GitCommit():
             for fl in files:
                 diffs.append(Diff(self.commit.repo,None,fl.blob.path,None,fl.blob.hexsha,None,str(fl.blob.mode),True,False,None,None,''))
             return diffs
+    
     def getTree(self):
         return GitTree(self.commit.repo,self.commit.tree)
     

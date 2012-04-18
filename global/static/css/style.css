@@ -192,4 +192,8 @@ input,select,textarea{
 	
 	background-color:white
 }
+.code{
+	font-family: monospace;
+	border:1px solid #CCCCCC;
+}
 

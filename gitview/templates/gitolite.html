@@ -1,0 +1,137 @@
+{% extends "layout.html" %}
+
+{% block repoHeader %}
+<span style="text-align:center;"><b>Gitolite Management</b></span>
+{% endblock %}
+
+{% block contentBlock %}
+
+{% if feedback %}
+<div id="resultDiv" style="color:{{fbcolor}};width:70%;left: 15%;text-align:center; font-size:20px; position:absolute; margin-top:-150px;opacity:0;background:#CCCCCC; border:1px solid #000000;">
+	<b>{{feedback}}</b><br/>
+</div>
+<script type="text/javascript">
+	$('#resultDiv').animate({'margin-top':'-120px',opacity:1},1000).delay(3000).animate({'margin-top':'-150px',opacity:0},1000,'linear');
+</script>
+
+{% endif %}
+
+<script>
+(function($) {
+    function pasteIntoInput(el, text) {
+        el.focus();
+        if (typeof el.selectionStart == "number") {
+            var val = el.value;
+            var selStart = el.selectionStart;
+            el.value = val.slice(0, selStart) + text + val.slice(el.selectionEnd);
+            el.selectionEnd = el.selectionStart = selStart + text.length;
+        } else if (typeof document.selection != "undefined") {
+            var textRange = document.selection.createRange();
+            textRange.text = text;
+            textRange.collapse(false);
+            textRange.select();
+        }
+    }
+
+    function allowTabChar(el) {
+        $(el).keydown(function(e) {
+            if (e.which == 9) {
+                pasteIntoInput(this, "\t");
+                return false;
+            }
+        });
+
+        // For Opera, which only allows suppression of keypress events, not keydown
+        $(el).keypress(function(e) {
+            if (e.which == 9) {
+                return false;
+            }
+        });
+    }
+
+    $.fn.allowTabChar = function() {
+        if (this.jquery) {
+            this.each(function() {
+                if (this.nodeType == 1) {
+                    var nodeName = this.nodeName.toLowerCase();
+                    if (nodeName == "textarea" || (nodeName == "input" && this.type == "text")) {
+                        allowTabChar(this);
+                    }
+                }
+            })
+        }
+        return this;
+    }
+})(jQuery);
+</script>
+
+<table style="width:100%;">
+	<tr>
+		<td style="border-right:1px solid #CCCCCC;">
+			<form method="POST">{% csrf_token %}
+				<b>Content</b><br/>
+				<textarea id="contentArea" rows="30" cols="100" name="content">{{content}}</textarea><br/>
+				<script type="text/javascript">
+				
+					$('#contentArea').allowTabChar();
+				</script>
+				<b>Message</b><br/>
+				<textarea rows="5" cols="100" name="message"></textarea><br/>
+				<div style="text-align:right">
+					<input type="submit" name="action" value="Save">
+					<input type="submit" name="action" value="Push">
+					<input type="submit" name="action" value="Save and Push">
+					<input type="submit" name="action" value="Reset">
+				</div>
+			</form>
+		</td>
+		<td style="vertical-align:top;width:400px;" >
+			<b>Manual:</b><br/>
+			<ul>
+				<li>Permission
+					<ul>
+						<li>R:  for read only</li>
+						<li>RW: for push existing ref or create new ref</li>
+						<li>RW+:for "push -f" or ref deletion allowed</li>
+						<li>- (the minus sign): to deny access
+						<li><a href="http://sitaramc.github.com/gitolite/write-types.html" target="_blank">Advanced Permission</a></li>
+					</ul>
+				</li>
+				<li>User Group
+					<ul>
+						<li><b>Simple association</b><br/>
+							<div class="code">
+								@group1 = user1 user2 <br/>
+								<i>same result:</i><br/>
+								@group1 = user1<br/>
+								@group1 = user2
+							</div>
+						</li><br/>
+						<li><b>Aggregate group</b><br/>
+							<div class="code">
+								@group1= user1 user2<br/>
+								@group2= user3 user4<br/>
+								@developer = @group1 @group2 user5
+							</div>
+						</li>
+						<li><a href="http://sitaramc.github.com/gitolite/groups.html" target="_blank">Group Doc</a></li>
+					</ul>
+				</li>
+				<li>Example
+					<div class="code">
+						repo	test.git<br/>
+						&nbsp;&nbsp;&nbsp;&nbsp;RW+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;user1<br/>
+						&nbsp;&nbsp;&nbsp;&nbsp;R&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;@group1
+						<br/>
+						repo	/subdir/subRepos.test<br/>
+						&nbsp;&nbsp;&nbsp;&nbsp;RW+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;user1<br/>
+						&nbsp;&nbsp;&nbsp;&nbsp;R&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;@group1
+					</div>
+				</li>
+				<li><a href="http://sitaramc.github.com/gitolite/" target="_blank">Official Doc</a>
+			</ul>
+		</td>
+	</tr>
+</table>
+
+{% endblock %}
