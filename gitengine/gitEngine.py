@@ -5,12 +5,12 @@ import ghdiff
 import re
 from django.utils.encoding import smart_unicode,DjangoUnicodeDecodeError
 
-from git import Repo,Blob
+from git import Repo,Blob,Diff
 from git.exc import InvalidGitRepositoryError
 from binascii import unhexlify
 
 class GitRepo(Repo):
-    """ Rapresent a Git Repository """
+    """ Represent a Git Repository """
     def __init__(self,*args,**kwargs):
         super(GitRepo,self).__init__(*args,**kwargs)
         self.path=self.working_dir
@@ -120,34 +120,11 @@ class GitCommit():
                 return pc.diff(self.commit)
         else:
             #nessun parent(first commit)
-            """files=self.getTree().getAllFiles()
+            files=self.getTree().getAllFiles()
+            diffs=[]
             for fl in files:
-                treeChange=((None,fl.fileName),(None,None),(None,fl.sha))
-                changes.append(GitChange(self,treeChange))"""
-            pass
-
-    def getChange(self,fileName,parent=None):
-        """if parent==None:
-            parents=self.parents()
-            pc=self.repo.commit(parents[0])
-        else:
-            pc=self.repo.commit(parent)
-        chIter = self.repo.object_store.tree_changes(pc.tree,self.tree)
-        found=False
-        try:
-            while not found:
-                tc = chIter.next()
-                ch = GitChange(self,tc)
-                if ch.newFileName==fileName:
-                    found=True
-        except StopIteration:
-            pass
-        if found:
-            return ch
-        else:
-            return None"""
-        pass
-        
+                diffs.append(Diff(self.commit.repo,None,fl.blob.path,None,fl.blob.hexsha,None,str(fl.blob.mode),True,False,None,None,''))
+            return diffs
     def getTree(self):
         return GitTree(self.commit.repo,self.commit.tree)
     
@@ -193,7 +170,7 @@ class GitTree():
         files=[]
         for subTree in tree.trees:
             files.extend(self.__getTreeFiles(subTree, path))
-        for blob in tree.tree.blobs:
+        for blob in tree.blobs:
             files.append(GitFile(blob))
         return files
     
@@ -202,7 +179,7 @@ class GitTree():
             Return:
                 return a GitFile list
         """
-        return self.__getTreeFiles(self.sha)
+        return self.__getTreeFiles(self.tree)
 
 class GitPathNotFound(Exception):
     def __init__(self, value):
