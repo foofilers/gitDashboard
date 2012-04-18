@@ -37,8 +37,8 @@
 	</tr>
 	<tr>
 		<th colspan="2" style="padding:2px; text-align:right;">
-			<a href="{% url gitview.fileViews.tree%}?path={{repoPath}}&commit={{commit.id}}" title="File Tree"><img src="/static/images/file_tree.png" title="File Tree"/></a>
-			<a href="{% url gitview.fileViews.zipTree%}?path={{repoPath}}&commit={{commit.id}}" title="Zip Tree"><img src="/static/images/archive.png" border="0" title="Zip Tree"  /></a>
+			<a href="{% url gitview.fileViews.tree%}?path={{repoPath}}&commit={{commit.commit.hexsha}}" title="File Tree"><img src="/static/images/file_tree.png" title="File Tree"/></a>
+			<a href="{% url gitview.fileViews.zipTree%}?path={{repoPath}}&commit={{commit.commit.hexsha}}" title="Zip Tree"><img src="/static/images/archive.png" border="0" title="Zip Tree"  /></a>
 			<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{commit.commit.hexsha}}"><img src="/static/images/point.png" height="22px" width="22px" border="0" title="Show in the graph"/></a>
 		</th>
 	</tr>

@@ -1,8 +1,5 @@
 from django.utils.encoding import smart_unicode,DjangoUnicodeDecodeError
 from datetime import datetime
-import logging
-
-logger = logging.getLogger("gitGraph")
 
 def canvasTooltipRect(x,y,width,height,color):
     rectJS='var rect = new Kinetic.Rect({'
@@ -261,7 +258,6 @@ class GitGraphCanvas:
         dates=sorted(set(dates))
 
         x=maxBranchNameLength*(self._fontSize)
-        
         
         #find the first x coordinate for each date
         currMonth=""
