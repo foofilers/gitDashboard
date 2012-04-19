@@ -188,7 +188,7 @@ def new(request):
     try:
         if settings.SECURITY_SYSTEM.lower()=='gitolite':
             return redirect('gitview.gitolite.index')
-    except KeyError:
+    except AttributeError:
         pass 
     if request.method=='POST':
         newReposForm=NewReposForm(request.POST)
