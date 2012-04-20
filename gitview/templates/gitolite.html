@@ -10,6 +10,7 @@
 <div id="resultDiv" style="color:{{fbcolor}};width:70%;left: 15%;text-align:center; font-size:20px; position:absolute; margin-top:-150px;opacity:0;background:#CCCCCC; border:1px solid #000000;">
 	<b>{{feedback}}</b><br/>
 </div>
+
 <script type="text/javascript">
 	$('#resultDiv').animate({'margin-top':'-120px',opacity:1},1000).delay(3000).animate({'margin-top':'-150px',opacity:0},1000,'linear');
 </script>
@@ -65,6 +66,7 @@
 })(jQuery);
 
 $(document).ready(function(){
+	$('#contentArea').autoResize({});
     $("#tree").treeview({
     	collapsed:false,
     	persist: "cookie",
@@ -111,7 +113,7 @@ $(document).ready(function(){
 	});
 
     $("#resetCancelBtn" )
-	.click(function() {
+		.click(function() {
 		$( "#resetDiv" ).dialog( "close" );
 	});
     
@@ -130,7 +132,7 @@ $(document).ready(function(){
 	});
 
 	$("#delfileCancelBtn" )
-	.click(function() {
+		.click(function() {
 		$( "#delFileDiv" ).dialog( "close" );
 	});
 
@@ -141,12 +143,14 @@ function showContent(fileName){
 	},function(html){
 		$('#fileName').html(fileName);
 		$('#filePath').val(fileName);
-		$('#contentArea').html(html);
+		$('#contentArea').val(html);
+		$('#contentArea').removeAttr("disabled");
 		$('#saveBtn').removeAttr("disabled");
 		$('#resetBtn').removeAttr("disabled");
 		$('#delFileBtn').show();
 	});
 }
+
 {% if filePath  %}
 	showContent( "{{filePath}}" );
 {% endif %}
@@ -207,7 +211,7 @@ function showContent(fileName){
 			</div>
 			<span id="fileName" style="font-weight:bold;font-size:15px;"></span>
 			<input id="filePath" type="hidden" name="filePath"/>
-			<textarea id="contentArea" rows="30" cols="80" name="content"></textarea><br/>
+			<textarea id="contentArea" rows="30" cols="80" name="content" disabled></textarea><br/>
 			<script type="text/javascript">
 				$('#contentArea').allowTabChar();
 			</script>
