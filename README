@@ -9,7 +9,7 @@ Author: Igor Maculan ( n3wtron@gmail.com )
 
 Requirements:
  django 1.3.1
- dulwich
+ gitpython 0.3.xx
  ghdiff
  pygments
  pysqlite2

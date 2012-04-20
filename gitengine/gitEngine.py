@@ -60,13 +60,20 @@ class GitRepo(Repo):
         for cmt in cmts:
             commits.append(GitCommit(cmt))
         return commits
-            
+    
+    def getTree(self):
+        return GitTree(self, self.tree())
+    
+    def getTreeFile(self,path):
+        """ Retrieve the content of path """
+        return self.getTree().getFile(path)
+        
     def getHead(self):
         try:
             return self.head.commit.hexsha
         except ValueError:
             return None
-    
+        
     @staticmethod
     def getRepos(path,recursive=False,excludePath=[]):
         """ Retrieve a list of git repositories from a partent path

@@ -1,4 +1,5 @@
 from gitengine.gitEngine import GitRepo
+from git.exc import GitCommandError
 import os
 
 class GitoliteAdmin(GitRepo):
@@ -9,16 +10,6 @@ class GitoliteAdmin(GitRepo):
             self.createRepo()
         super(GitoliteAdmin,self).__init__(path)
     
-    def getConf(self):
-        """ Retrieve the content of conf/gitolite.conf """
-        tree=self.tree()
-        for subT in tree.trees:
-            if subT.path=='conf':
-                for bl in subT.blobs:
-                    if bl.name=='gitolite.conf':
-                        return bl.data_stream.read()
-        return None
-    
     def createRepo(self):
         admRepo = GitRepo.init(self.path, True)
         admRepo.description="Gitolite-Admin for GitDashboard"
@@ -28,17 +19,32 @@ class GitoliteAdmin(GitRepo):
         origin = self.remotes.origin
         origin.fetch()
         origin.pull('master')
-        
-    def push(self):
+    
+    def getWkFileContent(self,filePath):
+        """ Retrieve the content of path """
+        confFile = open(self.working_dir+os.sep+filePath,"r")
+        content = confFile.read()
+        confFile.close();
+        return content
+    
+    def push(self,message):
+        index = self.index
+        index.commit(message)
         origin = self.remotes.origin
         origin.push('master')
     
-    def save(self,content,message):
-        confFile = open(self.working_dir+"/conf/gitolite.conf","w")
+    def save(self,filePath,content):
+        confFile = open(self.working_dir+os.sep+filePath,"w")
         confFile.write(content)
         confFile.close()
         index = self.index
-        index.add(['conf/gitolite.conf'])
-        index.commit(message)
+        index.add([filePath])
+
+    def remove(self,filePath):
+        try:
+            self.index.remove([filePath], working_tree=True)
+        except GitCommandError:
+            os.remove(self.working_dir+os.sep+filePath)
         
-        
+    def resetHard(self):
+        self.head.reset(working_tree=True)

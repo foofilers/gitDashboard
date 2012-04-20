@@ -63,75 +63,206 @@
         return this;
     }
 })(jQuery);
+
+$(document).ready(function(){
+    $("#tree").treeview({
+    	collapsed:false,
+    	persist: "cookie",
+    	cookieId: "fileTreeNavigation_gitolite"
+    });
+    $('#layout').layout({
+    	applyDefaultStyles: true ,
+    	west__size:200,
+    	east__size:350,
+    	});
+    $( "#pushDiv" ).dialog({
+    	autoOpen: false,
+    	height: 200,
+    	modal: true
+    });
+    $( "#openPush" )
+		.button()
+		.click(function() {
+			$( "#pushDiv" ).dialog( "open" );
+	});
+    
+    $("#newFileDiv").dialog({
+	   	autoOpen: false,
+	   	height: 110,
+	   	modal: true
+     });
+    
+    $( "#openNew" )
+		.button()
+		.click(function() {
+			$( "#newFileDiv" ).dialog( "open" );
+	});
+    
+    $("#resetDiv").dialog({
+	   	autoOpen: false,
+	   	height: 110,
+	   	modal: true
+     });
+    
+    $( "#openReset" )
+		.button()
+		.click(function() {
+			$( "#resetDiv" ).dialog( "open" );
+	});
+
+    $("#resetCancelBtn" )
+	.click(function() {
+		$( "#resetDiv" ).dialog( "close" );
+	});
+    
+    $("#delFileDiv").dialog({
+	   	autoOpen: false,
+	   	height: 110,
+	   	modal: true
+     });
+    
+    $( "#delFileBtn" )
+		.button()
+		.click(function() {
+			$("#delFileName").html($('#filePath').val());
+			$("#delFilePath").val($('#filePath').val());
+			$("#delFileDiv" ).dialog( "open" );
+	});
+
+	$("#delfileCancelBtn" )
+	.click(function() {
+		$( "#delFileDiv" ).dialog( "close" );
+	});
+
+});
+function showContent(fileName){
+	$.get("{%url gitview.gitolite.fileContent%}",{
+		filePath:fileName
+	},function(html){
+		$('#fileName').html(fileName);
+		$('#filePath').val(fileName);
+		$('#contentArea').html(html);
+		$('#saveBtn').removeAttr("disabled");
+		$('#resetBtn').removeAttr("disabled");
+		$('#delFileBtn').show();
+	});
+}
+{% if filePath  %}
+	showContent( "{{filePath}}" );
+{% endif %}
+
+
+
 </script>
 
-<table style="width:100%;">
-	<tr>
-		<td style="border-right:1px solid #CCCCCC;">
-			<form method="POST">{% csrf_token %}
-				<b>Content</b><br/>
-				<textarea id="contentArea" rows="30" cols="100" name="content">{{content}}</textarea><br/>
-				<script type="text/javascript">
-				
-					$('#contentArea').allowTabChar();
-				</script>
-				<b>Message</b><br/>
-				<textarea rows="5" cols="100" name="message"></textarea><br/>
-				<div style="text-align:right">
-					<input type="submit" name="action" value="Save">
-					<input type="submit" name="action" value="Push">
-					<input type="submit" name="action" value="Save and Push">
-					<input type="submit" name="action" value="Reset">
-				</div>
-			</form>
-		</td>
-		<td style="vertical-align:top;width:400px;" >
-			<b>Manual:</b><br/>
-			<ul>
-				<li>Permission
-					<ul>
-						<li>R:  for read only</li>
-						<li>RW: for push existing ref or create new ref</li>
-						<li>RW+:for "push -f" or ref deletion allowed</li>
-						<li>- (the minus sign): to deny access
-						<li><a href="http://sitaramc.github.com/gitolite/write-types.html" target="_blank">Advanced Permission</a></li>
-					</ul>
-				</li>
-				<li>User Group
-					<ul>
-						<li><b>Simple association</b><br/>
-							<div class="code">
-								@group1 = user1 user2 <br/>
-								<i>same result:</i><br/>
-								@group1 = user1<br/>
-								@group1 = user2
-							</div>
-						</li><br/>
-						<li><b>Aggregate group</b><br/>
-							<div class="code">
-								@group1= user1 user2<br/>
-								@group2= user3 user4<br/>
-								@developer = @group1 @group2 user5
-							</div>
-						</li>
-						<li><a href="http://sitaramc.github.com/gitolite/groups.html" target="_blank">Group Doc</a></li>
-					</ul>
-				</li>
-				<li>Example
-					<div class="code">
-						repo	test.git<br/>
-						&nbsp;&nbsp;&nbsp;&nbsp;RW+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;user1<br/>
-						&nbsp;&nbsp;&nbsp;&nbsp;R&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;@group1
-						<br/>
-						repo	/subdir/subRepos.test<br/>
-						&nbsp;&nbsp;&nbsp;&nbsp;RW+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;user1<br/>
-						&nbsp;&nbsp;&nbsp;&nbsp;R&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;@group1
-					</div>
-				</li>
-				<li><a href="http://sitaramc.github.com/gitolite/" target="_blank">Official Doc</a>
-			</ul>
-		</td>
-	</tr>
-</table>
+<div id="pushDiv" title="Push">
+	<form method="POST">{% csrf_token %}
+		Message:
+		<textarea name="message" cols="30" rows="5"></textarea>
+		<input type="submit" name="action" value="Push"/>
+	</form>
+</div>
 
+<div id="newFileDiv" title="New File">
+	<form method="POST">{% csrf_token %}
+		FilePath
+		<input type="text" name="newFilePath" size="30"/> 
+		<input type="submit" name="action" value="NewFile"/>
+	</form>
+</div>
+
+<div id="resetDiv" title="Reset Changes">
+	<form method="POST">{% csrf_token %}
+		<span style="color:red"><b>!!WARNING!! ALL Changes will be lost</b></span><br>
+		<input type="submit" id="resetBtn" name="action" value="Reset"/>
+		<input type="button" id="resetCancelBtn" value="Cancel"/>
+	</form>
+</div>
+
+<div id="delFileDiv" title="Delete File">
+	<form method="POST">{% csrf_token %}
+		<span id="delFileName"></span>
+		<input type="hidden" id="delFilePath" name="delFilePath" /><br/>
+		<input type="submit" name="action" value="Delete"/>
+		<input type="button" id="delfileCancelBtn" value="Cancel"/>
+	</form>
+</div>
+
+<div>
+	<input type="button" id="openNew" value="New File">
+	<input type="button" id="openPush" value="Push">
+	<input type="button" id="openReset" value="Reset">
+</div>
+<hr/>
+<div id="layout" style="height:100%;">
+	<div id="treeMenu" class="ui-layout-west">
+		<ul id="tree" class="filetree">
+			{{treeContent|safe}}
+		</ul>
+	</div>
+	<div class="fileContent ui-layout-center" id="fileContent">
+		<form method="POST">{% csrf_token %}
+			<div style="float:right; margin-right:5px;">
+				<input type="button" id="delFileBtn" value="DeleteFile" style="display:none;"/>
+			</div>
+			<span id="fileName" style="font-weight:bold;font-size:15px;"></span>
+			<input id="filePath" type="hidden" name="filePath"/>
+			<textarea id="contentArea" rows="30" cols="80" name="content"></textarea><br/>
+			<script type="text/javascript">
+				$('#contentArea').allowTabChar();
+			</script>
+			<div style="text-align:right">
+				<input id="saveBtn" type="submit" name="action" value="Save" disabled>
+				<input id="resetBtn" type="submit" name="action" value="Cancel" disabled>
+			</div>
+		</form>
+	</div>
+	<div id="manual" class="ui-layout-east">
+		<b>Manual:</b><br/>
+		<ul>
+			<li>Permission
+				<ul>
+					<li>R:  for read only</li>
+					<li>RW: for push existing ref or create new ref</li>
+					<li>RW+:for "push -f" or ref deletion allowed</li>
+					<li>- (the minus sign): to deny access
+					<li><a href="http://sitaramc.github.com/gitolite/write-types.html" target="_blank">Advanced Permission</a></li>
+				</ul>
+			</li>
+			<li>User Group
+				<ul>
+					<li><b>Simple association</b><br/>
+						<div class="code">
+							@group1 = user1 user2 <br/>
+							<i>same result:</i><br/>
+							@group1 = user1<br/>
+							@group1 = user2
+						</div>
+					</li><br/>
+					<li><b>Aggregate group</b><br/>
+						<div class="code">
+							@group1= user1 user2<br/>
+							@group2= user3 user4<br/>
+							@developer = @group1 @group2 user5
+						</div>
+					</li>
+					<li><a href="http://sitaramc.github.com/gitolite/groups.html" target="_blank">Group Doc</a></li>
+				</ul>
+			</li>
+			<li>Example
+				<div class="code">
+					repo	test.git<br/>
+					&nbsp;&nbsp;&nbsp;&nbsp;RW+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;user1<br/>
+					&nbsp;&nbsp;&nbsp;&nbsp;R&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;@group1
+					<br/>
+					repo	/subdir/subRepos.test<br/>
+					&nbsp;&nbsp;&nbsp;&nbsp;RW+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;user1<br/>
+					&nbsp;&nbsp;&nbsp;&nbsp;R&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;@group1
+				</div>
+			</li>
+			<li><a href="http://sitaramc.github.com/gitolite/" target="_blank">Official Doc</a>
+		</ul>
+	</div>
+	
+</div>
 {% endblock %}

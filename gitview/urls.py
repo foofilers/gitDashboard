@@ -11,9 +11,11 @@ urlpatterns = patterns('',
     url(r'^viewgit$', 'gitview.views.viewgit'),
     url(r'^viewgit/$', 'gitview.views.viewgit'),
     url(r'^fileContent', 'gitview.fileViews.fileContent'),
+    
     url(r'^rawContent', 'gitview.fileViews.rawContent'),
     url(r'^tree$', 'gitview.fileViews.tree'),
     url(r'^zipTree', 'gitview.fileViews.zipTree'),
-    url(r'^gitolite', 'gitview.gitolite.index'),
+    url(r'^gitolite$', 'gitview.gitolite.index'),
+    url(r'^gitoliteFile', 'gitview.gitolite.fileContent'),
     url(r'^$', 'gitview.views.index'),
 )
