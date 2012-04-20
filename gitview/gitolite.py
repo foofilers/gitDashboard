@@ -83,7 +83,7 @@ def index(request):
     for f in rootFiles:
         treeContent+="<li><span class=\"file\">"
         treeContent+="<a href='#' onclick=\"showContent('"+f+"') \">"
-        treeContent+=f.blob.name+"</a></span></li>"
+        treeContent+=f+"</a></span></li>"
     return render_to_response("gitolite.html",RequestContext(request,{'repo':admin,'treeContent':treeContent,'filePath':filePath,'fbcolor':fbcolor,'feedback':feedback}))
 
 @login_required(login_url='login')
