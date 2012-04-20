@@ -44,6 +44,7 @@ class GitoliteAdmin(GitRepo):
         try:
             self.index.remove([filePath], working_tree=True)
         except GitCommandError:
+            self.index.remove([filePath])
             os.remove(self.working_dir+os.sep+filePath)
         
     def resetHard(self):
