@@ -78,7 +78,7 @@ def index(request):
             if isdir(fullPath):
                 treeContent+=dir_to_ul(c,settings.GITOLITE_PATH)
             else:
-                rootFiles.append(c[len(wkDir):])
+                rootFiles.append(c)
     #add files at the end
     for f in rootFiles:
         treeContent+="<li><span class=\"file\">"
