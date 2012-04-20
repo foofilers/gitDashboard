@@ -143,10 +143,13 @@ function showContent(fileName){
 	},function(html){
 		$('#fileName').html(fileName);
 		$('#filePath').val(fileName);
-		$('#contentArea').val(html);
 		$('#contentArea').removeAttr("disabled");
-		$('#saveBtn').removeAttr("disabled");
-		$('#resetBtn').removeAttr("disabled");
+		$('#contentArea').val(html);
+		$('#saveBtn').button();
+		$('#cancelBtn').button();
+		
+		$('#saveBtn').show();
+		$('#cancelBtn').show();
 		$('#delFileBtn').show();
 	});
 }
@@ -206,18 +209,18 @@ function showContent(fileName){
 	</div>
 	<div class="fileContent ui-layout-center" id="fileContent">
 		<form method="POST">{% csrf_token %}
-			<div style="float:right; margin-right:5px;">
-				<input type="button" id="delFileBtn" value="DeleteFile" style="display:none;"/>
-			</div>
-			<span id="fileName" style="font-weight:bold;font-size:15px;"></span>
-			<input id="filePath" type="hidden" name="filePath"/>
-			<textarea id="contentArea" rows="30" cols="80" name="content" disabled></textarea><br/>
-			<script type="text/javascript">
-				$('#contentArea').allowTabChar();
-			</script>
-			<div style="text-align:right">
-				<input id="saveBtn" type="submit" name="action" value="Save" disabled>
-				<input id="resetBtn" type="submit" name="action" value="Cancel" disabled>
+			<div>
+				<div style="float:right; margin-right:5px;">
+					<input id="saveBtn" type="submit" name="action" value="Save" style="display:none;" >
+					<input id="cancelBtn" type="submit" name="action" value="Cancel" style="display:none;" >
+					<input type="button" id="delFileBtn" value="DeleteFile" style="display:none;" />
+				</div>
+				<span id="fileName" style="font-weight:bold;font-size:15px;"></span>
+				<input id="filePath" type="hidden" name="filePath"/>
+				<textarea id="contentArea" rows="30" cols="80" name="content" disabled></textarea><br/>
+				<script type="text/javascript">
+					$('#contentArea').allowTabChar();
+				</script>
 			</div>
 		</form>
 	</div>
