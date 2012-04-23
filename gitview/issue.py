@@ -1,7 +1,6 @@
 from suds.client import Client,WebFault
 import re
 from xml.sax._exceptions import SAXParseException
-import logging
 class Mantis1_7IssuePane():
     
     def __init__(self,message,parseMessage,wsdlUrl,issueUrl,username,password):
@@ -30,9 +29,9 @@ class Mantis1_7IssuePane():
             result+="<tr><td>Category:</td><td>"+str(self.issue.category)+"</td></tr>";
             result+="<tr><td>Summary:</td><td>"+str(self.issue.summary)+"</td></tr>";
             result+="<tr><td>Status:</td><td>"+str(self.issue.status.name)+"</td></tr>";
-            
         except SAXParseException:
-            logging.getLogger(self.__class__).error("SaxParseException")
+            errorMsg="Error calling MantisConnect"
+            result+="<tr><td colspan='2'>"+errorMsg+"</td></tr>";
         except WebFault as error:
             faultString=error.fault.faultstring
             edpos = faultString.find('Error Description')
