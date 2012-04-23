@@ -1,5 +1,5 @@
 from django.shortcuts import render_to_response
-from gitengine.gitEngine import GitRepo, GitDir,GitChange
+from gitengine.core import GitRepo, GitDir,GitChange
 from django.template import RequestContext
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper

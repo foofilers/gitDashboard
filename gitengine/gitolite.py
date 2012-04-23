@@ -1,4 +1,4 @@
-from gitengine.gitEngine import GitRepo
+from gitengine.core import GitRepo
 from git.exc import GitCommandError
 import os
 
