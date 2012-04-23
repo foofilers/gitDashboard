@@ -11,7 +11,7 @@ import time
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 import re
-import md5
+from issue import Mantis1_7IssuePane
 
 def getGitPath():
     if settings.GIT_PATH[-1]=='/':
@@ -156,8 +156,16 @@ def commit(request):
     repo = GitRepo(getGitPath()+sep+reposPath)
     commit = repo.getCommit(commitId)
     changes=commit.getChanges()
-    gravatarMd5=md5.new(commit.commit.committer.email).hexdigest()
-    return render_to_response("commit.html",RequestContext(request,{'gitPath':getGitPath(),'repoPath':reposPath,'commit':commit,'changes':changes,'branch':branch,'gravatarMd5':gravatarMd5}))
+    
+    issueSystem=settings.ISSUE_SYSTEM
+    try:
+        if issueSystem.lower()=='mantis_1.7':
+            issuePanelContent = Mantis1_7IssuePane(commit.commit.message,settings.MESSAGE_ID_PATTERN,settings.ISSUE_WSDL,settings.ISSUE_URL,settings.ISSUE_USERNAME,settings.ISSUE_PASSWORD).renderHtml()
+    except AttributeError:
+        issueSystem=""
+        issuePanelContent=""
+    
+    return render_to_response("commit.html",RequestContext(request,{'gitPath':getGitPath(),'repoPath':reposPath,'commit':commit,'changes':changes,'branch':branch,'issueSystem':issueSystem,'issuePanelContent':issuePanelContent}))
 
 def compareCommit(request):
     """ Compare two commit"""

@@ -196,4 +196,16 @@ input,select,textarea{
 	font-family: monospace;
 	border:1px solid #CCCCCC;
 }
+.issuePanel{
+	
+}
+
+.issuePanel table{
+	border-spacing:0px;
+	border-collapse: collapse;
+}
+
+.issuePanel table td{
+	padding:2px;
+}
 
