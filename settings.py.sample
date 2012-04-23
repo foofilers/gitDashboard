@@ -168,5 +168,13 @@ GITOLITE_URL="git@localhost:gitolite-admin"
 
 #ViewGit Project mapping (for compatibility with viewgit url)
 #VIEWGIT_MAP_PROJECTS={}
+
+# Issue Configuration
 #ISSUE_URL="http://www.example.com/mantis/view.php?id=%ID%"
 #MESSAGE_ID_PATTERN="Issue #%ID%"
+## Mantis configuration
+#ISSUE_SYSTEM="mantis_1.7"
+#ISSUE_WSDL="http://example.com/mantis/api/soap/mantisconnect.php?wsdl"
+#ISSUE_USERNAME='username'
+#ISSUE_PASSWORD='password'
+
