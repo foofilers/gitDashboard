@@ -12,7 +12,7 @@ class Mantis1_7IssuePane():
         self.password=password
         
         pattern = parseMessage.replace("%ID%",'([0-9]*)')
-        gr = re.search(pattern,message)
+        gr = re.search(pattern,message,re.IGNORECASE)
         self.issueId=int(gr.group(1))
 
     def renderHtml(self):
