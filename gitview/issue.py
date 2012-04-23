@@ -24,7 +24,7 @@ class Mantis1_7IssuePane():
             soapClient = Client(self.wsdlUrl)
             issue = soapClient.service.mc_issue_get(self.username,self.password,self.issueId)
             self.issue=issue
-            result+="<tr><td>Id:</td><td><a href=\""+Mantis1_7IssuePane.getMantisLink(self.message, self.parseMessage, self.issueUrl)+'">'+str(self.issueId)+"</a></td></tr>";
+            result+="<tr><td>Id:</td><td><a target=\"_blank\" href=\""+Mantis1_7IssuePane.getMantisLink(self.message, self.parseMessage, self.issueUrl)+'">'+str(self.issueId)+"</a></td></tr>";
             result+="<tr><td>Project:</td><td>"+str(self.issue.project.name)+"</td></tr>";
             result+="<tr><td>Category:</td><td>"+str(self.issue.category)+"</td></tr>";
             result+="<tr><td>Summary:</td><td>"+str(self.issue.summary)+"</td></tr>";
