@@ -11,7 +11,7 @@ import time
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 import re
-from issue import Mantis1_7IssuePane
+from issue import Mantis1_7IssuePane,NoIssueFoundException
 
 def getGitPath():
     if settings.GIT_PATH[-1]=='/':
@@ -164,6 +164,10 @@ def commit(request):
     except AttributeError:
         issueSystem=""
         issuePanelContent=""
+    except NoIssueFoundException:
+        issueSystem=""
+        issuePanelContent=""
+    
     
     return render_to_response("commit.html",RequestContext(request,{'gitPath':getGitPath(),'repoPath':reposPath,'commit':commit,'changes':changes,'branch':branch,'issueSystem':issueSystem,'issuePanelContent':issuePanelContent}))
 
