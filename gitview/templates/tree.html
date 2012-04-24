@@ -24,7 +24,7 @@
 	function showContent(fileName){
 		$.get("{%url gitview.fileViews.fileContent%}",{
 			path:"{{repoPath}}",
-			commitId:"{{commit.commit.hexsha}}",
+			commitId:"{{commitId}}",
 			branch:"{{branch}}",			
 			filePath:fileName
 		},function(html){
