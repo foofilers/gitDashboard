@@ -33,7 +33,11 @@ class Mantis1_7IssuePane():
             
             result+="<tr><td>Project:</td><td>"+str(self.issue.project.name)+"</td></tr>";
             result+="<tr><td>Category:</td><td>"+str(self.issue.category)+"</td></tr>";
-            result+="<tr><td>Summary:</td><td>"+str(self.issue.summary)+"</td></tr>";
+            try:
+                result+="<tr><td>Summary:</td><td>"+str(self.issue.summary)+"</td></tr>";
+            except UnicodeEncodeError:
+                result+="<tr><td>Summary:</td><td>CANNOT READ:UTF-8 PROBLEM</td></tr>";
+                
             result+="<tr><td>Status:</td><td>"+str(self.issue.status.name)+"</td></tr>";
             try:
                 result+="<tr><td>Handler:</td><td>"+str(self.issue.handler.name)+"</td></tr>";    
