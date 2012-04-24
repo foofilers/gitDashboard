@@ -35,7 +35,10 @@ class Mantis1_7IssuePane():
             result+="<tr><td>Category:</td><td>"+str(self.issue.category)+"</td></tr>";
             result+="<tr><td>Summary:</td><td>"+str(self.issue.summary)+"</td></tr>";
             result+="<tr><td>Status:</td><td>"+str(self.issue.status.name)+"</td></tr>";
-            
+            try:
+                result+="<tr><td>Handler:</td><td>"+str(self.issue.handler.name)+"</td></tr>";    
+            except AttributeError:
+                pass
         except SAXParseException:
             errorMsg="Error calling MantisConnect"
             result+="<tr><td colspan='2'>"+errorMsg+"</td></tr>";
