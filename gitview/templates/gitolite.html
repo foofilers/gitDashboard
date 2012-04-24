@@ -17,6 +17,24 @@
 
 {% endif %}
 
+{% if popupMessage %}
+	<div id="popupDiv" title="{{feedback}} FeedBack" style="color:{{fbcolor}};">
+		{{popupMessage|linebreaks}}
+		<hr/>
+		<span style="color:black;">
+			<b>WARNING</b>: The push operation can be terminated successfully, but the gitolite backend can be in error, please put attention on feedback message</br>
+		</span>
+	</div>
+	<script type="text/javascript">
+		$( "#popupDiv" ).dialog({
+	    	autoOpen: true,
+	    	width: 640,
+	    	height: 300,
+	    	modal: true
+	    });
+	</script>
+{% endif %}
+
 <script>
 (function($) {
     function pasteIntoInput(el, text) {

@@ -1,6 +1,6 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from gitengine.gitolite import GitoliteAdmin
+from gitengine.gitolite import GitoliteAdmin,PushException
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from os import listdir
@@ -28,6 +28,7 @@ def index(request):
     feedback=""
     fbcolor='green'
     filePath=None
+    popupMessage=None
     if request.method=="POST":
         action= request.POST['action']
         if action.lower()=='newfile':
@@ -60,8 +61,14 @@ def index(request):
                 feedback='Error message cannot be empty'
                 fbcolor='red'
             else:
-                feedback='Pushed'
-                admin.push(message)
+                try:
+                    pm = admin.push(message)
+                    feedback='Pushed'
+                    popupMessage=pm
+                except PushException as pe:
+                    popupMessage=pe.message
+                    feedback='Error: PUSH FAILED'
+                    fbcolor='red'
                 
         if action.lower().find("reset")!=-1:
             admin.resetHard()
@@ -84,7 +91,7 @@ def index(request):
         treeContent+="<li><span class=\"file\">"
         treeContent+="<a href='#' onclick=\"showContent('"+f+"') \">"
         treeContent+=f+"</a></span></li>"
-    return render_to_response("gitolite.html",RequestContext(request,{'repo':admin,'treeContent':treeContent,'filePath':filePath,'fbcolor':fbcolor,'feedback':feedback}))
+    return render_to_response("gitolite.html",RequestContext(request,{'repo':admin,'treeContent':treeContent,'filePath':filePath,'fbcolor':fbcolor,'feedback':feedback,'popupMessage':popupMessage}))
 
 @login_required(login_url='login')
 def fileContent(request):

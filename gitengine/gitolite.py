@@ -1,6 +1,24 @@
 from gitengine.core import GitRepo
 from git.exc import GitCommandError
+from git import PushInfo
+from git.remote import RemoteProgress
 import os
+import logging
+
+logger = logging.getLogger('gitengine')
+
+class PushProgress(RemoteProgress):
+    def __init__(self,*args,**kwargs):
+        super(PushProgress,self).__init__(*args,**kwargs)
+        self.message=""
+    def line_dropped(self,line):
+        logger.debug(line)
+        if line.find('remote:')==0:
+            self.message+=line.replace('remote:','')+"\n"
+
+class PushException(Exception):
+    def __init__(self,message):
+        self.message=message
 
 class GitoliteAdmin(GitRepo):
     def __init__(self,path,url):
@@ -31,7 +49,17 @@ class GitoliteAdmin(GitRepo):
         index = self.index
         index.commit(message)
         origin = self.remotes.origin
-        origin.push('master')
+        pp = PushProgress()
+        pushResults = origin.push('master',pp)
+        error=False
+        pushMessage=""
+        for pr in pushResults:
+            pushMessage+=pr.summary
+            if pr.flags>=PushInfo.ERROR:
+                error=True
+        if error:
+            raise PushException(pushMessage)
+        return pp.message
     
     def save(self,filePath,content):
         confFile = open(self.working_dir+os.sep+filePath,"w")
