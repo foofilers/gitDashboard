@@ -242,7 +242,7 @@ def graph(request):
         until=None
     try:
         cmtId=request.GET['id']
-        highlights="highlightsCircle(stage,circlesLayer,circle_"+cmtId+");"
+        highlights="highlightsCircle(stage,circlesLayer,circle_"+cmtId+",width);"
     except KeyError:
         highlights=None;
     
