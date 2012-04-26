@@ -157,8 +157,8 @@ class CommitGraph:
         radius=6
         tooltip=[]
         dt = datetime.fromtimestamp(self.cmt.commit.committed_date)
+        tooltip.append("ID: "+self.cmt.commit.hexsha)
         tooltip.append("Date: "+dt.strftime('%Y-%m-%d %H:%M:%S'))
-        tooltip.append("--------------");
         message=self.cmt.commit.message
         rows=smart_unicode(message).split('\n')
         for row in rows:
