@@ -1,5 +1,10 @@
 from django.utils.encoding import smart_unicode,DjangoUnicodeDecodeError
 from datetime import datetime
+import md5
+
+def getGravatarUrl(email,size):
+    md5Email=md5.new(email).hexdigest()
+    return "http://www.gravatar.com/avatar/"+md5Email+"?d=mm&s="+str(size)
 
 def canvasTooltipRect(x,y,width,height,color):
     rectJS='var rect = new Kinetic.Rect({'
@@ -8,9 +13,9 @@ def canvasTooltipRect(x,y,width,height,color):
     rectJS+='width:'+str(width)+','
     rectJS+='height:'+str(height)+','
     rectJS+='fill:"'+color+'",'
-    rectJS+='alpha: 0.75,'
     rectJS+='stroke: "black",'
-    rectJS+='strokeWidth: 1'
+    rectJS+='strokeWidth: 2,'
+    rectJS+='lineJoin: "round"'
     rectJS+='});\n'
     rectJS+='tooltipLayer.add(rect);'
     return rectJS
@@ -25,25 +30,39 @@ def canvasDateRect(x,y,width,color):
     rectJS+='alpha: 0.75,'
     rectJS+='stroke: "white",'
     rectJS+='strokeWidth: 1'
+
     rectJS+='});\n'
     rectJS+='textGroup.add(dateRect);'
     return rectJS
     
-def canvasTooltip(x,y,message):
+def canvasTooltip(x,y,message,size=10):
     tooltipJS='var tooltip = new Kinetic.Text({'
     tooltipJS+='text: "'+message+'",'
     tooltipJS+="x:"+str(x)+','
     tooltipJS+="y:"+str(y)+','
     tooltipJS+='fontFamily: "Verdana",'
-    tooltipJS+='fontSize: 10,'
+    tooltipJS+='fontSize: '+str(size)+','
     tooltipJS+='padding: 5,'
     tooltipJS+='textFill: "black"'
     tooltipJS+='})\n;'
     tooltipJS+='tooltipLayer.add(tooltip);'
     return tooltipJS
+
+def canvasGravatarImage(x,y,author):
+    img =' var img = new Image();'
+    img+= 'var gravImg = new Kinetic.Image({'
+    img+= 'image:img,'
+    img+= "x:"+str(x)+','
+    img+= "y:"+str(y)+','
+    img+= 'width:32,height:32 '
+    img+= '});'
+    img+='tooltipLayer.add(gravImg);'
+    img+='img.src="'+getGravatarUrl(author.email,32)+'";'
+    img+=canvasTooltip(x+"+30",y+"+8",author.name,10);
+    return img
    
-def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
-    jsvar='circle_'+cmtID
+def canvasCircle(x,y,radius,color,tooltip,cmt,gitGraph):
+    jsvar='circle_'+cmt.commit.hexsha
     circleJS="var "+jsvar+" = new Kinetic.Circle({"
     circleJS+="x:"+str(x)+','
     circleJS+="y:"+str(y)+','
@@ -57,10 +76,11 @@ def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
     circleJS+='var mousePos = stage.getMousePosition();\n'
     circleJS+='tooltipLayer.removeChildren();\n'
     circleJS+='document.body.style.cursor = "pointer";\n'
-    tooltipY=5
+    tooltipY=37
     maxLen=0
     tooltips=""
     numLines=0
+    tooltips+=canvasGravatarImage('mousePos.x+25','mousePos.y+25',cmt.commit.author)
     for msg in tooltip:
         if numLines<14:
             if numLines==13:
@@ -84,7 +104,7 @@ def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
         
     if maxLen*8>gitGraph._maxTooltipWidth:
         gitGraph._maxTooltipWidth=maxLen*8
-    circleJS+=canvasTooltipRect('mousePos.x+20', 'mousePos.y+20', maxLen*8, str(tooltipY),color)
+    circleJS+=canvasTooltipRect('mousePos.x+20', 'mousePos.y+20', maxLen*8, str(tooltipY),"#FFFFFF")
     circleJS+=tooltips
     circleJS+='tooltipLayer.show();\n'    
     circleJS+='tooltipLayer.draw();\n'
@@ -101,7 +121,7 @@ def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
     #click
     circleJS+=jsvar+'.on("mousedown", function(){\n'
     if gitGraph.commitUrl:
-        cmtUrl=gitGraph.commitUrl.replace("$$",cmtID)
+        cmtUrl=gitGraph.commitUrl.replace("$$",cmt.commit.hexsha)
     else:
         cmtUrl=""
     circleJS+='window.location = "'+cmtUrl+'";'
@@ -136,12 +156,6 @@ class CommitGraph:
     def draw(self):
         radius=6
         tooltip=[]
-        tooltip.append("id: "+self.cmt.commit.hexsha)
-        cmprts=self.cmt.commit.parents
-        for cmpr in cmprts:
-            tooltip.append("parent: "+cmpr.hexsha)
-        tooltip.append("Branch: "+self.branchName)
-        tooltip.append("Author: "+self.cmt.commit.author.name)
         dt = datetime.fromtimestamp(self.cmt.commit.committed_date)
         tooltip.append("Date: "+dt.strftime('%Y-%m-%d %H:%M:%S'))
         tooltip.append("--------------");
@@ -150,7 +164,7 @@ class CommitGraph:
         for row in rows:
             if len(row)>0:
                 tooltip.append(row)
-        return canvasCircle(self.x, self.y, radius, self.color,tooltip,self.cmt.commit.hexsha,self.gitGraph)
+        return canvasCircle(self.x, self.y, radius, self.color,tooltip,self.cmt,self.gitGraph)
     def drawLabels(self):
         labelStr = ''
         labels=self.cmt.getTags()
