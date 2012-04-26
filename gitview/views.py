@@ -250,8 +250,8 @@ def graph(request):
     commitUrl=reverse('gitview.views.commit')
     commitUrl+="?path="+repoPath+'&branch='+branch+"&id=$$"
     graph=GitGraphCanvas(repo,since=since,until=until,commitUrl=str(commitUrl))
-    
-    return render_to_response("graph.html",RequestContext(request,{'repoPath':repoPath,'branch':branch,'canvasContent':graph.render(),'width':graph.getWidth(),'height':graph.getHeight(),'highlights':highlights}))
+    (branches,commits)=graph.render()
+    return render_to_response("graph.html",RequestContext(request,{'repoPath':repoPath,'branch':branch,'canvasCommit':commits,'canvasBranchName':branches,'branchNamesWidth':graph.branchNamesWidth,'width':graph.getWidth(),'height':graph.getHeight(),'highlights':highlights}))
 
 """ redirect per compatibilita' con viewgit"""
 def viewgit(request):

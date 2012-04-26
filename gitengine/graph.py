@@ -80,7 +80,7 @@ def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
             numLines+=1
         
     if (tooltipY-20)>gitGraph._maxTooltipHeight:
-        gitGraph._maxTooltipHeight=tooltipY-20
+        gitGraph._maxTooltipHeight=tooltipY-20+gitGraph.branchNamesWidth
         
     if maxLen*8>gitGraph._maxTooltipWidth:
         gitGraph._maxTooltipWidth=maxLen*8
@@ -110,7 +110,7 @@ def canvasCircle(x,y,radius,color,tooltip,cmtID,gitGraph):
     circleJS+='circleGroup.add('+jsvar+');\n'
     return circleJS
 
-def canvasText(x,y,text,color,gitGraph,fontSize=None):
+def canvasText(x,y,text,color,gitGraph,group,fontSize=None):
     textJS='var text= new Kinetic.Text({'
     textJS+='x:'+str(x)+','
     textJS+='y:'+str(y)+','
@@ -122,7 +122,7 @@ def canvasText(x,y,text,color,gitGraph,fontSize=None):
     textJS+='text:"'+text+'",'
     textJS+='textFill:"'+color+'"'
     textJS+='});\n'
-    textJS+='textGroup.add(text);\n'
+    textJS+=group+'.add(text);\n'
     return textJS;
     
 class CommitGraph:
@@ -235,7 +235,6 @@ class GitGraphCanvas:
             branchCmts=self.repo.getCommits(branch=branchSha,since=self.since,until=self.until)
             branchDates={}
             for cmt in branchCmts:
-                
                 cmts[cmt.commit.hexsha]=cmt
                 dt = cmt.commit.committed_date
                 dates.append(dt)
@@ -257,8 +256,9 @@ class GitGraphCanvas:
             branchesCmtsDates[branchSha] = branchDates;
         dates=sorted(set(dates))
 
-        x=maxBranchNameLength*(self._fontSize)
+        self.branchNamesWidth=maxBranchNameLength*(self._fontSize)
         
+        x=0
         #find the first x coordinate for each date
         currMonth=""
         currDay=""
@@ -353,34 +353,36 @@ class GitGraphCanvas:
         for y in years:
             canvas+=canvasDateRect(yearX[y][0]-self.radius-5, 7, yearX[y][1]-yearX[y][0],"black");
             yX=yearX[y][0]+((yearX[y][1]-yearX[y][0])/2)-self.radius-10
-            canvas+=canvasText(yX,12,y,'white',self,fontSize=8)
+            canvas+=canvasText(yX,12,y,'white',self,'textGroup',fontSize=8)
         
         months = sorted(months)
         for mn in months:
             canvas+=canvasDateRect(monthX[mn][0]-self.radius-5, 27, monthX[mn][1]-monthX[mn][0],"#202020");
             mnX=monthX[mn][0]+((monthX[mn][1]-monthX[mn][0])/2)-self.radius-10
-            canvas+=canvasText(mnX,32,mn.split('-')[1],'white',self,fontSize=8)
+            canvas+=canvasText(mnX,32,mn.split('-')[1],'white',self,'textGroup',fontSize=8)
         days = sorted(days)
         for d in days:
             canvas+=canvasDateRect(daysX[d][0]-self.radius-5, 47, daysX[d][1]-daysX[d][0],"#404040");
             dX=daysX[d][0]+((daysX[d][1]-daysX[d][0])/2)-self.radius-10
-            canvas+=canvasText(dX,52,d.split('-')[2],'white',self,fontSize=8)
+            canvas+=canvasText(dX,52,d.split('-')[2],'white',self,'textGroup',fontSize=8)
         #y delay
         y=80
         branchToDrop=[] #list of branch to drop because is empty
+        branchNameCanvas=""
+        canvasCircles=""
         for branchSha in sortedBranches:
             if len(graphCommits[branchSha])>0:
                 if branchSha == self.repo.head.commit.hexsha:
-                    canvas+=canvasText(15, y, branches[branchSha], "red",self)
+                    branchNameCanvas+=canvasText(10, y-5, branches[branchSha], "red",self,'branchNames',8)
                     color="red"
                 else:
-                    canvas+=canvasText(15, y, branches[branchSha], "black",self)
+                    branchNameCanvas+=canvasText(10, y-5, branches[branchSha], "black",self,'branchNames',8)
                     color="#8ED6FF"
                 #draw circle
                 for grpCmt in graphCommits[branchSha]:
                     grpCmt.y=y
-                    canvas+=grpCmt.draw()
-                    canvas+=grpCmt.drawLabels()
+                    canvasCircles+=grpCmt.draw()
+                    canvasCircles+=grpCmt.drawLabels()
                 y+=self.radius+20
             else:
                 branchToDrop.append(branchSha)
@@ -401,7 +403,8 @@ class GitGraphCanvas:
                             x=commitsPos[son].x
                             y=commitsPos[son].y
                             canvas+='line('+str(xPar)+','+str(yPar)+','+str(x)+','+str(y)+',"#000000",lineGroup);\n'
-        return canvas
+        canvas+=canvasCircles;
+        return (branchNameCanvas,canvas)
     def getWidth(self):
         return self._width
     def getHeight(self):

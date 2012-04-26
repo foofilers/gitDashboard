@@ -122,9 +122,13 @@ function highlightsCircle(stage,layer,circle){
 var labelGroup = new Kinetic.Group();
 var circlesLayer = new Kinetic.Layer();
 window.onload = function(){
+
+	
 	var width=document.getElementById("canvasGraph").offsetWidth;
 	width=width-20;
 	var stage = new Kinetic.Stage("canvasGraph", width, {{height}});
+	
+	var branchNames = new Kinetic.Layer();
 	
 	var tooltipLayer = new Kinetic.Layer();
 	var tagLayer = new Kinetic.Layer();
@@ -135,23 +139,70 @@ window.onload = function(){
 	var textGroup = new Kinetic.Group();
 	
 	var backgroundRect=new Kinetic.Rect({
+		x:-15,
+		y:0,
+		width:{{width}}+30,
+		height:{{height}},
+		fill:'#F5F8FF',
+		stroke: "#CCCCCC",
+	    strokeWidth: 1
+	});
+	var branchLayerBg=new Kinetic.Rect({
 		x:0,
 		y:0,
-		width:{{width}},
+		width:{{branchNamesWidth}},
 		height:{{height}},
-		fill:'#CCFFFF',
-		alpha:0.2
-		
+		fill:'#ECF0FB'
 	});
+	var branchBarYear=new Kinetic.Rect({
+		x:0,
+		y:7,
+		width:{{branchNamesWidth}},
+		height:20,
+		fill:'black',
+		alpha: 0.75,
+		stroke: "white",
+	    strokeWidth: 1
+	});
+	var branchBarMonth=new Kinetic.Rect({
+		x:0,
+		y:27,
+		width:{{branchNamesWidth}},
+		height:20,
+		fill:'#202020',
+		alpha: 0.75,
+		stroke: "white",
+	    strokeWidth: 1
+	});
+	var branchBarDay=new Kinetic.Rect({
+		x:0,
+		y:47,
+		width:{{branchNamesWidth}},
+		height:20,
+		fill:'#404040',
+		alpha: 0.75,
+		stroke: "white",
+	    strokeWidth: 1
+	});
+	
+	branchNames.add(branchLayerBg);
+	branchNames.add(branchBarYear);
+	branchNames.add(branchBarMonth);
+	branchNames.add(branchBarDay);
+	
+	{{canvasBranchName|safe}}
+	
 	backgroundRect.on("mousemove",function(){
 		document.body.style.cursor = "move";
 	})
-	circleGroup.add(backgroundRect);
-
-	{{canvasContent|safe}}
+	circlesLayer.add(backgroundRect);
+	
+	
+	{{canvasCommit|safe}}
 	
 	circlesLayer.add(lineGroup);
 	circlesLayer.add(circleGroup);
+	
 	circlesLayer.add(labelGroup);
 	circlesLayer.add(textGroup);
 	
@@ -161,7 +212,7 @@ window.onload = function(){
 	//prevent to move after left border
 	circlesLayer.on("dragend", function(e){
         if (circlesLayer.x>0){
-        	circlesLayer.setPosition(0,0);
+        	circlesLayer.setPosition({{branchNamesWidth}}+10,0);
         	circlesLayer.draw();
         }
     });
@@ -169,7 +220,11 @@ window.onload = function(){
 	stage.add(circlesLayer);
 	stage.add(tooltipLayer);
 	stage.add(tagLayer);
+	stage.add(branchNames)
 	{{highlights|default_if_none:''|safe}}
+	
+	
+	
 };
 
 </script>
