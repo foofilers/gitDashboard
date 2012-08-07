@@ -263,10 +263,10 @@ class GitGraphCanvas:
                                 sons[prt.hexsha].append(cmtID)
                             else:
                                 sons[prt.hexsha]=[cmtID]
-                    if dt in branchDates:
-                        branchDates[dt].append(cmtID)
-                    else:
-                        branchDates[dt]=[cmtID]
+                if dt in branchDates:
+                    branchDates[dt].append(cmtID)
+                else:
+                    branchDates[dt]=[cmtID]
             branchesCmtsDates[branchSha] = branchDates;
         dates=sorted(set(dates))
 
