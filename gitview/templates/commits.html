@@ -21,7 +21,7 @@
 			{{branchForm.path}}
 			{% if moduleName != "" %}<b>Folder:</b> <a href="{% url gitview.views.index %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{%endif%}
 			<b>Name:</b> {{ repoName }}<br/>
-			<b>Branch:</b> {{branchForm.branch}}<br/>
+			<b>Branch/Tag:</b> {{branchForm.branch}}<br/>
 		</form>
 	{% endif %}
 	
