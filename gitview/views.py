@@ -72,9 +72,14 @@ class BranchForm(forms.Form):
                     else:
                         shas[refs[key]]=key
             branches.append( (repo.head.commit.hexsha,shas[repo.head.commit.hexsha]) )
+            nameBranches={}
             for sh in shas.keys():
-                if sh!=repo.head.commit.hexsha:
-                    branches.append( (sh,shas[sh]) )
+                nameBranches[shas[sh]]=sh
+            sortedNameBranches = nameBranches.keys()
+            sortedNameBranches.sort()
+            for br in sortedNameBranches:
+                if nameBranches[br]!=repo.head.commit.hexsha:
+                    branches.append( (nameBranches[br],br) )
             try:
                 head=repo.head.commit.hexsha
             except KeyError:
