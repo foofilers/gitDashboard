@@ -19,14 +19,8 @@ class GitRepo(Repo):
 
     def getTagsRef(self):
         tags={}
-        refs=self.get_refs()
-        for ref in refs.keys():
-            if ref.find('refs/tags/')!=-1:
-                obj=self.get_object(refs[ref])
-                if obj.get_type()==4:
-                    tags[ref]=obj._object_sha
-                else:
-                    tags[ref]=refs[ref]
+        for tg in self.tags:
+            tags[tg.name]=tg.commit.hexsha
         return tags
     
     def getBranches(self):

@@ -43,15 +43,29 @@ def index(request):
     repos=GitRepo.getRepos(currPath, False,settings.GIT_EXCLUDE_PATH)
     return render_to_response("index.html",RequestContext(request,{'gitPath':gitPath,'currPath':currPath,'gitBasicUrl':settings.GIT_BASIC_URL,'subDirs':subDirs,'repos':repos}))
 
+def sortBranch (curr,nxt):
+    if (curr.find('tag')>-1):
+        if (nxt.find('tag')):
+            return cmp(curr,nxt)
+        else:
+            return 1
+    else:
+        if (nxt.find('tag')):
+            return -1
+        else:
+            return cmp(curr,nxt)
+
 class BranchForm(forms.Form):
     def __init__(self,repo,*args,**kwargs):
         super(BranchForm,self).__init__(*args,**kwargs)
         refs = repo.getBranches()
+        refs.update(repo.getTagsRef())
         branches = []
         shas = {}
         try:
             shas[repo.head.commit.hexsha]='HEAD'
-            for key in refs.keys():
+            keys = refs.keys()
+            for key in keys:
                 if key!='HEAD':
                     if refs[key] in shas:
                         shas[refs[key]]=shas[refs[key]]+" - "+key
