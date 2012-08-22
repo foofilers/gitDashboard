@@ -161,7 +161,8 @@ def commits(request):
             'numPages':range(numPages+1)[1:],
             'page':page+1,
             'filePath':filePath,
-            'gitPath':getGitPath()
+            'gitPath':getGitPath(),
+            'gitBasicUrl':settings.GIT_BASIC_URL
             }))
 
 def commit(request):

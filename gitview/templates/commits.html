@@ -4,6 +4,7 @@
 {% load gravatar %}
 
 {% block repoHeader %}
+	<div style="line-height: 15px;">
 	{% if filePath %}
 		{% if moduleName != "" %}<b>Folder:</b> <a href="{% url gitview.views.index %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{%endif%}
 		<b>Name:</b> {{ repoName }}<br/>
@@ -21,10 +22,11 @@
 			{{branchForm.path}}
 			{% if moduleName != "" %}<b>Folder:</b> <a href="{% url gitview.views.index %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{%endif%}
 			<b>Name:</b> {{ repoName }}<br/>
+			<b>URL:</b> {{gitBasicUrl}}/{{ repoName }}<br/>
 			<b>Branch/Tag:</b> {{branchForm.branch}}<br/>
 		</form>
 	{% endif %}
-	
+	</div>
 {% endblock %}
 {% block contentBlock %}
 	<script type="text/javascript">
