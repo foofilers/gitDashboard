@@ -213,8 +213,7 @@ class NewReposForm(forms.Form):
 
 @login_required(login_url='login')
 def new(request):
-    """ Add New repository Page
-    """
+    """ Add New repository Page """
     if not request.user.is_staff:
         return render_to_response("notAlowed.html",RequestContext(request))
     try:
@@ -286,3 +285,13 @@ def viewgit(request):
     except AttributeError:
         repoPath=projectName
     return redirect(reverse('gitview.views.commit')+"?path="+repoPath+"&id="+commitId)
+
+@login_required(login_url='login')
+def modDescription(request):
+    repoPath = request.GET['path']
+    repo=GitRepo(getGitPath()+sep+repoPath)
+    msg=None
+    if request.method=='POST':
+        repo.description=request.POST['description']
+        msg="Description changed"
+    return render_to_response("modDescription.html",RequestContext(request,{'repo':repo,'msg':msg}))

@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block repoHeader %}
+<b>Update Description of {{repo.path}}</b>
+{% endblock %}
+
+{% block contentBlock %}
+
+<form method="POST">{% csrf_token %}
+	<table align="center">
+		<tr>
+			<td>Description:</td>
+			<td><input type="text"  name="description" value="{{repo.description}}" size="80"/></td>
+		</tr>
+		<tr>
+			<td colspan="2" align="center">
+				<input type="submit" value="Update Description"/>
+			</td>
+		</tr>
+		{%if msg %}
+		<tr>
+			<td colspan="2" align="center">
+				<b>{{msg}}</b>
+			</td>
+		</tr>
+		{%endif%}
+	</table>
+</form>
+
+{% endblock %}
