@@ -21,7 +21,7 @@
 		<form id="branchForm" method="GET" style="margin:auto;" class="branchForm">
 			{{branchForm.path}}
 			{% if moduleName != "" %}<b>Folder:</b> <a href="{% url gitview.views.index %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{%endif%}
-			<b>Name:</b> {{ repoName }}<br/>
+			<b>Name:</b> {{ repoName }} {%if repoDesc %}- {{ repoDesc }} {% if request.user.username %}<a href="{%url gitview.views.modDescription%}?path={{repoPath}}"><img src="/static/images/edit.png" border="0" title="Edit Description"/></a>{%endif%}{%endif%}<br/>
 			<b>URL:</b> {{gitBasicUrl}}{% if moduleName != "" %}/{{ moduleName }}{%endif%}/{{ repoName }}<br/>
 			<b>Branch/Tag:</b> {{branchForm.branch}}<br/>
 		</form>

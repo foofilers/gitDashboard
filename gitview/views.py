@@ -147,12 +147,17 @@ def commits(request):
         moduleName=reposPath[:reposPath.rfind('/')]
     else:
         moduleName=''
+    if repo.bare:
+        repoDesc=repo.description
+    else:
+        repoDesc=None
     return render_to_response("commits.html",RequestContext(request,{
             'branchForm':branchForm,
             'filterForm':filterForm,
             'repoPath':reposPath,
             'moduleName':moduleName,
             'repoName':repoName,
+            'repoDesc':repoDesc,
             'branch':branch,
             'since':since,
             'until':until,
@@ -290,8 +295,7 @@ def viewgit(request):
 def modDescription(request):
     repoPath = request.GET['path']
     repo=GitRepo(getGitPath()+sep+repoPath)
-    msg=None
     if request.method=='POST':
         repo.description=request.POST['description']
-        msg="Description changed"
-    return render_to_response("modDescription.html",RequestContext(request,{'repo':repo,'msg':msg}))
+        return redirect(reverse('gitview.views.commits')+"?path="+repoPath)
+    return render_to_response("modDescription.html",RequestContext(request,{'repo':repo}))
