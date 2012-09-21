@@ -253,16 +253,15 @@ class GitGraphCanvas:
                 dt = cmt.commit.committed_date
                 dates.append(dt)
                 cmtID=cmt.commit.hexsha+"_"+branchSha
-                if cmtID in parents[branchSha] or cmt.commit.hexsha==branchCmts[0].commit.hexsha:
-                    if len(cmt.commit.parents)>0:
-                        firstPrt=cmt.commit.parents[0].hexsha
-                        firstprtID=firstPrt+"_"+branchSha
-                        parents[branchSha].append(firstprtID)
-                        for prt in cmt.commit.parents:
-                            if prt.hexsha in sons:
-                                sons[prt.hexsha].append(cmtID)
-                            else:
-                                sons[prt.hexsha]=[cmtID]
+                if len(cmt.commit.parents)>0:
+                    firstPrt=cmt.commit.parents[0].hexsha
+                    firstprtID=firstPrt+"_"+branchSha
+                    parents[branchSha].append(firstprtID)
+                    for prt in cmt.commit.parents:
+                        if prt.hexsha in sons:
+                            sons[prt.hexsha].append(cmtID)
+                        else:
+                            sons[prt.hexsha]=[cmtID]
                 if dt in branchDates:
                     branchDates[dt].append(cmtID)
                 else:
