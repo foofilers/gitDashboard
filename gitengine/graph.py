@@ -417,13 +417,12 @@ class GitGraphCanvas:
                         if son in commitsPos:
                             x=commitsPos[son].x
                             y=commitsPos[son].y
-                            if yPar==y:
-                                #horizontal
-                                if y not in lines.keys():
-                                    lines[y]=(min(xPar,x),max(xPar,x))
-                                else:
-                                    lines[y]=(min(lines[y][0],x),max(lines[y][1],x))
+                            #horizontal
+                            if y not in lines.keys():
+                                lines[y]=(min(xPar,x),max(xPar,x))
                             else:
+                                lines[y]=(min(lines[y][0],xPar),max(lines[y][1],x))
+                            if yPar!=y:
                                 canvas+='line('+str(xPar)+','+str(yPar)+','+str(x)+','+str(y)+',"#000000",lineGroup);\n'
         for lnY in lines:
             canvas+='line('+str(lines[lnY][0])+','+str(lnY)+','+str(lines[lnY][1])+','+str(lnY)+',"#000000",lineGroup);\n'
