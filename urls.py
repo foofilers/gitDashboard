@@ -13,8 +13,8 @@ urlpatterns = patterns('',
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^rest/', include('gitDashboard.rest.urls')),
-    url(r'^login','gitDashboard.login.views.loginView'),
-    url(r'^logout','gitDashboard.login.views.logoutView'),
-    url(r'', include('gitDashboard.gitview.urls')),
+    url(r'^rest/', include('rest.urls')),
+    url(r'^login','login.views.loginView'),
+    url(r'^logout','login.views.logoutView'),
+    url(r'', include('gitview.urls')),
 )

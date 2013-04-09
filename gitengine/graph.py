@@ -3,8 +3,10 @@ from datetime import datetime
 import hashlib
 
 def getGravatarUrl(email,size):
-    md5Email=hashlib.new(email).hexdigest()
-    return "http://www.gravatar.com/avatar/"+md5Email+"?d=mm&s="+str(size)
+	md5Digester = hashlib.md5()
+	md5Digester.update(email)
+	md5Email = md5Digester.hexdigest()
+	return "http://www.gravatar.com/avatar/"+md5Email+"?d=mm&s="+str(size)
 
 def canvasTooltipRect(x,y,width,height,color):
     rectJS='var rect = new Kinetic.Rect({'
