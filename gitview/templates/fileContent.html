@@ -6,8 +6,9 @@
 	<tr>
 		<th style="font-weight:normal;text-align:left;padding-left:10px;">
 			{{gitFile.blob.path}} 
-			<a href="{%url gitview.fileViews.rawContent%}?path={{repoPath}}&filePath={{gitFile.blob.path}}&branch={{branch}}&commitId={{commitId}}">Raw</a>
-			<a href="{%url gitview.views.commits%}?path={{repoPath}}&filePath={{gitFile.blob.path}}&branch={{branch}}">History</a>
+			<a href="{%url "gitview.fileViews.rawContent"%}?path={{repoPath}}&filePath={{gitFile.blob.path}}&branch={{branch}}&commitId={{commitId}}">Download</a>
+			<a href="{%url "gitview.views.commits"%}?path={{repoPath}}&filePath={{gitFile.blob.path}}&branch={{branch}}">History</a>
+            <a href="{%url "gitview.fileViews.view" %}?path={{repoPath}}&commit={{commitId}}&filePath={{gitFile.blob.path}}&branch={{branch}}">Link</a>
 		</th>
 	</tr>
 	<tr>

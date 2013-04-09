@@ -3,7 +3,7 @@
 {% load highlight %}
 
 {% block repoHeader %}
-<b>Repository path:</b>{{ repoPath }} (<a href="{%url gitview.views.commits%}?path={{repoPath}}">commits</a>)
+<b>Repository path:</b>{{ repoPath }} (<a href="{%url "gitview.views.commits"%}?path={{repoPath}}">commits</a>)
 {% endblock %}
 
 {% block contentBlock %}
@@ -18,10 +18,10 @@
 				</tr>
 				<tr>
 					<td>
-						<b>Id:</b> <a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{commit1.commit.hexsha}}">{{commit1.commit.hexsha}}</a><br/>
+						<b>Id:</b> <a href="{%url "gitview.views.commit"%}?path={{repoPath}}&id={{commit1.commit.hexsha}}">{{commit1.commit.hexsha}}</a><br/>
 						<b>Parents:</b>
 							{% for par in commit1.commit.parents %}
-								<a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{par.hexsha}}">{{par.hexsha}}</a>
+								<a href="{%url "gitview.views.commit"%}?path={{repoPath}}&id={{par.hexsha}}">{{par.hexsha}}</a>
 							{% endfor %}<br/>
 						<b>Author:</b> {{commit1.commit.author.name}} &lt;{{commit1.commit.author.email}}&gt;<br/>
 						<b>Commit Date:</b>	{{commit1.commit.committed_date|timestamp:'%Y-%m-%d %H:%M'}}<br/>
@@ -42,10 +42,10 @@
 				</tr>
 				<tr>
 					<td>
-						<b>Id:</b> <a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{commit2.commit.hexsha}}">{{commit2.commit.hexsha}}</a><br/>
+						<b>Id:</b> <a href="{%url "gitview.views.commit"%}?path={{repoPath}}&id={{commit2.commit.hexsha}}">{{commit2.commit.hexsha}}</a><br/>
 						<b>Parents:</b>
 							{% for par in commit2.commit.parents %}
-								<a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{par.hexsha}}">{{par.hexsha}}</a>
+								<a href="{%url "gitview.views.commit"%}?path={{repoPath}}&id={{par.hexsha}}">{{par.hexsha}}</a>
 							{% endfor %}<br/>
 						<b>Author:</b> {{commit2.commit.author.name}} &lt;{{commit2.commit.author.email}}&gt;<br/><br/>
 						<b>Commit Date:</b>	{{commit2.commit.committed_date|timestamp:'%Y-%m-%d %H:%M'}}<br/>
@@ -70,7 +70,7 @@
 					$(function(){
 						//diff call
 						$('#{{change.a_blob.hexsha}}_showBtn').click(function(){
-							$.get("{%url gitview.fileViews.diff %}",{
+							$.get("{%url "gitview.fileViews.diff" %}",{
 								path:"{{repoPath}}",
 								commit:"{{commit.commit.hexsha}}",
 								oldSha:"{{change.a_blob.hexsha}}",
@@ -83,7 +83,7 @@
 						});
 						//GHDiff Call
 						$('#{{change.a_blob.hexsha}}_ghshowBtn').click(function(){
-							$.get("{%url gitview.fileViews.diff %}",{
+							$.get("{%url "gitview.fileViews.diff" %}",{
 								path:"{{repoPath}}",
 								commit:"{{commit.commit.hexsha}}",
 								oldSha:"{{change.a_blob.hexsha}}",
@@ -117,7 +117,7 @@
 		{% if change.deleted_file  %}
 			<tr><th style="text-align:left;">&nbsp;<span class="gd">deleted</span> {{change.a_blob.path}}</th></tr>
 		{% else %}
-			<tr><th style="text-align:left;">&nbsp;<span class="gi">created</span> <a href="{%url gitview.fileViews.view %}?path={{repoPath}}&commit={{commit1.commit.hexsha}}&filePath={{change.b_blob.path}}">{{change.b_blob.path}}</a></th></tr>
+			<tr><th style="text-align:left;">&nbsp;<span class="gi">created</span> <a href="{%url "gitview.fileViews.view" %}?path={{repoPath}}&commit={{commit1.commit.hexsha}}&filePath={{change.b_blob.path}}">{{change.b_blob.path}}</a></th></tr>
 		{% endif %}
 	{% endif %}
 </table>

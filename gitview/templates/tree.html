@@ -2,7 +2,7 @@
 {% load highlight %}
 
 {% block repoHeader %}
-<b>Repository path:</b><a href="{% url gitview.views.commits %}?path={{ repoPath }}&branch={{branch}}">{{ repoPath }}</a>/[commit:<a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{commitId}}&branch={{branch}}">{{commitId}}</a>]
+<b>Repository path:</b><a href="{%url "gitview.views.commits" %}?path={{ repoPath }}&branch={{branch}}">{{ repoPath }}</a>/[commit:<a href="{%url "gitview.views.commit"%}?path={{repoPath}}&id={{commitId}}&branch={{branch}}">{{commitId}}</a>]
 {%endblock%}
 
 {% block contentBlock %}
@@ -22,7 +22,7 @@
 	});
 	
 	function showContent(fileName){
-		$.get("{%url gitview.fileViews.fileContent%}",{
+		$.get("{%url "gitview.fileViews.fileContent"%}",{
 			path:"{{repoPath}}",
 			commitId:"{{commitId}}",
 			branch:"{{branch}}",			

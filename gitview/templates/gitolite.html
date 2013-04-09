@@ -155,7 +155,7 @@ $(document).ready(function(){
 
 });
 function showContent(fileName){
-	$.get("{%url gitview.gitolite.fileContent%}",{
+	$.get("{%url "gitview.gitolite.fileContent"%}",{
 		filePath:fileName
 	},function(html){
 		$('#fileName').html(fileName);

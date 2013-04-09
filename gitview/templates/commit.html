@@ -5,7 +5,7 @@
 {% load gravatar %}
 
 {% block repoHeader %}
-<b>Repository:</b> <a href="{% url gitview.views.commits %}?path={{ repoPath }}&branch={{branch}}">/{{ repoPath }}</a>
+<b>Repository:</b> <a href="{%url "gitview.views.commits" %}?path={{ repoPath }}&branch={{branch}}">/{{ repoPath }}</a>
 {%endblock %}
 
 {% block contentBlock %}
@@ -34,7 +34,7 @@
 			<b>Id:</b>	{{commit.commit.hexsha}}<br/>
 			<b>Parents:</b>
 				{% for par in commit.commit.parents %}
-					<a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{par}}">{{par}}</a>
+					<a href="?path={{repoPath}}&id={{par}}">{{par}}</a>
 				{% endfor %}<br/>
 			<b>Author:</b> {{commit.commit.author.name}} &lt;{{commit.commit.author.email}}&gt; <br/>
 			<b>Commit Date:</b>	{{commit.commit.committed_date|timestamp:'%Y-%m-%d %H:%M'}}<br/>
@@ -46,9 +46,9 @@
 	</tr>
 	<tr>
 		<th colspan="3" style="padding:2px; text-align:right;">
-			<a href="{% url gitview.fileViews.tree%}?path={{repoPath}}&commit={{commit.commit.hexsha}}" title="File Tree"><img src="/static/images/file_tree.png" title="File Tree"/></a>
-			<a href="{% url gitview.fileViews.zipTree%}?path={{repoPath}}&commit={{commit.commit.hexsha}}" title="Zip Tree"><img src="/static/images/archive.png" border="0" title="Zip Tree"  /></a>
-			<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{commit.commit.hexsha}}"><img src="/static/images/point.png" height="22px" width="22px" border="0" title="Show in the graph"/></a>
+			<a href="{%url "gitview.fileViews.tree"%}?path={{repoPath}}&commit={{commit.commit.hexsha}}" title="File Tree"><img src="/static/images/file_tree.png" title="File Tree"/></a>
+			<a href="{%url "gitview.fileViews.zipTree"%}?path={{repoPath}}&commit={{commit.commit.hexsha}}" title="Zip Tree"><img src="/static/images/archive.png" border="0" title="Zip Tree"  /></a>
+			<a href="?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{commit.commit.hexsha}}"><img src="/static/images/point.png" height="22px" width="22px" border="0" title="Show in the graph"/></a>
 		</th>
 	</tr>
 </table>
@@ -63,7 +63,7 @@
 					$(function(){
 						//diff call
 						$('#{{change.a_blob.hexsha}}_showBtn').click(function(){
-							$.get("{%url gitview.fileViews.diff %}",{
+							$.get("",{
 								path:"{{repoPath}}",
 								commit:"{{commit.commit.hexsha}}",
 								oldSha:"{{change.a_blob.hexsha}}",
@@ -76,7 +76,7 @@
 						});
 						//GHDiff Call
 						$('#{{change.a_blob.hexsha}}_ghshowBtn').click(function(){
-							$.get("{%url gitview.fileViews.diff %}",{
+							$.get("{%url "gitview.fileViews.diff" %}",{
 								path:"{{repoPath}}",
 								commit:"{{commit.commit.hexsha}}",
 								oldSha:"{{change.a_blob.hexsha}}",
@@ -94,10 +94,10 @@
 			</th>
 			<th style="text-align:left;">&nbsp;
 				{% if not change.renamed %}
-					<a href="{%url gitview.fileViews.view %}?path={{repoPath}}&commit={{commit.commit.hexsha}}&filePath={{change.a_blob.path}}&branch={{branch}}">
+					<a href="{%url "gitview.fileViews.view" %}?path={{repoPath}}&commit={{commit.commit.hexsha}}&filePath={{change.a_blob.path}}&branch={{branch}}">
 						{{change.a_blob.path}}</a>
 				{% else %}
-					{{change.renamed_from}} -> <a href="{%url gitview.fileViews.view %}?path={{repoPath}}&commit={{commit.commit.hexsha}}&filePath={{change.a_blob.path}}&branch={{branch}}">{{change.renamed_to}}</a>
+					{{change.renamed_from}} -> <a href="{%url "gitview.fileViews.view" %}?path={{repoPath}}&commit={{commit.commit.hexsha}}&filePath={{change.a_blob.path}}&branch={{branch}}">{{change.renamed_to}}</a>
 				{% endif %}
 			</th>
 		</tr>
@@ -111,7 +111,7 @@
 		{% if change.deleted_file  %}
 			<tr><th style="text-align:left;">&nbsp;<span class="gd">deleted</span> {{change.a_blob.path}}</th></tr>
 		{% else %}
-			<tr><th style="text-align:left;">&nbsp;<span class="gi">created</span> <a href="{%url gitview.fileViews.view %}?path={{repoPath}}&commit={{commit.commit.hexsha}}&filePath={{change.b_blob.path}}">{{change.b_blob.path}}</a></th></tr>
+			<tr><th style="text-align:left;">&nbsp;<span class="gi">created</span> <a href="{%url "gitview.fileViews.view" %}?path={{repoPath}}&commit={{commit.commit.hexsha}}&filePath={{change.b_blob.path}}">{{change.b_blob.path}}</a></th></tr>
 		{% endif %}
 	{% endif %}
 </table>

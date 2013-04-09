@@ -1,9 +1,9 @@
 from django.utils.encoding import smart_unicode,DjangoUnicodeDecodeError
 from datetime import datetime
-import md5
+import hashlib
 
 def getGravatarUrl(email,size):
-    md5Email=md5.new(email).hexdigest()
+    md5Email=hashlib.new(email).hexdigest()
     return "http://www.gravatar.com/avatar/"+md5Email+"?d=mm&s="+str(size)
 
 def canvasTooltipRect(x,y,width,height,color):

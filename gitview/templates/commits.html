@@ -6,9 +6,9 @@
 {% block repoHeader %}
 	<div style="line-height: 20px;">
 	{% if filePath %}
-		{% if moduleName != "" %}<b>Folder:</b> <a href="{% url gitview.views.index %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{%endif%}
+		{% if moduleName != "" %}<b>Folder:</b> <a href="{%url "gitview.views.index" %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{%endif%}
 		<b>Name:</b> {{ repoName }}<br/>
-		<b>FileName path:</b><a href="{% url gitview.views.index %}?path={{ modulePath }}">{{ modulePath }}</a>/{{ repoName }}/{{filePath}}
+		<b>FileName path:</b><a href="{%url "gitview.views.index" %}?path={{ modulePath }}">{{ modulePath }}</a>/{{ repoName }}/{{filePath}}
 	{%else%}
 		<script>
 			$(function(){
@@ -20,8 +20,8 @@
 		
 		<form id="branchForm" method="GET" style="margin:auto;" class="branchForm">
 			{{branchForm.path}}
-			{% if moduleName != "" %}<b>Folder:</b> <a href="{% url gitview.views.index %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{%endif%}
-			<b>Name:</b> {{ repoName }} {%if repoDesc %}- {{ repoDesc }} {% if request.user.username %}<a href="{%url gitview.views.modDescription%}?path={{repoPath}}"><img src="/static/images/edit.png" border="0" title="Edit Description"/></a>{%endif%}{%endif%}<br/>
+			{% if moduleName != "" %}<b>Folder:</b> <a href="{%url "gitview.views.index" %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{%endif%}
+			<b>Name:</b> {{ repoName }} {%if repoDesc %}- {{ repoDesc }} {% if request.user.username %}<a href="{%url "gitview.views.modDescription"%}?path={{repoPath}}"><img src="/static/images/edit.png" border="0" title="Edit Description"/></a>{%endif%}{%endif%}<br/>
 			<b>URL:</b> {{gitBasicUrl}}{% if moduleName != "" %}/{{ moduleName }}{%endif%}/{{ repoName }}<br/>
 			<b>Branch/Tag:</b> {{branchForm.branch}}<br/>
 		</form>
@@ -78,7 +78,7 @@
 						<script type="text/javascript">
 							$('#graphBtn').click(function(){
 								$('#filterForm').get(0).setAttribute('method', 'GET');
-								$('#filterForm').get(0).setAttribute('action', '{%url gitview.views.graph %}');
+								$('#filterForm').get(0).setAttribute('action', '{%url "gitview.views.graph" %}');
 								filterForm.submit();
 							});
 						</script>
@@ -89,7 +89,7 @@
 		</form>
 	</div>
 	<br/>
-	<form method="GET" action="{% url gitview.views.compareCommit %}">
+	<form method="GET" action="{%url "gitview.views.compareCommit" %}">
 		<input type="hidden" name="path" value="{{ repoPath|safe }}"/>
 		<script type="text/javascript">
 			$(function(){
@@ -130,10 +130,10 @@
 					{% endif %}
 				</td>
 				<td style="text-align:center;" nowrap="nowrap">
-					<a href="{% url gitview.views.commit %}?path={{repoPath}}&id={{cmt.commit.hexsha}}&branch={{branch}}"><img src="/static/images/detail.png" border="0" title="Detail"/></a>
-					<a href="{% url gitview.fileViews.tree%}?path={{repoPath}}&commit={{cmt.commit.hexsha}}&branch={{branch}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
-					<a href="{% url gitview.fileViews.zipTree%}?path={{repoPath}}&commit={{cmt.commit.hexsha}}"><img src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
-					<a href="{%url gitview.views.graph %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{cmt.commit.hexsha}}"><img src="/static/images/point.png" border="0" title="Show in the graph" height="22px" width="22px"/></a>
+					<a href="{%url "gitview.views.commit" %}?path={{repoPath}}&id={{cmt.commit.hexsha}}&branch={{branch}}"><img src="/static/images/detail.png" border="0" title="Detail"/></a>
+					<a href="{%url "gitview.fileViews.tree"%}?path={{repoPath}}&commit={{cmt.commit.hexsha}}&branch={{branch}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
+					<a href="{%url "gitview.fileViews.zipTree"%}?path={{repoPath}}&commit={{cmt.commit.hexsha}}"><img src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
+					<a href="{%url "gitview.views.graph" %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{cmt.commit.hexsha}}"><img src="/static/images/point.png" border="0" title="Show in the graph" height="22px" width="22px"/></a>
 				</td>
 			</tr>
 			{% endfor %}

@@ -24,22 +24,56 @@
 	<div class="menuPanel">
 		<div class="loginPanel">
 			 {% if request.user.username %}
-                   {% blocktrans %}welcome{% endblocktrans %} {{request.user.first_name}} [ <a href="{%url login.views.logoutView %}">logout</a> ]
+                   {% blocktrans %}welcome{% endblocktrans %} {{request.user.first_name}} [ <a href="{%url "gitDashboard.login.views.logoutView" %}">logout</a> ]
               {% else %}
-                  <a href="{%url login.views.loginView %}">login</a>
+                  <a href="{%url "gitDashboard.login.views.loginView" %}">login</a>
               {%endif%}
 		</div>
 		<div class="menu">
-			<a href="{%url gitview.views.index %}">Home</a>
+			<a href="{%url "gitview.views.index" %}">Home</a>
 					{% if request.user.username %}
-					 	&nbsp;&nbsp;&nbsp;<a href="{%url gitview.views.new %}">Repository Management</a>
+					 	&nbsp;&nbsp;&nbsp;<a href="{%url "gitview.views.new" %}">Repository Management</a>
 					{%endif%}
 		</div>
 	</div>
 	<div class="top">
 		<div class="title">
-			<a href="{%url gitview.views.index %}"><img id="logoImg" src="/static/images/logo.png" border="0px"/></a>
+			<a href="{%url "gitview.views.index" %}"><img id="logoImg" src="/static/images/logo.png" border="0px"/></a>
 		</div>
+        <div id="search">
+            <form action="{%url 'gitview.views.commits' %}" id="searchReposForm">
+                {% blocktrans %}search{% endblocktrans %}:<input type="text" id="searchRepos" name="path">
+                <script>
+                    $('#searchRepos').autocomplete({
+                           source:function(request,response){
+                               $.ajax({
+                                   url: "{% url 'rest.search.searchRepos' %}?search="+$('#searchRepos').val(),
+                                   dataType: "json",
+                                   success: function(data){
+                                       response($.map( data,function(item){
+                                            return{
+                                                label:item.repo,
+                                                value:item.repo
+                                            }
+                                       }));
+                                   }
+                               })
+                           },
+                           minLength:2,
+                           open: function() {
+                               $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+                           },
+                           close: function() {
+                               $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+                           },
+                           select:function(){
+                               $('#searchReposForm').submit();
+                           }
+                        }
+                    )
+                </script>
+            </form>
+        </div>
 	</div>
 	<div class="repoHeader">
 		{% block repoHeader %}  {% endblock %}

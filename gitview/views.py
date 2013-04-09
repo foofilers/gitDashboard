@@ -13,12 +13,14 @@ from django.contrib.auth.decorators import login_required
 import re
 from issue import Mantis1_7IssuePane,NoIssueFoundException
 
+
 def getGitPath():
-    if settings.GIT_PATH[-1]=='/':
-        gitPath=settings.GIT_PATH
+    if settings.GIT_PATH[-1] == '/':
+        gitPath = settings.GIT_PATH
     else:
-        gitPath=settings.GIT_PATH+"/"
+        gitPath = settings.GIT_PATH+"/"
     return gitPath
+
 
 def index(request):
     gitPath=getGitPath()

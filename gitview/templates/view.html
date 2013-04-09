@@ -2,12 +2,12 @@
 {% load highlight %}
 
 {% block repoHeader %}
-<b>Repository path:</b>{{ repoPath }} (<a href="{%url gitview.views.commit%}?path={{repoPath}}&id={{commitId}}&branch={{branch}}">commit</a>)
+<b>Repository path:</b>{{ repoPath }} (<a href="{%url "gitview.views.commit"%}?path={{repoPath}}&id={{commitId}}&branch={{branch}}">commit</a>)
 {% endblock %}
 {% block contentBlock %}
 <script>
 	$(function(){
-		$.get("{%url gitview.fileViews.fileContent%}",{
+		$.get("{%url "gitview.fileViews.fileContent"%}",{
 			path:"{{repoPath}}",
 			commitId:"{{commitId}}",
 			filePath:"{{fileName}}",

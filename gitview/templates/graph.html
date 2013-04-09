@@ -3,7 +3,7 @@
 
 
 {% block repoHeader %}
-<b>Repository:</b> <a href="{% url gitview.views.commits %}?path={{ repoPath }}&branch={{branch}}">{{ repoPath }}</a>
+<b>Repository:</b> <a href="{%url "gitview.views.commits" %}?path={{ repoPath }}&branch={{branch}}">{{ repoPath }}</a>
 {%endblock %}
 
 {% block contentBlock %}

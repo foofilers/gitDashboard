@@ -70,6 +70,11 @@ form {
 	vertical-align: middle;
 }
 
+#search{
+    float:right;
+    margin-top:25px;
+}
+
 .center{
 	background-color:white;
 	border:1px solid #CCCCCC;
