@@ -1,216 +1,234 @@
-body{
-	font-family: verdana;
-	font-size:12px;
-	background-color: #EEEEEE;
-	margin:0px;
+body {
+    font-family: verdana;
+    font-size: 12px;
+    background-color: #EEEEEE;
+    margin: 0px;
 }
-table{
-	font-size:12px;
+
+table {
+    font-size: 12px;
 }
-a visited{
-	color:black;
+
+a visited {
+    color: black;
 }
+
 a {
-	color:black;
+    color: black;
 }
 
 form {
-	margin : 0;
-	padding : 0;
+    margin: 0;
+    padding: 0;
 }
 
-.menuPanel{
-	background-image:url("/static/images/ui-bg_diagonals-thick_20_666666_40x40.png");
-	height:22px;
-	width: 100%;	
+.menuPanel {
+    background-image: url("/static/images/ui-bg_diagonals-thick_20_666666_40x40.png");
+    height: 22px;
+    width: 100%;
 }
-.menu{
-	padding-top:3px;
-	margin-left:5px;
-	color: white;
-	font-weight: bold;
-	font-family: serif,sans-serif,verdana;
+
+.menu {
+    padding-top: 3px;
+    margin-left: 5px;
+    color: white;
+    font-weight: bold;
+    font-family: serif, sans-serif, verdana;
 }
-.menu a visited{
-	color:white;
+
+.menu a visited {
+    color: white;
 }
+
 .menu a {
-	color:white;
+    color: white;
 }
 
-.loginPanel{
-	float:right;
-	color:white;
-	padding-top:3px;
-	margin-right:5px;
-	font-weight: bold;
-	font-family: serif,sans-serif,verdana;
+.loginPanel {
+    float: right;
+    color: white;
+    padding-top: 3px;
+    margin-right: 5px;
+    font-weight: bold;
+    font-family: serif, sans-serif, verdana;
 }
 
-.loginPanel a visited{
-	color:white;
+.loginPanel a visited {
+    color: white;
 }
+
 .loginPanel a {
-	color:white;
+    color: white;
 }
 
-.login{
-	border:1px solid #000000;
-	float:right;
-	margin-right:10px;
+.login {
+    border: 1px solid #000000;
+    float: right;
+    margin-right: 10px;
 }
 
-.top{
-	
-	background-color:white;
-	border:1px solid #CCCCCC;
-	height: 50px;
-}
-.top img{
-	vertical-align: middle;
+.top {
+
+    background-color: white;
+    border: 1px solid #CCCCCC;
+    height: 50px;
 }
 
-#search{
-    float:right;
-    margin-top:25px;
+.top img {
+    vertical-align: middle;
 }
 
-.center{
-	background-color:white;
-	border:1px solid #CCCCCC;
-	padding:5px;
-	
+#search {
+    float: right;
+    margin-top: 25px;
 }
 
-.bottom{
-	text-align:right;
-	border-left:1px solid #CCCCCC;
-	border-right:1px solid #CCCCCC;
-	border-bottom:1px solid #CCCCCC;
-	padding-right:5px;
-	font-size:10px;
+.center {
+    background-color: white;
+    border: 1px solid #CCCCCC;
+    padding: 5px;
+
 }
 
-.repoHeader{
-	margin-top:5px;
-	background-color:white;
-	border:1px solid #CCCCCC;
-	margin-bottom:5px;
-	padding:5px;
+.bottom {
+    text-align: right;
+    border-left: 1px solid #CCCCCC;
+    border-right: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+    padding-right: 5px;
+    font-size: 10px;
 }
 
-input,select,textarea{
-	font-family:monospace;
-	border:1px solid #CCCCCC;
+.repoHeader {
+    margin-top: 5px;
+    background-color: white;
+    border: 1px solid #CCCCCC;
+    margin-bottom: 5px;
+    padding: 5px;
 }
 
-.title{
-	font-weight: bold;
-	float:left;
-	clear:left;
+input, select, textarea {
+    font-family: monospace;
+    border: 1px solid #CCCCCC;
 }
 
-.content{
-	padding-top:10px;
+.title {
+    font-weight: bold;
+    float: left;
+    clear: left;
 }
 
-.gridTable{
-	border:1px solid #000000;
-	border-collapse: collapse;
-	margin-bottom:10px;
+.content {
+    padding-top: 10px;
 }
 
-.gridTable td{
-	padding:5px;
-	border:1px solid #CCCCCC;
+.gridTable {
+    border: 1px solid #000000;
+    border-collapse: collapse;
+    margin-bottom: 10px;
 }
 
-.gridTable th{
-	background-image:url("/static/images/bg_table.png");
-	font-size:12px;
-	border:1px solid #CCCCCC;
-	height:25px;
+.gridTable td {
+    padding: 5px;
+    border: 1px solid #CCCCCC;
+}
+
+.gridTable th {
+    background-image: url("/static/images/bg_table.png");
+    font-size: 12px;
+    border: 1px solid #CCCCCC;
+    height: 25px;
 }
 
 .gridTable tr.highlight {
-  background-color: #e5f0f5;
-}
-.highlighttable{
-	width:100%;
-}
-.gd{
-	color:red;
-}
-.gi{
-	color:green;
-}
-.gu{
-	color:gray;
-}
-.commitTable{
-	border:1px solid #c5d5dd;
-	border-collapse: collapse;
-}
-.commitTable td{
-	padding:15px;
-	border:1px solid #c5d5dd;
-}	
-	
-.commitTable th{
-	padding:15px;
-	font-weight:normal;
-	text-align:left;
-	border:1px solid #c5d5dd;
-	background-color: #e5f0f5;
+    background-color: #e5f0f5;
 }
 
-.tag{
-	margin-right:5px;
-	font-size:10px;
-	background-color: #e5f0f5;
-	border:1px solid #c5d5dd;
+.highlighttable {
+    width: 100%;
 }
 
-.branch{
-	margin-right:5px;
-	font-size:10px;
-	background-color: lightgreen;
-	border:1px solid #CCCCCC;
+.gd {
+    color: red;
 }
 
-.fileContent{
-	overflow: auto;
+.gi {
+    color: green;
 }
 
-.branchForm select{
-	background-color: white;
+.gu {
+    color: gray;
 }
 
-.leftMenu{
-	float:left;
-	width:200px;
+.commitTable {
+    border: 1px solid #c5d5dd;
+    border-collapse: collapse;
 }
-.rightContent{
-	padding-left:210px;
+
+.commitTable td {
+    padding: 15px;
+    border: 1px solid #c5d5dd;
 }
+
+.commitTable th {
+    padding: 15px;
+    font-weight: normal;
+    text-align: left;
+    border: 1px solid #c5d5dd;
+    background-color: #e5f0f5;
+}
+
+.tag {
+    margin-right: 5px;
+    font-size: 10px;
+    background-color: #e5f0f5;
+    border: 1px solid #c5d5dd;
+}
+
+.branch {
+    margin-right: 5px;
+    font-size: 10px;
+    background-color: lightgreen;
+    border: 1px solid #CCCCCC;
+}
+
+.fileContent {
+    overflow: auto;
+}
+
+.branchForm select {
+    background-color: white;
+}
+
+.leftMenu {
+    float: left;
+    width: 200px;
+}
+
+.rightContent {
+    padding-left: 210px;
+}
+
 #canvasGraph {
-	
-	background-color:white
-}
-.code{
-	font-family: monospace;
-	border:1px solid #CCCCCC;
-}
-.issuePanel{
-	
+
+    background-color: white
 }
 
-.issuePanel table{
-	border-spacing:0px;
-	border-collapse: collapse;
+.code {
+    font-family: monospace;
+    border: 1px solid #CCCCCC;
 }
 
-.issuePanel table td{
-	padding:2px;
+.issuePanel {
+
+}
+
+.issuePanel table {
+    border-spacing: 0px;
+    border-collapse: collapse;
+}
+
+.issuePanel table td {
+    padding: 2px;
 }
 

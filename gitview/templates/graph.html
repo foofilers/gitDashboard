@@ -3,240 +3,241 @@
 
 
 {% block repoHeader %}
-<b>Repository:</b> <a href="{%url "gitview.views.commits" %}?path={{ repoPath }}&branch={{branch}}">{{ repoPath }}</a>
-{%endblock %}
+    <b>Repository:</b>
+    <a href="{% url "gitview.views.commits" %}?path={{ repoPath }}&branch={{ branch }}">{{ repoPath }}</a>
+{% endblock %}
 
 {% block contentBlock %}
-<script src="/static/js/kinetic-v3.8.5.min.js"></script>
-<form>
-	<label>Show Tag</label>
-	<input type="checkbox" id="shotTagsChk" checked></input>
-</form>
-<div id="canvasGraph" style="border:1px solid #000000;margin:auto;height:{{height}};width:100%;"></div>
+    <script src="/static/js/kinetic-v3.8.5.min.js"></script>
+    <form>
+        <label>Show Tag</label>
+        <input type="checkbox" id="shotTagsChk" checked></input>
+    </form>
+    <div id="canvasGraph" style="border:1px solid #000000;margin:auto;height:{{ height }};width:100%;"></div>
 
-<script type="text/javascript">
-function line(x1,y1,x2,y2,color,layer){
-	var ln = new Kinetic.Shape({
-        drawFunc: function(){
-            var context = this.getContext();
-            context.beginPath();
-        	context.lineWidth = 2;
-        	context.strokeStyle = color;
-        	oblique=false;
-        	vertical=false;
-        	if (x2-x1 != 0){
-        		m = (y2 - y1) / (x2 - x1)
-        		if (m!=0){
-            		oblique=true
-            	}
-        	}else{
-        		vertical=true
-        	}
-        	context.moveTo(x1,y1);
-        	if (!oblique){
-        		context.lineTo(x2,y2);
-        	}else{
-        		//oblique
-        		context.strokeStyle="blue";
-        		if (y2<=y1){
-        			//destination higher than source
-        			context.lineTo(x1,y2+20);
-            		context.lineTo(x2-15,y2+20);
-            		context.lineTo(x2,y2);
-            		//arrow
-            		context.moveTo(x2-5,y2+5);
-            		context.lineTo(x2-13,y2+9);
-            		context.moveTo(x2-5,y2+5);
-            		context.lineTo(x2-3,y2+13);
-        		}else{
-        			//destination lower than source
-        			context.lineTo(x1,y2-20);
-            		context.lineTo(x2-15,y2-20);
-            		context.lineTo(x2,y2);
-            		//arrow
-            		context.moveTo(x2-5,y2-5);
-            		context.lineTo(x2-13,y2-9);
-            		context.moveTo(x2-5,y2-5);
-            		context.lineTo(x2-3,y2-13);
-            		
-        		}
-        		
-        	}
-        	context.stroke();
-        	context.closePath();
-        	context.restore();
-        }});
-	layer.add(ln);
-}
+    <script type="text/javascript">
+    function line(x1, y1, x2, y2, color, layer) {
+        var ln = new Kinetic.Shape({
+            drawFunc: function () {
+                var context = this.getContext();
+                context.beginPath();
+                context.lineWidth = 2;
+                context.strokeStyle = color;
+                oblique = false;
+                vertical = false;
+                if (x2 - x1 != 0) {
+                    m = (y2 - y1) / (x2 - x1)
+                    if (m != 0) {
+                        oblique = true
+                    }
+                } else {
+                    vertical = true
+                }
+                context.moveTo(x1, y1);
+                if (!oblique) {
+                    context.lineTo(x2, y2);
+                } else {
+                    //oblique
+                    context.strokeStyle = "blue";
+                    if (y2 <= y1) {
+                        //destination higher than source
+                        context.lineTo(x1, y2 + 20);
+                        context.lineTo(x2 - 15, y2 + 20);
+                        context.lineTo(x2, y2);
+                        //arrow
+                        context.moveTo(x2 - 5, y2 + 5);
+                        context.lineTo(x2 - 13, y2 + 9);
+                        context.moveTo(x2 - 5, y2 + 5);
+                        context.lineTo(x2 - 3, y2 + 13);
+                    } else {
+                        //destination lower than source
+                        context.lineTo(x1, y2 - 20);
+                        context.lineTo(x2 - 15, y2 - 20);
+                        context.lineTo(x2, y2);
+                        //arrow
+                        context.moveTo(x2 - 5, y2 - 5);
+                        context.lineTo(x2 - 13, y2 - 9);
+                        context.moveTo(x2 - 5, y2 - 5);
+                        context.lineTo(x2 - 3, y2 - 13);
+
+                    }
+
+                }
+                context.stroke();
+                context.closePath();
+                context.restore();
+            }});
+        layer.add(ln);
+    }
 
 
-function label(x,y,tagText,layer,bgcolor,fgcolor){
-	var length = tagText.length*07;
-	var tag = new Kinetic.Shape({
-        drawFunc: function(){
-        	var context = this.getContext();
-            context.beginPath();
-        	context.lineWidth = 2;
-        	context.moveTo(x,y);
-        	context.lineTo(x+7,y+7);
-        	context.moveTo(x,y);
-        	context.lineTo(x-7,y+7);
-        	context.lineTo(x-7,y+length+7);
-        	context.lineTo(x+7,y+length+7);
-        	context.lineTo(x+7,y+7);
-        	context.closePath();
-            this.fillStroke();
-        },
-        fill: bgcolor,
-        stroke: fgcolor,
-        strokeWidth: 1,
-        alpha:0.6
-	});
-	layer.add(tag);
-	ytext=y+7;
-	xtext=x+5;
-	var simpleText = new Kinetic.Text({
-		x:xtext,
-		y:ytext,
-        text:tagText,
-        fontSize: 8,
-        textFill: "white",
-        fontFamily:"Verdana",        
-        rotationDeg:90,
-        
-    });
-	layer.add(simpleText);
-}
+    function label(x, y, tagText, layer, bgcolor, fgcolor) {
+        var length = tagText.length * 07;
+        var tag = new Kinetic.Shape({
+            drawFunc: function () {
+                var context = this.getContext();
+                context.beginPath();
+                context.lineWidth = 2;
+                context.moveTo(x, y);
+                context.lineTo(x + 7, y + 7);
+                context.moveTo(x, y);
+                context.lineTo(x - 7, y + 7);
+                context.lineTo(x - 7, y + length + 7);
+                context.lineTo(x + 7, y + length + 7);
+                context.lineTo(x + 7, y + 7);
+                context.closePath();
+                this.fillStroke();
+            },
+            fill: bgcolor,
+            stroke: fgcolor,
+            strokeWidth: 1,
+            alpha: 0.6
+        });
+        layer.add(tag);
+        ytext = y + 7;
+        xtext = x + 5;
+        var simpleText = new Kinetic.Text({
+            x: xtext,
+            y: ytext,
+            text: tagText,
+            fontSize: 8,
+            textFill: "white",
+            fontFamily: "Verdana",
+            rotationDeg: 90,
 
-function highlightsCircle(stage,layer,circle,width){
-	if (circle!=null){
-		var period = 2000;
-		stage.onFrame(function(frame){
-			var scale = Math.sin(frame.time * 2 * Math.PI / period) + 0.001;
-			circle.setScale(scale*1.5);
-			layer.draw();
-		});
-		stage.start();
-		xpos=({{width}} - circle.x)-{{branchNamesWidth}}+20;
-		layer.move(xpos,0,0);
-	}
-}
-var labelGroup = new Kinetic.Group();
-var circlesLayer = new Kinetic.Layer();
-window.onload = function(){
+        });
+        layer.add(simpleText);
+    }
 
-	var width=document.getElementById("canvasGraph").offsetWidth;
-	width=width-20;
-	var stage = new Kinetic.Stage("canvasGraph", width, {{height}});
-	
-	var branchNames = new Kinetic.Layer();
-	
-	var tooltipLayer = new Kinetic.Layer();
-	var tagLayer = new Kinetic.Layer();
-	
-	var lineGroup = new Kinetic.Group();
-	var circleGroup = new Kinetic.Group();
-	
-	var textGroup = new Kinetic.Group();
-	
-	var backgroundRect=new Kinetic.Rect({
-		x:-15,
-		y:0,
-		width:{{width}}+30,
-		height:{{height}},
-		fill:'#F5F8FF',
-		stroke: "#CCCCCC",
-	    strokeWidth: 1
-	});
-	var branchLayerBg=new Kinetic.Rect({
-		x:0,
-		y:0,
-		width:{{branchNamesWidth}},
-		height:{{height}},
-		fill:'#ECF0FB'
-	});
-	var branchBarYear=new Kinetic.Rect({
-		x:0,
-		y:7,
-		width:{{branchNamesWidth}},
-		height:20,
-		fill:'black',
-		alpha: 0.75,
-		stroke: "white",
-	    strokeWidth: 1
-	});
-	var branchBarMonth=new Kinetic.Rect({
-		x:0,
-		y:27,
-		width:{{branchNamesWidth}},
-		height:20,
-		fill:'#202020',
-		alpha: 0.75,
-		stroke: "white",
-	    strokeWidth: 1
-	});
-	var branchBarDay=new Kinetic.Rect({
-		x:0,
-		y:47,
-		width:{{branchNamesWidth}},
-		height:20,
-		fill:'#404040',
-		alpha: 0.75,
-		stroke: "white",
-	    strokeWidth: 1
-	});
-	
-	branchNames.add(branchLayerBg);
-	branchNames.add(branchBarYear);
-	branchNames.add(branchBarMonth);
-	branchNames.add(branchBarDay);
-	
-	{{canvasBranchName|safe}}
-	
-	backgroundRect.on("mousemove",function(){
-		document.body.style.cursor = "move";
-	})
-	circlesLayer.add(backgroundRect);
-	
-	
-	{{canvasCommit|safe}}
-	
-	circlesLayer.add(lineGroup);
-	circlesLayer.add(circleGroup);
-	
-	circlesLayer.add(labelGroup);
-	circlesLayer.add(textGroup);
-	
-	circlesLayer.draggable(true);
-	circlesLayer.setDragConstraint("horizontal");
-	
-	//prevent to move after left border
-	circlesLayer.on("dragend", function(e){
-        if (circlesLayer.x>0){
-        	circlesLayer.setPosition({{branchNamesWidth}}+10,0);
-        	circlesLayer.draw();
+    function highlightsCircle(stage, layer, circle, width) {
+        if (circle != null) {
+            var period = 2000;
+            stage.onFrame(function (frame) {
+                var scale = Math.sin(frame.time * 2 * Math.PI / period) + 0.001;
+                circle.setScale(scale * 1.5);
+                layer.draw();
+            });
+            stage.start();
+            xpos = ({{width}} -circle.x) - {{branchNamesWidth}}+20;
+            layer.move(xpos, 0, 0);
         }
-    });
-	circlesLayer.move(-{{width}}+Math.floor(width/1.3),0);
-	stage.add(circlesLayer);
-	stage.add(tooltipLayer);
-	stage.add(tagLayer);
-	stage.add(branchNames)
-	{{highlights|default_if_none:''|safe}}
-	
-};
+    }
+    var labelGroup = new Kinetic.Group();
+    var circlesLayer = new Kinetic.Layer();
+    window.onload = function () {
 
-</script>
-<script>
-$('#shotTagsChk').change(function(){
-	if ( $('#shotTagsChk').is(':checked') ){
-		labelGroup.show();
-		circlesLayer.draw();
-	}else{
-		labelGroup.hide();
-		circlesLayer.draw();
-	}
-});
-</script>
+        var width = document.getElementById("canvasGraph").offsetWidth;
+        width = width - 20;
+        var stage = new Kinetic.Stage("canvasGraph", width, {{height}});
+
+        var branchNames = new Kinetic.Layer();
+
+        var tooltipLayer = new Kinetic.Layer();
+        var tagLayer = new Kinetic.Layer();
+
+        var lineGroup = new Kinetic.Group();
+        var circleGroup = new Kinetic.Group();
+
+        var textGroup = new Kinetic.Group();
+
+        var backgroundRect = new Kinetic.Rect({
+            x: -15,
+            y: 0,
+            width: {{width}}+30,
+            height:{{height}},
+            fill: '#F5F8FF',
+            stroke: "#CCCCCC",
+            strokeWidth: 1
+        });
+        var branchLayerBg = new Kinetic.Rect({
+            x: 0,
+            y: 0,
+            width:{{branchNamesWidth}},
+            height:{{height}},
+            fill: '#ECF0FB'
+        });
+        var branchBarYear = new Kinetic.Rect({
+            x: 0,
+            y: 7,
+            width:{{branchNamesWidth}},
+            height: 20,
+            fill: 'black',
+            alpha: 0.75,
+            stroke: "white",
+            strokeWidth: 1
+        });
+        var branchBarMonth = new Kinetic.Rect({
+            x: 0,
+            y: 27,
+            width:{{branchNamesWidth}},
+            height: 20,
+            fill: '#202020',
+            alpha: 0.75,
+            stroke: "white",
+            strokeWidth: 1
+        });
+        var branchBarDay = new Kinetic.Rect({
+            x: 0,
+            y: 47,
+            width:{{branchNamesWidth}},
+            height: 20,
+            fill: '#404040',
+            alpha: 0.75,
+            stroke: "white",
+            strokeWidth: 1
+        });
+
+        branchNames.add(branchLayerBg);
+        branchNames.add(branchBarYear);
+        branchNames.add(branchBarMonth);
+        branchNames.add(branchBarDay);
+
+        {{canvasBranchName|safe}}
+
+        backgroundRect.on("mousemove", function () {
+            document.body.style.cursor = "move";
+        })
+        circlesLayer.add(backgroundRect);
+
+
+        {{canvasCommit|safe}}
+
+        circlesLayer.add(lineGroup);
+        circlesLayer.add(circleGroup);
+
+        circlesLayer.add(labelGroup);
+        circlesLayer.add(textGroup);
+
+        circlesLayer.draggable(true);
+        circlesLayer.setDragConstraint("horizontal");
+
+        //prevent to move after left border
+        circlesLayer.on("dragend", function (e) {
+            if (circlesLayer.x > 0) {
+                circlesLayer.setPosition({{branchNamesWidth}}+10, 0);
+                circlesLayer.draw();
+            }
+        });
+        circlesLayer.move(-{{width}}+Math.floor(width / 1.3), 0);
+        stage.add(circlesLayer);
+        stage.add(tooltipLayer);
+        stage.add(tagLayer);
+        stage.add(branchNames)
+        {{highlights|default_if_none:''|safe}}
+
+    };
+
+    </script>
+    <script>
+        $('#shotTagsChk').change(function () {
+            if ($('#shotTagsChk').is(':checked')) {
+                labelGroup.show();
+                circlesLayer.draw();
+            } else {
+                labelGroup.hide();
+                circlesLayer.draw();
+            }
+        });
+    </script>
 
 {% endblock %}

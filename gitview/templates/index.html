@@ -2,100 +2,107 @@
 {% load pathutils %}
 
 {% block repoHeader %}
-<script>
-	$(function(){
-		$('#subDirSel').change(function(){
-			$('#subDirForm').submit();
-		});
-	});
-</script>
-<form id="subDirForm">
-<b>Current Directory :</b> /{% if currPath != gitPath %}{{currPath|relpath:gitPath}}{% endif %}
-<select id="subDirSel" name="path" class="ui-corner-all">
-	<option value="{{currPath|relpath:gitPath}}"></option>
-	{% if currPath != gitPath %}
-		<option value="{{currPath|parent:gitPath}}">../</option>
-	{% endif %}
-	{% for dr in subDirs %}
-		<option value="{{currPath|relpath:gitPath}}/{{dr}}">{{dr}}</option>
-	{%endfor%}
-</select>
-</form>
+    <script>
+        $(function () {
+            $('#subDirSel').change(function () {
+                $('#subDirForm').submit();
+            });
+        });
+    </script>
+    <form id="subDirForm">
+        <b>Current Directory :</b> /{% if currPath != gitPath %}{{ currPath|relpath:gitPath }}{% endif %}
+        <select id="subDirSel" name="path" class="ui-corner-all">
+            <option value="{{ currPath|relpath:gitPath }}"></option>
+            {% if currPath != gitPath %}
+                <option value="{{ currPath|parent:gitPath }}">../</option>
+            {% endif %}
+            {% for dr in subDirs %}
+                <option value="{{ currPath|relpath:gitPath }}/{{ dr }}">{{ dr }}</option>
+            {% endfor %}
+        </select>
+    </form>
 {% endblock %}
 
 {% block contentBlock %}
-<script type="text/javascript">
-	$(function(){
-		$('#repoTable tr').hover(
-			function(){
-				$(this).addClass("highlight");
-			},
-			function(){
-				$(this).removeClass("highlight");
-			}	
-		);
-	}
-	);
-</script>
-<div>
-	<table id="repoTable" width="100%" class="gridTable">
-		<tr>
-			<th>Path</th>
-			<th>Description</th>
-			<th>Url</th>
-			<th>Actions</th>
-		</tr>
-		{% if currPath != gitPath %}
-			<tr>
-				<td>
-					<img src="/static/images/parentFolder.png" style="width:24px; height:24px; vertical-align:middle;"  />
-					<a href="{%url "gitview.views.index"%}?path={{currPath|parent:gitPath}}">Parent</a>
-				</td>
-				<td>
-					Parent Folder
-				</td>
-				<td>
-				</td>
-				<td></td>
-			</tr>
-		{%endif%}
-		{% for dr in subDirs %}
-			<tr>
-				<td>
-					<img src="/static/images/repoFolder.png" style="width:24px; height:24px; vertical-align:middle;"  />
-					<a href="{%url "gitview.views.index"%}?path={{currPath|relpath:gitPath}}/{{dr}}">{{dr}}</a>
-				</td>
-				<td>
-					folder
-				</td>
-				<td>
-				</td>
-				<td></td>
-			</tr>
-		{%endfor%}
-		{% for rep in repos %}
-		<tr>
-			<td><img src="/static/images/gitRepos.png" style="width:20px; height:20px; vertical-align:middle;"  />
-				{% if rep.getHead %}
-				<a href="{%url "gitview.views.commits"%}?path={{rep.path|relpath:gitPath}}">
-					{{rep.path|relpath:currPath}}
-				</a>
-				{% else %}
-					{{rep.path|relpath:currPath}} (NO-HEAD)
-				{% endif %}
-			</td>
-			<td>{%if rep.bare %}{% if request.user.username %}<a href="{%url "gitview.views.modDescription"%}?path={{rep.path|relpath:gitPath}}"><img src="/static/images/edit.png" border="0" title="Edit Description"/></a>{%endif%} {{rep.description}}{%endif%}</td>
-			<td>{{gitBasicUrl}}{{rep.path|relpath:gitPath}}</td>
-			<td style="text-align:center;">
-				{% if rep.getHead %}
-					<a href="{%url "gitview.fileViews.tree"%}?path={{rep.path|relpath:gitPath}}&commit={{rep.getHead}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
-					<a href="{%url "gitview.fileViews.zipTree"%}?path={{rep.path|relpath:gitPath}}&commit={{rep.getHead}}"><img src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
-				{% else %}
-					<img src="/static/images/empty.png" title="Empty"/>
-				{% endif%}
-			</td>
-		</tr>
-		{% endfor %}
-	</table>
-</div>
+    <script type="text/javascript">
+        $(function () {
+                    $('#repoTable tr').hover(
+                            function () {
+                                $(this).addClass("highlight");
+                            },
+                            function () {
+                                $(this).removeClass("highlight");
+                            }
+                    );
+                }
+        );
+    </script>
+    <div>
+        <table id="repoTable" width="100%" class="gridTable">
+            <tr>
+                <th>Path</th>
+                <th>Description</th>
+                <th>Url</th>
+                <th>Actions</th>
+            </tr>
+            {% if currPath != gitPath %}
+                <tr>
+                    <td>
+                        <img src="/static/images/parentFolder.png"
+                             style="width:24px; height:24px; vertical-align:middle;"/>
+                        <a href="{% url "gitview.views.index" %}?path={{ currPath|parent:gitPath }}">Parent</a>
+                    </td>
+                    <td>
+                        Parent Folder
+                    </td>
+                    <td>
+                    </td>
+                    <td></td>
+                </tr>
+            {% endif %}
+            {% for dr in subDirs %}
+                <tr>
+                    <td>
+                        <img src="/static/images/repoFolder.png"
+                             style="width:24px; height:24px; vertical-align:middle;"/>
+                        <a href="{% url "gitview.views.index" %}?path={{ currPath|relpath:gitPath }}/{{ dr }}">{{ dr }}</a>
+                    </td>
+                    <td>
+                        folder
+                    </td>
+                    <td>
+                    </td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+            {% for rep in repos %}
+                <tr>
+                    <td><img src="/static/images/gitRepos.png" style="width:20px; height:20px; vertical-align:middle;"/>
+                        {% if rep.getHead %}
+                            <a href="{% url "gitview.views.commits" %}?path={{ rep.path|relpath:gitPath }}">
+                                {{ rep.path|relpath:currPath }}
+                            </a>
+                        {% else %}
+                            {{ rep.path|relpath:currPath }} (NO-HEAD)
+                        {% endif %}
+                    </td>
+                    <td>{% if rep.bare %}{% if request.user.username %}
+                        <a href="{% url "gitview.views.modDescription" %}?path={{ rep.path|relpath:gitPath }}">
+                        <img src="/static/images/edit.png" border="0" title="Edit Description"/></a>{% endif %}
+                        {{ rep.description }}{% endif %}</td>
+                    <td>{{ gitBasicUrl }}{{ rep.path|relpath:gitPath }}</td>
+                    <td style="text-align:center;">
+                        {% if rep.getHead %}
+                            <a href="{% url "gitview.fileViews.tree" %}?path={{ rep.path|relpath:gitPath }}&commit={{ rep.getHead }}"><img
+                                    src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
+                            <a href="{% url "gitview.fileViews.zipTree" %}?path={{ rep.path|relpath:gitPath }}&commit={{ rep.getHead }}"><img
+                                    src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
+                        {% else %}
+                            <img src="/static/images/empty.png" title="Empty"/>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock %}

@@ -1,16 +1,19 @@
 import logging
+import os
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-import os
+
 from gitview.views import getGitPath
+
 
 log = logging.getLogger("gitDashboard")
 
 
-def _recSearch(dir, search):
+def __recSearch(dir, search):
 	contentDir = os.listdir(dir)
 	res = []
-	log.debug("search repos on directory " + dir + "with search:"+search)
+	log.debug("search repos on directory " + dir + "with search:" + search)
 	for cnt in contentDir:
 		if os.path.isdir(dir + os.path.sep + cnt):
 			if cnt.lower().find('.git') > 0 or os.path.exists(dir + os.path.sep + cnt + os.path.sep + ".git"):
@@ -19,14 +22,15 @@ def _recSearch(dir, search):
 					res.append(dir + os.path.sep + cnt)
 			else:
 				if cnt.lower() != '.git':
-					res += _recSearch(dir + os.path.sep + cnt, search)
+					res += __recSearch(dir + os.path.sep + cnt, search)
 	return res
+
 
 @api_view(['GET'])
 def searchRepos(request):
 	srcQuery = request.GET['search']
 	basePath = getGitPath()
 	autoCompleteJson = []
-	for path in _recSearch(basePath, srcQuery):
-		autoCompleteJson.append({'repo': path.replace(os.path.sep+os.path.sep,os.path.sep).replace(basePath, '')})
+	for path in __recSearch(basePath, srcQuery):
+		autoCompleteJson.append({'repo': path.replace(os.path.sep + os.path.sep, os.path.sep).replace(basePath, '')})
 	return Response(autoCompleteJson)

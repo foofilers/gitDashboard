@@ -1,93 +1,95 @@
 {% load i18n %}
 <html>
 <head>
-	<title>Git DashBoard</title>
-	<link rel="shortcut icon" href="/static/images/favicon.png" />
-	<link href="/static/css/style.css" rel="stylesheet" type="text/css" />
-	<link href="/static/css/jquery-ui-1.8.18.custom.css" rel="stylesheet" type="text/css" />
-	<link href="/static/css/jquery-ui-timepicker-addon.css" rel="stylesheet" type="text/css" />
-	<link href="/static/css/jquery.tooltip.css" rel="stylesheet" type="text/css" />
-	<link href="/static/css/jquery.treeview.css" rel="stylesheet" type="text/css" />  
-	
-	<script type="text/javascript" src="/static/js/jquery-1.7.1.min.js"></script>
-	<script type="text/javascript" src="/static/js/jquery-ui-1.8.18.custom.min.js"></script>
-	<script type="text/javascript" src="/static/js/jquery-ui-timepicker-addon.js"></script>
-	<script type="text/javascript" src="/static/js/jquery-ui-timepicker-it.js"></script>
-	<script type="text/javascript" src="/static/js/jquery.tooltip.js"></script>
-	<script type="text/javascript" src="/static/js/jquery.treeview.js"></script>
-	<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
-	<script type="text/javascript" src="/static/js/jquery.layout.js"></script>
-	<script type="text/javascript" src="/static/js/autoresize.jquery.js"></script>
-	
+    <title>Git DashBoard</title>
+    <link rel="shortcut icon" href="/static/images/favicon.png"/>
+    <link href="/static/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/jquery-ui-1.8.18.custom.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/jquery-ui-timepicker-addon.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/jquery.tooltip.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/jquery.treeview.css" rel="stylesheet" type="text/css"/>
+
+    <script type="text/javascript" src="/static/js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-ui-1.8.18.custom.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-ui-timepicker-it.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.tooltip.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.treeview.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.layout.js"></script>
+    <script type="text/javascript" src="/static/js/autoresize.jquery.js"></script>
+
 </head>
 <body>
-	<div class="menuPanel">
-		<div class="loginPanel">
-			 {% if request.user.username %}
-                   {% blocktrans %}welcome{% endblocktrans %} {{request.user.first_name}} [ <a href="{%url "login.views.logoutView" %}">logout</a> ]
-              {% else %}
-                  <a href="{%url "login.views.loginView" %}">login</a>
-              {%endif%}
-		</div>
-		<div class="menu">
-			<a href="{%url "gitview.views.index" %}">Home</a>
-					{% if request.user.username %}
-					 	&nbsp;&nbsp;&nbsp;<a href="{%url "gitview.views.new" %}">Repository Management</a>
-					{%endif%}
-		</div>
-	</div>
-	<div class="top">
-		<div class="title">
-			<a href="{%url "gitview.views.index" %}"><img id="logoImg" src="/static/images/logo.png" border="0px"/></a>
-		</div>
-        <div id="search">
-            {% blocktrans %}search{% endblocktrans %}:<input type="text" id="searchRepos" name="path" size="30">
-            <script>
-                $('#searchRepos').autocomplete({
-                       source:function(request,response){
-                           $.ajax({
-                               url: "{% url 'rest.search.searchRepos' %}?search="+$('#searchRepos').val(),
-                               dataType: "json",
-                               success: function(data){
-                                   response($.map( data,function(item){
+<div class="menuPanel">
+    <div class="loginPanel">
+        {% if request.user.username %}
+            {% blocktrans %}welcome{% endblocktrans %} {{ request.user.first_name }} [
+            <a href="{% url "login.views.logoutView" %}">logout</a> ]
+        {% else %}
+            <a href="{% url "login.views.loginView" %}">login</a>
+        {% endif %}
+    </div>
+    <div class="menu">
+        <a href="{% url "gitview.views.index" %}">Home</a>
+        {% if request.user.username %}
+            &nbsp;&nbsp;&nbsp;<a href="{% url "gitview.views.new" %}">Repository Management</a>
+        {% endif %}
+    </div>
+</div>
+<div class="top">
+    <div class="title">
+        <a href="{% url "gitview.views.index" %}"><img id="logoImg" src="/static/images/logo.png" border="0px"/></a>
+    </div>
+    <div id="search">
+        {% blocktrans %}search{% endblocktrans %}:<input type="text" id="searchRepos" name="path" size="30">
+        <script>
+            $('#searchRepos').autocomplete({
+                        source: function (request, response) {
+                            $.ajax({
+                                url: "{% url 'rest.search.searchRepos' %}?search=" + $('#searchRepos').val(),
+                                dataType: "json",
+                                success: function (data) {
+                                    response($.map(data, function (item) {
                                         return{
-                                            label:item.repo,
-                                            value:item.repo
+                                            label: item.repo,
+                                            value: item.repo
                                         }
-                                   }));
-                               }
-                           })
-                       },
+                                    }));
+                                }
+                            })
+                        },
 
-                       minLength:2,
-                       open: function() {
-                           $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
-                       },
-                       close: function() {
-                           $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
-                       },
-                       select:function(event,ui){
-                           window.location.href="{% url 'gitview.views.commits' %}?path="+ui.item.label;
-                       }
+                        minLength: 2,
+                        open: function () {
+                            $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
+                        },
+                        close: function () {
+                            $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
+                        },
+                        select: function (event, ui) {
+                            window.location.href = "{% url 'gitview.views.commits' %}?path=" + ui.item.label;
+                        }
                     }
-                )
-            </script>
-        </div>
-	</div>
-	<div class="repoHeader">
-		{% block repoHeader %}  {% endblock %}
-	</div>
-	
-	<div class="center">
-		{% block contentBlock %} content {% endblock %}
-	</div>
-	<div class="bottom" >
-		<a href="https://github.com/n3wtron/gitDashboard" target="_blank">realized by Igor Maculan (n3wtron@gmail.com)</a>
-	</div>
-	<div style="float:right; margin-top:10px;">
-			<a href="http://www.djangoproject.com/"><img src="/static/logos/django.gif" border="0" style="vertical-align:middle;"></a>
-			<a href="http://www.python.org"><img src="/static/logos/python.png" border="0" style="vertical-align:middle;"></a>
-			<a href="http://jquery.com/"><img src="/static/logos/jquery.png" border="0" style="vertical-align:middle;"></a>
-	</div>
+            )
+        </script>
+    </div>
+</div>
+<div class="repoHeader">
+    {% block repoHeader %}  {% endblock %}
+</div>
+
+<div class="center">
+    {% block contentBlock %} content {% endblock %}
+</div>
+<div class="bottom">
+    <a href="https://github.com/n3wtron/gitDashboard" target="_blank">realized by Igor Maculan (n3wtron@gmail.com)</a>
+</div>
+<div style="float:right; margin-top:10px;">
+    <a href="http://www.djangoproject.com/"><img src="/static/logos/django.gif" border="0"
+                                                 style="vertical-align:middle;"></a>
+    <a href="http://www.python.org"><img src="/static/logos/python.png" border="0" style="vertical-align:middle;"></a>
+    <a href="http://jquery.com/"><img src="/static/logos/jquery.png" border="0" style="vertical-align:middle;"></a>
+</div>
 </body>
 </html>

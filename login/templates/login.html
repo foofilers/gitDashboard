@@ -1,15 +1,15 @@
 {% extends "layout.html" %}
 {% block contentBlock %}
-<form action="login" method="post">{% csrf_token %}
-<input type="hidden" name="nextPage" value="{{nextPage}}"/>
-	<table align="center">
-		{{ loginForm }}
-		<tr>
-			<td colspan="2" align="center">
-				<input type="submit" value="login"/>
-			</td>
-		</tr>
-	</table>
-</form>
+    <form action="login" method="post">{% csrf_token %}
+        <input type="hidden" name="nextPage" value="{{ nextPage }}"/>
+        <table align="center">
+            {{ loginForm }}
+            <tr>
+                <td colspan="2" align="center">
+                    <input type="submit" value="login"/>
+                </td>
+            </tr>
+        </table>
+    </form>
 
-{%endblock%}
+{% endblock %}

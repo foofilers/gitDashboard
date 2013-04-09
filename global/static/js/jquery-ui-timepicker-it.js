@@ -1,6 +1,6 @@
 /* Italian translation for the jQuery Timepicker Addon */
 /* Written by Marco "logicoder" Del Tongo */
-(function($) {
+(function ($) {
     $.timepicker.regional['it'] = {
         timeOnlyTitle: 'Scegli orario',
         timeText: 'Orario',

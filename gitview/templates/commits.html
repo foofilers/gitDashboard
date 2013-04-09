@@ -4,162 +4,178 @@
 {% load gravatar %}
 
 {% block repoHeader %}
-	<div style="line-height: 20px;">
-	{% if filePath %}
-		{% if moduleName != "" %}<b>Folder:</b> <a href="{%url "gitview.views.index" %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{%endif%}
-		<b>Name:</b> {{ repoName }}<br/>
-		<b>FileName path:</b><a href="{%url "gitview.views.index" %}?path={{ modulePath }}">{{ modulePath }}</a>/{{ repoName }}/{{filePath}}
-	{%else%}
-		<script>
-			$(function(){
-				$('#id_branch').change(function(){
-					$('#branchForm').submit();
-				});
-			})
-		</script>
-		
-		<form id="branchForm" method="GET" style="margin:auto;" class="branchForm">
-			{{branchForm.path}}
-			{% if moduleName != "" %}<b>Folder:</b> <a href="{%url "gitview.views.index" %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{%endif%}
-			<b>Name:</b> {{ repoName }} {%if repoDesc %}- {{ repoDesc }} {% if request.user.username %}<a href="{%url "gitview.views.modDescription"%}?path={{repoPath}}"><img src="/static/images/edit.png" border="0" title="Edit Description"/></a>{%endif%}{%endif%}<br/>
-			<b>URL:</b> {{gitBasicUrl}}{% if moduleName != "" %}/{{ moduleName }}{%endif%}/{{ repoName }}<br/>
-			<b>Branch/Tag:</b> {{branchForm.branch}}<br/>
-		</form>
-	{% endif %}
-	</div>
+    <div style="line-height: 20px;">
+        {% if filePath %}
+            {% if moduleName != "" %}<b>Folder:</b>
+                <a href="{% url "gitview.views.index" %}?path={{ moduleName }}">/{{ moduleName }}</a><br/>{% endif %}
+            <b>Name:</b> {{ repoName }}<br/>
+            <b>FileName path:</b><a href="{% url "gitview.views.index" %}?path={{ modulePath }}">{{ modulePath }}</a>/
+            {{ repoName }}/{{ filePath }}
+        {% else %}
+            <script>
+                $(function () {
+                    $('#id_branch').change(function () {
+                        $('#branchForm').submit();
+                    });
+                })
+            </script>
+
+            <form id="branchForm" method="GET" style="margin:auto;" class="branchForm">
+                {{ branchForm.path }}
+                {% if moduleName != "" %}<b>Folder:</b>
+                    <a href="{% url "gitview.views.index" %}?path={{ moduleName }}">/{{ moduleName }}</a>
+                    <br/>{% endif %}
+                <b>Name:</b> {{ repoName }} {% if repoDesc %}- {{ repoDesc }}
+                {% if request.user.username %}<a href="{% url "gitview.views.modDescription" %}?path={{ repoPath }}">
+                    <img src="/static/images/edit.png" border="0" title="Edit Description"/></a>{% endif %}{% endif %}
+                <br/>
+                <b>URL:</b> {{ gitBasicUrl }}{% if moduleName != "" %}/{{ moduleName }}{% endif %}/{{ repoName }}<br/>
+                <b>Branch/Tag:</b> {{ branchForm.branch }}<br/>
+            </form>
+        {% endif %}
+    </div>
 {% endblock %}
 {% block contentBlock %}
-	<script type="text/javascript">
-		$(function(){
-			$('#commitTable tr').hover(
-				function(){
-					$(this).addClass("highlight");
-				},
-				function(){
-					$(this).removeClass("highlight");
-				}	
-			);
-		});
-	</script>
-	<div id="filterDiv"  class="ui-corner-all" style="border:1px solid #000000; text-align:center;">
-		<script type="text/javascript">
-			$(function(){
-				$('#id_since').datetimepicker({
-					dateFormat:'yy-mm-dd'
-				});
-				$('#id_until').datetimepicker({
-					dateFormat:'yy-mm-dd'
-				});
-			});
-		</script>
-		
-		<form method="POST" id="filterForm" style="margin:auto;">{%csrf_token%}
-			{% if filePath %}
-				<input type="hidden" id="filePath" name="filePath" value="{{filePath}}">
-			{% endif %}
-			<input type="hidden" name="path" value="{{repoPath}}"/>
-			<input type="hidden" name="branch" value="{{branch}}"/>
-			{{filterForm.page}}
-			{{ filterForm.no_field_errors }}
-			<table style="margin:auto;">
-			<tr>
-				<th colspan="5" align="center">Filter</th>
-			</tr>
-			<tr>
-				<td> {{ filterForm.since.errors }}<label for="id_since">Since:</label>{{filterForm.since}}</td>
-				<td> {{ filterForm.until.errors }}<label for="id_until">Until:</label>{{filterForm.until}}</td>
-				<td> {{ filterForm.number.errors }}<label for="id_number">Num.Commits:</label>{{filterForm.number}}</td>
-				<td>
-					<input type="submit" value="Filter" class="ui-corner-all"/>
-				</td>
-				<td>
-				{% if not filePath %}
-						<input id="graphBtn" type="image" style="border:0px;" src="/static/images/graph.png" title="Graph"/>
-						<script type="text/javascript">
-							$('#graphBtn').click(function(){
-								$('#filterForm').get(0).setAttribute('method', 'GET');
-								$('#filterForm').get(0).setAttribute('action', '{%url "gitview.views.graph" %}');
-								filterForm.submit();
-							});
-						</script>
-					{% endif %}
-				</td>
-			</tr>
-			</table>
-		</form>
-	</div>
-	<br/>
-	<form method="GET" action="{%url "gitview.views.compareCommit" %}">
-		<input type="hidden" name="path" value="{{ repoPath|safe }}"/>
-		<script type="text/javascript">
-			$(function(){
-				$('#commitTable :checkbox').click(function(){
-					if($("#commitTable :checkbox:checked").length > 2) {
-						alert("Cannot compare between 3 commit");
-						$(this).prop('checked',false)
-					}
-				});
-			});
-		</script>
-		<table id="commitTable" width="100%" class="gridTable">
-			<tr>
-				<th>Sel</th>
-				<th>Date</th>
-				<th>Author</th>
-				<th>Message</th>
-				<th>Actions</th>
-			</tr>
-			{% for cmt in commits %}
-			<tr>
-				<td><input type="checkbox" name="compareCommitId" value="{{cmt.commit.hexsha}}" ></td>
-				<td nowrap="nowrap">{{cmt.commit.committed_date|timestamp:'%Y-%m-%d %H:%M'}}</td>
-				<td nowrap="nowrap"><img style="vertical-align:middle;" src="{{cmt.commit.author.email|gravatarImageUrl:32}}"/>&nbsp;{{cmt.commit.author.name}} &lt;{{cmt.commit.author.email}}&gt;</td>
-				<td>
-					{{cmt.commit.message}}
-					{% for tag in cmt.getTags %}
-						{% if tag != '' %}
-							<span class="tag">{{tag}}</span>
-						{% endif %}
-					{%endfor%}
-					{% if cmt.getBranches %}
-						{% for branch in cmt.getBranches %}
-							{% if branch != '' %}
-								<span class="branch">{{branch}}</span>
-							{% endif %}
-						{%endfor%}
-					{% endif %}
-				</td>
-				<td style="text-align:center;" nowrap="nowrap">
-					<a href="{%url "gitview.views.commit" %}?path={{repoPath}}&id={{cmt.commit.hexsha}}&branch={{branch}}"><img src="/static/images/detail.png" border="0" title="Detail"/></a>
-					<a href="{%url "gitview.fileViews.tree"%}?path={{repoPath}}&commit={{cmt.commit.hexsha}}&branch={{branch}}"><img src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
-					<a href="{%url "gitview.fileViews.zipTree"%}?path={{repoPath}}&commit={{cmt.commit.hexsha}}"><img src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
-					<a href="{%url "gitview.views.graph" %}?path={{repoPath}}&branch={{branch}}&since={{since|default_if_none:''}}&until={{until|default_if_none:''}}&id={{cmt.commit.hexsha}}"><img src="/static/images/point.png" border="0" title="Show in the graph" height="22px" width="22px"/></a>
-				</td>
-			</tr>
-			{% endfor %}
-			<tr>
-				<td colspan="5">
-					<div id="pagesDiv" style="float:right;">
-						<script>
-							function setNPage(np){
-								$('#id_page').val(np);
-								$('#filterForm').submit();
-							}
-						</script>
-						{%for np in numPages%}
-							{% if np != page %}
-								<a href="#" onClick="setNPage({{np}});">{{np}}</a>
-							{% else %}
-								{{np}}
-							{% endif %}
-						{%endfor%}
-					</div>
-					<div id="compareDiv">
-						<input type="submit" value="Compare" class="ui-corner-all"/>
-					</div>
-				</td>
-			</tr>
-		</table>
-	</form>
+    <script type="text/javascript">
+        $(function () {
+            $('#commitTable tr').hover(
+                    function () {
+                        $(this).addClass("highlight");
+                    },
+                    function () {
+                        $(this).removeClass("highlight");
+                    }
+            );
+        });
+    </script>
+    <div id="filterDiv" class="ui-corner-all" style="border:1px solid #000000; text-align:center;">
+        <script type="text/javascript">
+            $(function () {
+                $('#id_since').datetimepicker({
+                    dateFormat: 'yy-mm-dd'
+                });
+                $('#id_until').datetimepicker({
+                    dateFormat: 'yy-mm-dd'
+                });
+            });
+        </script>
+
+        <form method="POST" id="filterForm" style="margin:auto;">{% csrf_token %}
+            {% if filePath %}
+                <input type="hidden" id="filePath" name="filePath" value="{{ filePath }}">
+            {% endif %}
+            <input type="hidden" name="path" value="{{ repoPath }}"/>
+            <input type="hidden" name="branch" value="{{ branch }}"/>
+            {{ filterForm.page }}
+            {{ filterForm.no_field_errors }}
+            <table style="margin:auto;">
+                <tr>
+                    <th colspan="5" align="center">Filter</th>
+                </tr>
+                <tr>
+                    <td>{{ filterForm.since.errors }}<label for="id_since">Since:</label>{{ filterForm.since }}</td>
+                    <td>{{ filterForm.until.errors }}<label for="id_until">Until:</label>{{ filterForm.until }}</td>
+                    <td>{{ filterForm.number.errors }}<label for="id_number">Num.Commits:</label>{{ filterForm.number }}
+                    </td>
+                    <td>
+                        <input type="submit" value="Filter" class="ui-corner-all"/>
+                    </td>
+                    <td>
+                        {% if not filePath %}
+                            <input id="graphBtn" type="image" style="border:0px;" src="/static/images/graph.png"
+                                   title="Graph"/>
+                            <script type="text/javascript">
+                                $('#graphBtn').click(function () {
+                                    $('#filterForm').get(0).setAttribute('method', 'GET');
+                                    $('#filterForm').get(0).setAttribute('action', '{%url "gitview.views.graph" %}');
+                                    filterForm.submit();
+                                });
+                            </script>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <br/>
+    <form method="GET" action="{% url "gitview.views.compareCommit" %}">
+        <input type="hidden" name="path" value="{{ repoPath|safe }}"/>
+        <script type="text/javascript">
+            $(function () {
+                $('#commitTable :checkbox').click(function () {
+                    if ($("#commitTable :checkbox:checked").length > 2) {
+                        alert("Cannot compare between 3 commit");
+                        $(this).prop('checked', false)
+                    }
+                });
+            });
+        </script>
+        <table id="commitTable" width="100%" class="gridTable">
+            <tr>
+                <th>Sel</th>
+                <th>Date</th>
+                <th>Author</th>
+                <th>Message</th>
+                <th>Actions</th>
+            </tr>
+            {% for cmt in commits %}
+                <tr>
+                    <td><input type="checkbox" name="compareCommitId" value="{{ cmt.commit.hexsha }}"></td>
+                    <td nowrap="nowrap">{{ cmt.commit.committed_date|timestamp:'%Y-%m-%d %H:%M' }}</td>
+                    <td nowrap="nowrap"><img style="vertical-align:middle;"
+                                             src="{{ cmt.commit.author.email|gravatarImageUrl:32 }}"/>&nbsp;{{ cmt.commit.author.name }}
+                        &lt;{{ cmt.commit.author.email }}&gt;</td>
+                    <td>
+                        {{ cmt.commit.message }}
+                        {% for tag in cmt.getTags %}
+                            {% if tag != '' %}
+                                <span class="tag">{{ tag }}</span>
+                            {% endif %}
+                        {% endfor %}
+                        {% if cmt.getBranches %}
+                            {% for branch in cmt.getBranches %}
+                                {% if branch != '' %}
+                                    <span class="branch">{{ branch }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                    <td style="text-align:center;" nowrap="nowrap">
+                        <a href="{% url "gitview.views.commit" %}?path={{ repoPath }}&id={{ cmt.commit.hexsha }}&branch={{ branch }}"><img
+                                src="/static/images/detail.png" border="0" title="Detail"/></a>
+                        <a href="{% url "gitview.fileViews.tree" %}?path={{ repoPath }}&commit={{ cmt.commit.hexsha }}&branch={{ branch }}"><img
+                                src="/static/images/file_tree.png" border="0" title="File Tree"/></a>
+                        <a href="{% url "gitview.fileViews.zipTree" %}?path={{ repoPath }}&commit={{ cmt.commit.hexsha }}"><img
+                                src="/static/images/archive.png" border="0" title="Zip Tree"/></a>
+                        <a href="{% url "gitview.views.graph" %}?path={{ repoPath }}&branch={{ branch }}&since={{ since|default_if_none:'' }}&until={{ until|default_if_none:'' }}&id={{ cmt.commit.hexsha }}"><img
+                                src="/static/images/point.png" border="0" title="Show in the graph" height="22px"
+                                width="22px"/></a>
+                    </td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="5">
+                    <div id="pagesDiv" style="float:right;">
+                        <script>
+                            function setNPage(np) {
+                                $('#id_page').val(np);
+                                $('#filterForm').submit();
+                            }
+                        </script>
+                        {% for np in numPages %}
+                            {% if np != page %}
+                                <a href="#" onClick="setNPage({{ np }});">{{ np }}</a>
+                            {% else %}
+                                {{ np }}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div id="compareDiv">
+                        <input type="submit" value="Compare" class="ui-corner-all"/>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </form>
 
 {% endblock %}
