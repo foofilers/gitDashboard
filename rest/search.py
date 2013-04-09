@@ -10,13 +10,16 @@ log = logging.getLogger("gitDashboard")
 def _recSearch(dir, search):
 	contentDir = os.listdir(dir)
 	res = []
+	log.debug("search repos on directory " + dir + "with search:"+search)
 	for cnt in contentDir:
 		if os.path.isdir(dir + os.path.sep + cnt):
-			if cnt.lower().find(search.lower()) > -1:
-				if cnt.find('.git') > -1 or os.path.exists(dir + os.path.sep + cnt + os.path.sep + ".git"):
+			if cnt.lower().find('.git') > 0 or os.path.exists(dir + os.path.sep + cnt + os.path.sep + ".git"):
+				if cnt.lower().find(search.lower()) > -1:
 					# git repos
 					res.append(dir + os.path.sep + cnt)
-			res += _recSearch(dir + os.path.sep + cnt,search)
+			else:
+				if cnt.lower() != '.git':
+					res += _recSearch(dir + os.path.sep + cnt, search)
 	return res
 
 @api_view(['GET'])

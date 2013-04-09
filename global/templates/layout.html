@@ -41,39 +41,37 @@
 			<a href="{%url "gitview.views.index" %}"><img id="logoImg" src="/static/images/logo.png" border="0px"/></a>
 		</div>
         <div id="search">
-            <form action="{%url 'gitview.views.commits' %}" id="searchReposForm">
-                {% blocktrans %}search{% endblocktrans %}:<input type="text" id="searchRepos" name="path">
-                <script>
-                    $('#searchRepos').autocomplete({
-                           source:function(request,response){
-                               $.ajax({
-                                   url: "{% url 'rest.search.searchRepos' %}?search="+$('#searchRepos').val(),
-                                   dataType: "json",
-                                   success: function(data){
-                                       response($.map( data,function(item){
-                                            return{
-                                                label:item.repo,
-                                                value:item.repo
-                                            }
-                                       }));
-                                   }
-                               })
-                           },
-                           minLength:2,
-                           open: function() {
-                               $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
-                           },
-                           close: function() {
-                               $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
-                           },
-                           select:function(event,ui){
-                               $('#searchRepos').val(ui.item.label);
-                               $('#searchReposForm').submit();
-                           }
-                        }
-                    )
-                </script>
-            </form>
+            {% blocktrans %}search{% endblocktrans %}:<input type="text" id="searchRepos" name="path" size="30">
+            <script>
+                $('#searchRepos').autocomplete({
+                       source:function(request,response){
+                           $.ajax({
+                               url: "{% url 'rest.search.searchRepos' %}?search="+$('#searchRepos').val(),
+                               dataType: "json",
+                               success: function(data){
+                                   response($.map( data,function(item){
+                                        return{
+                                            label:item.repo,
+                                            value:item.repo
+                                        }
+                                   }));
+                               }
+                           })
+                       },
+
+                       minLength:2,
+                       open: function() {
+                           $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+                       },
+                       close: function() {
+                           $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+                       },
+                       select:function(event,ui){
+                           window.location.href="{% url 'gitview.views.commits' %}?path="+ui.item.label;
+                       }
+                    }
+                )
+            </script>
         </div>
 	</div>
 	<div class="repoHeader">
