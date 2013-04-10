@@ -221,7 +221,7 @@ def compareCommit(request):
 	repo = GitRepo(getGitPath() + sep + reposPath)
 	commit1 = repo.getCommit(commitIds[0])
 	commit2 = repo.getCommit(commitIds[1])
-	if (commit1.commit.committed_date > commit2.commit.committed_date):
+	if commit1.commit.committed_date > commit2.commit.committed_date:
 		swp = commit1
 		commit1 = commit2
 		commit2 = swp
