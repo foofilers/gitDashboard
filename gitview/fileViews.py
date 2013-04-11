@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
+from pomparser.core import PomParser
 
 from gitengine.core import GitRepo, GitDir, GitChange
 from views import getGitPath
@@ -55,8 +56,12 @@ def fileContent(request):
 	repo = GitRepo(getGitPath() + sep + reposPath)
 	commit = repo.getCommit(commitId)
 	gitFile = commit.getTree().getFile(filePath)
+	artifact=None
+	if gitFile.blob.path[:7]=='pom.xml':
+		parser=PomParser([],[])
+		artifact = parser.parsePom(pomContent=gitFile.getContent(),recursive=False)
 	return render_to_response("fileContent.html", RequestContext(request, {'repoPath': reposPath, 'commitId': commitId,
-	                                                                       'gitFile': gitFile, 'branch': branch}))
+	                                                                       'gitFile': gitFile, 'branch': branch,'artifact':artifact}))
 
 
 def rawContent(request):

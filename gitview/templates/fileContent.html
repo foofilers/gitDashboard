@@ -2,20 +2,87 @@
 <style>
     {{'code'|highlightstyle}}
 </style>
-<table class="gridTable" width="100%">
-    <tr>
-        <th style="font-weight:normal;text-align:left;padding-left:10px;">
-            {{ gitFile.blob.path }}
-            <a href="{% url "gitview.fileViews.rawContent" %}?path={{ repoPath }}&filePath={{ gitFile.blob.path }}&branch={{ branch }}&commitId={{ commitId }}">Download</a>
-            <a href="{% url "gitview.views.commits" %}?path={{ repoPath }}&filePath={{ gitFile.blob.path }}&branch={{ branch }}">History</a>
-            <a href="{% url "gitview.fileViews.view" %}?path={{ repoPath }}&commit={{ commitId }}&filePath={{ gitFile.blob.path }}&branch={{ branch }}">Link</a>
-        </th>
-    </tr>
-    <tr>
-        <td>
-            <div class="code">
-                {{ gitFile.getContent|highlightTable:gitFile.blob.name|safe }}
-            </div>
-        </td>
-    </tr>
-</table>
+
+{% if artifact %}
+    <div id="mavenPanel">
+        <div style="float: left;height: 300px;width: 70px;">
+            <img src="/static/images/maven.png" style="margin-left:-120px;margin-top:120px;-webkit-transform: rotate(270deg);-moz-transform: rotate(270deg);filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);"/>
+        </div>
+        <div style="padding-left: 75px;">
+            <form>
+                <b>GroupId</b>: {{ artifact.groupId }} <br/>
+                <b>ArtifactId</b>: {{ artifact.artifactId }} <br/>
+                <b>Version</b>: {{ artifact.version }} <br/>
+                <hr/>
+                Dependency Type:
+                <select id="scopeType">
+                    <option value="compile">compile</option>
+                    <option value="test">test</option>
+                    <option value="runtime">runtime</option>
+                    <option value="provided">provided</option>
+                    <option value="all">all</option>
+                </select>
+                <br/>
+                Recursive <input type="checkbox" id="mavenDepRecursive" /><br/>
+                <input type="button" value="View Dependencies" id="mavenRefreshBtn"/>
+            </form>
+            <div id="mavenDepContent"></div>
+            <script type="text/javascript">
+                function refreshMavenDep(){
+                    $("#mavenDepContent").jstree({
+                        "json_data":{
+                            "ajax":{
+                                "url":"{% url 'rest.maven.dependencies' %}?groupId={{ artifact.groupId }}&artifactId={{ artifact.artifactId }}&version={{ artifact.version }}",
+                                "data":{
+                                    'recursive':function(){
+                                        return $('#mavenDepRecursive').prop("checked");
+                                    },
+                                    'scope':function(){
+                                        return $('#scopeType').val();
+                                    }
+                                },
+                                "progressive_render" : true
+                            }
+                        },
+                        "plugins":["themes","json_data"],
+                        "core" : {
+                            "animation":200,
+                            "initially_open" : [ "dep_me" ]
+                        },
+                        "themes":{
+                            'theme':'classic'
+                        }
+                    });
+                }
+                $(function(){
+                    $('#mavenRefreshBtn').click(function(){
+                        refreshMavenDep();
+                    });
+                });
+            </script>
+        </div>
+    </div>
+    <script>
+
+    </script>
+{% endif %}
+
+<div id="fileContentPanel">
+    <table class="gridTable" style="width: 100%;">
+        <tr>
+            <th style="font-weight:normal;text-align:left;padding-left:10px;">
+                {{ gitFile.blob.path }}
+                <a href="{% url "gitview.fileViews.rawContent" %}?path={{ repoPath }}&filePath={{ gitFile.blob.path }}&branch={{ branch }}&commitId={{ commitId }}">Download</a>
+                <a href="{% url "gitview.views.commits" %}?path={{ repoPath }}&filePath={{ gitFile.blob.path }}&branch={{ branch }}">History</a>
+                <a href="{% url "gitview.fileViews.view" %}?path={{ repoPath }}&commit={{ commitId }}&filePath={{ gitFile.blob.path }}&branch={{ branch }}">Link</a>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div class="code">
+                    {{ gitFile.getContent|highlightTable:gitFile.blob.name|safe }}
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
