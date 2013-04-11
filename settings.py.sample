@@ -178,4 +178,5 @@ GITOLITE_URL="git@localhost:gitolite-admin"
 #ISSUE_WSDL="http://example.com/mantis/api/soap/mantisconnect.php?wsdl"
 #ISSUE_USERNAME='username'
 #ISSUE_PASSWORD='password'
-
+MAVEN_RELEASES_URLS=[]
+MAVEN_SNAPSHOTS_URLS=[]

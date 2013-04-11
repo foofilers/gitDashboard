@@ -2,6 +2,7 @@ import logging
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from pomparser.core import PomParser, ArtifactParserException
+from django.conf import settings
 
 log = logging.getLogger('gitDashboard')
 
@@ -30,10 +31,7 @@ def dependencies(request):
 	artifactId = request.GET['artifactId']
 	version = request.GET['version']
 
-	parser = PomParser(["http://drim1.icnet:8081/nexus/content/repositories/drim-releases",
-	                    "http://drim1.icnet:8081/nexus/content/groups/public"],
-	                   ["http://drim1.icnet:8081/nexus/content/repositories/drim-snapshots",
-	                    "http://drim1.icnet:8081/nexus/content/groups/public"])
+	parser = PomParser(settings.MAVEN_RELEASES_URLS,settings.MAVEN_SNAPSHOTS_URLS)
 	recursive = False
 	scope = 'compile'
 	if request.GET['recursive'] == 'true':
