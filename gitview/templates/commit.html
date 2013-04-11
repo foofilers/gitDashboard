@@ -67,7 +67,7 @@
                             $(function () {
                                 //diff call
                                 $('#{{change.a_blob.hexsha}}_showBtn').click(function () {
-                                    $.get("", {
+                                    $.get("{% url "gitview.fileViews.diff" %}", {
                                                 path: "{{repoPath}}",
                                                 commit: "{{commit.commit.hexsha}}",
                                                 oldSha: "{{change.a_blob.hexsha}}",
