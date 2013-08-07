@@ -167,7 +167,7 @@ def commits(request):
 	else:
 		moduleName = ''
 	if repo.bare:
-		repoDesc = repo.description
+		repoDesc = repo.getDescription()
 	else:
 		repoDesc = None
 	return render_to_response("commits.html", RequestContext(request, {
