@@ -89,7 +89,10 @@
                     <td>{% if rep.bare %}{% if request.user.username %}
                         <a href="{% url "gitview.views.modDescription" %}?path={{ rep.path|relpath:gitPath }}">
                         <img src="/static/images/edit.png" border="0" title="Edit Description"/></a>{% endif %}
-                        {{ rep.description }}{% endif %}</td>
+			{% if rep.getDescription %}
+	                        {{ rep.getDescription }}
+			{% endif %}
+			{% endif %}</td>
                     <td>{{ gitBasicUrl }}{{ rep.path|relpath:gitPath }}</td>
                     <td style="text-align:center;">
                         {% if rep.getHead %}

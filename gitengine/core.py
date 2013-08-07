@@ -32,6 +32,12 @@ class GitRepo(Repo):
 			branches[ref.name] = ref.commit.hexsha
 		return branches
 
+	def getDescription(self):
+		try:
+			return self.description;
+		except IOError:
+			return None
+
 	def getCommit(self, commitId):
 		""" Retrieve a GitCommit object represent single commit from reporistory  """
 		return GitCommit(self.commit(commitId))
