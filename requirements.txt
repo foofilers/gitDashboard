@@ -1,0 +1,6 @@
+django=>1.4
+djangorestframework
+gitpython
+ghdiff
+pygments
+suds
