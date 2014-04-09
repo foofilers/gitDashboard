@@ -8,16 +8,23 @@ Description:
 Author: Igor Maculan ( n3wtron@gmail.com ) 
 
 Requirements:
- django 1.3.1
- gitpython 0.3.xx
+ django >1.4
+ djangorestframework
+ gitpython >0.3
  ghdiff
  pygments
- pysqlite2
  suds
+
+Optional Dependencies (based on database backend, and preferred driver):
+ pysqlite
+ psycopg2
+ etc...
  
 Installation:
  1) install the python dependencies (see Requirements) with pip
- 	i.e. pip install django
+ 	i.e.:
+	  pip install -r requirements.txt
+	  pip install pysqlite
  2) copy settings.py.sample into settings.py
  3) edit settings.py and set the variables 
  	GIT_PATH : the directory that contain the git repositories
