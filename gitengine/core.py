@@ -7,7 +7,11 @@ from binascii import unhexlify
 import ghdiff
 from django.utils.encoding import smart_unicode, DjangoUnicodeDecodeError
 from git import Repo, Blob, Diff
-from git.exc import InvalidGitRepositoryError
+
+try:
+    from git.exc import InvalidGitRepositoryError
+except ImportError:
+    from git.errors import InvalidGitRepositoryError
 
 
 class GitRepo(Repo):

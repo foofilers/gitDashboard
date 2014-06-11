@@ -1,11 +1,15 @@
 import os
 import logging
 
-from git.exc import GitCommandError
 from git import PushInfo
 from git.remote import RemoteProgress
 
 from gitengine.core import GitRepo
+
+try:
+    from git.exc import GitCommandError
+except ImportError:
+    from git.errors import GitCommandError
 
 
 logger = logging.getLogger('gitengine')
