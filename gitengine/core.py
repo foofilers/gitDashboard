@@ -1,8 +1,8 @@
-from os import listdir, makedirs
-from os.path import isdir, sep
-from difflib import unified_diff
 import re
 from binascii import unhexlify
+from difflib import unified_diff
+from os import listdir, makedirs
+from os.path import isdir, sep
 
 import ghdiff
 from django.utils.encoding import smart_unicode, DjangoUnicodeDecodeError

@@ -1,19 +1,23 @@
+import os
+import re
+import time
+from base64 import b64decode
+
 from os import sep, listdir
 from os.path import isdir
-import time
-import re
 
+from django import forms
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
-from django.conf import settings
-from django import forms
-from django.core.urlresolvers import reverse
-from django.contrib.auth.decorators import login_required
 
+import gitengine.core as gitEngine
 from gitengine.core import GitRepo
 from gitengine.graph import GitGraphCanvas
-import gitengine.core as gitEngine
 from issue import Mantis1_7IssuePane, NoIssueFoundException
+from utils import checkRepoAuthorization
 
 
 def getGitPath():
@@ -108,6 +112,10 @@ class FilterForm(forms.Form):
 
 def commits(request):
 	reposPath = request.GET['path'].replace("//", "/")
+
+	if not checkRepoAuthorization(request,reposPath):
+		return redirect(forbidden)
+
 	repo = GitRepo(getGitPath() + sep + reposPath)
 	until = None
 	since = None
@@ -187,6 +195,8 @@ def commit(request):
 	:param request:
 	"""
 	reposPath = request.GET['path']
+	if not checkRepoAuthorization(request,reposPath):
+		return redirect(forbidden)
 	commitId = request.GET['id']
 	try:
 		branch = request.GET['branch']
@@ -217,6 +227,8 @@ def commit(request):
 def compareCommit(request):
 	""" Compare two commit"""
 	reposPath = request.GET['path']
+	if not checkRepoAuthorization(request,reposPath):
+		return redirect(forbidden)
 	commitIds = request.GET.getlist('compareCommitId')
 	repo = GitRepo(getGitPath() + sep + reposPath)
 	commit1 = repo.getCommit(commitIds[0])
@@ -270,6 +282,8 @@ def graph(request):
 		called by ajax
 	"""
 	repoPath = request.GET['path']
+	if not checkRepoAuthorization(request,repoPath):
+		return redirect(forbidden)
 	try:
 		branch = request.GET['branch']
 	except KeyError:
@@ -334,3 +348,6 @@ def modDescription(request):
 		repo.description = request.POST['description']
 		return redirect(reverse('gitview.views.commits') + "?path=" + repoPath)
 	return render_to_response("modDescription.html", RequestContext(request, {'repo': repo}))
+
+def forbidden(request):
+	return render_to_response("forbidden.html")

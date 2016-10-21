@@ -17,5 +17,6 @@ urlpatterns = patterns('',
                        url(r'^zipTree', 'gitview.fileViews.zipTree'),
                        url(r'^gitolite$', 'gitview.gitolite.index'),
                        url(r'^gitoliteFile', 'gitview.gitolite.fileContent'),
+                       url(r'^forbidden', 'gitview.views.forbidden'),
                        url(r'^$', 'gitview.views.index'),
 )

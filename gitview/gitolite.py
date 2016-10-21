@@ -1,10 +1,10 @@
 from os import listdir
 from os.path import isdir, sep
 
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
 from gitengine.gitolite import GitoliteAdmin, PushException
 

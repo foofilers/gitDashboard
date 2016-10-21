@@ -1,7 +1,7 @@
-from pygments import highlight
-from pygments.lexers import DiffLexer, get_lexer_for_filename, ClassNotFound, TextLexer
-from pygments.formatters import HtmlFormatter
 from django import template
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import get_lexer_for_filename, ClassNotFound, TextLexer
 
 register = template.Library()
 

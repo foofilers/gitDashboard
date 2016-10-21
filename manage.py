@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-from os import environ, listdir
-from os.path import join, dirname, abspath, exists
 import sys
+from os import environ
 
 if __name__ == "__main__":
 	environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")

@@ -1,5 +1,5 @@
-from datetime import datetime
 import hashlib
+from datetime import datetime
 
 from django.utils.encoding import smart_unicode, DjangoUnicodeDecodeError
 

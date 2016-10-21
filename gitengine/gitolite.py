@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 
 from git import PushInfo
 from git.remote import RemoteProgress

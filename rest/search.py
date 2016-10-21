@@ -6,7 +6,6 @@ from rest_framework.response import Response
 
 from gitview.views import getGitPath
 
-
 log = logging.getLogger("gitDashboard")
 
 

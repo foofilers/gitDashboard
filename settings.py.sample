@@ -166,6 +166,10 @@ SECURITY_SYSTEM="gitolite"
 GITOLITE_PATH="/path/example/gitolite-admin"
 # GITOLITE_URL: url of origin repo
 GITOLITE_URL="git@localhost:gitolite-admin"
+#GITOLITE_EXEC_PATH: gitolite script path
+GITOLITE_EXEC_PATH="/usr/bin/gitolite"
+#GITOLITE_HOME: dir that contains .gitolite dir
+GITOLITE_HOME="/gitolitehome"
 
 #ViewGit Project mapping (for compatibility with viewgit url)
 #VIEWGIT_MAP_PROJECTS={}

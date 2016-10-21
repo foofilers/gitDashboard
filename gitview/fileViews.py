@@ -1,18 +1,21 @@
-import zipfile
 import tempfile
+import zipfile
 from os import sep
 
-from django.shortcuts import render_to_response
-from django.template import RequestContext
-from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
+from django.http import HttpResponse
+from django.shortcuts import render_to_response, redirect
+from django.template import RequestContext
 
 from gitengine.core import GitRepo, GitDir, GitChange
-from views import getGitPath
+from gitview.utils import checkRepoAuthorization
+from views import getGitPath, forbidden
 
 
 def diff(request):
 	reposPath = request.GET['path']
+	if not checkRepoAuthorization(request,reposPath):
+		return redirect(forbidden)
 	commitId = request.GET['commit']
 	oldSha = request.GET['oldSha']
 	newSha = request.GET['newSha']
@@ -30,6 +33,8 @@ def diff(request):
 def view(request):
 	""" View a single file of a commit """
 	reposPath = request.GET['path']
+	if not checkRepoAuthorization(request,reposPath):
+		return redirect(forbidden)
 	commitId = request.GET['commit']
 	filePath = request.GET['filePath']
 	try:
@@ -46,6 +51,8 @@ def view(request):
 
 def fileContent(request):
 	reposPath = request.GET['path']
+	if not checkRepoAuthorization(request,reposPath):
+		return redirect(forbidden)
 	commitId = request.GET['commitId']
 	filePath = request.GET['filePath']
 	try:
@@ -61,6 +68,8 @@ def fileContent(request):
 
 def rawContent(request):
 	reposPath = request.GET['path']
+	if not checkRepoAuthorization(request,reposPath):
+		return redirect(forbidden)
 	commitId = request.GET['commitId']
 	filePath = request.GET['filePath']
 	repo = GitRepo(getGitPath() + sep + reposPath)
@@ -83,6 +92,8 @@ def dirFiles(gitdir, files):
 def zipTree(request):
 	""" zip a tree of a commit """
 	reposPath = request.GET['path']
+	if not checkRepoAuthorization(request,reposPath):
+		return redirect(forbidden)
 	commitId = request.GET['commit']
 	repo = GitRepo(getGitPath() + sep + reposPath)
 	commit = repo.getCommit(commitId)
@@ -124,6 +135,8 @@ def dir_to_ul(gitdir, repoPath):
 def tree(request):
 	""" View a tree of a commit """
 	reposPath = request.GET['path']
+	if not checkRepoAuthorization(request,reposPath):
+		return redirect(forbidden)
 	commitId = request.GET['commit']
 	try:
 		branch = request.GET['branch']

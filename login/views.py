@@ -1,9 +1,11 @@
-from django.template import loader, RequestContext
-from django.http import HttpResponse
 from django import forms
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.template import loader, RequestContext
+
+
 # Create your views here.
 
 class LoginForm(forms.Form):
