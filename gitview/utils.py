@@ -15,10 +15,11 @@ def checkRepoAuthorization(request, reposPath=None):
 			gitolite_home = os.environ['HOME']
 		else:
 			gitolite_home = settings.GITOLITE_HOME
-		cmd = "export HOME=" + gitolite_home + ";" + settings.GITOLITE_EXEC_PATH + " access -q " + reposPath + " "+user
+		cmd = "export HOME=" + gitolite_home + ";" + settings.GITOLITE_EXEC_PATH + " access -q " + reposPath + " " + user + " R"
 		if os.system(cmd) != 0:
 			return False
 	except Exception as e:
 		print e
 		return False
 	return True
+
