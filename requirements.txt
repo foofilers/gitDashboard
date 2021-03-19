@@ -2,7 +2,7 @@ Django==1.5.1
 GitPython==0.3.2.RC1
 Pygments==1.6
 async==0.6.1
-djangorestframework==2.3.6
+djangorestframework==3.11.2
 ghdiff==0.1
 gitdb==0.5.4
 pysqlite==2.6.3
