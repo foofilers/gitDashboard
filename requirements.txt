@@ -7,5 +7,5 @@ ghdiff==0.1
 gitdb==0.5.4
 pysqlite==2.6.3
 smmap==0.8.2
-suds==0.4
+suds==1.0.0
 wsgiref==0.1.2
